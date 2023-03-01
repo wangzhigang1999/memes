@@ -27,7 +27,11 @@ public class Controller {
 
     @RequestMapping("/upload")
     public Object upload(MultipartFile file, boolean personal) throws IOException {
-        String img = qiNiuOss.putImg(file.getBytes());
+        String img = qiNiuOss.putImg(file.getInputStream());
+        if (img == null) {
+            return "error";
+        }
+
         Image image = new Image();
         image.setUrl(img);
         image.setTime(Date.from(java.time.Instant.now()));

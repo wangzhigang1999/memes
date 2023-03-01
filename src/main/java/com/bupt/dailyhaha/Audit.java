@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.bson.Document;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -24,6 +25,8 @@ public class Audit {
     ThreadPoolExecutor pool = new ThreadPoolExecutor(10, 10, 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
 
     public final static Gson gson = new Gson();
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(Audit.class);
+
 
     public Audit(MongoClient client) {
         this.client = client;
@@ -50,14 +53,16 @@ public class Audit {
         assert response != null;
         int status = response.getStatus();
         pool.submit(() -> {
-            client.getDatabase("shadiao").getCollection("audit").insertOne(new Document()
+            Document document = new Document()
                     .append("url", url)
                     .append("method", method)
                     .append("ip", ip)
                     .append("classMethod", classMethod).append("detail", gson.toJson(proceed))
                     .append("parameterMap", gson.toJson(request.getParameterMap()))
-                    .append("status", status)
-            );
+                    .append("status", status);
+
+            logger.info("{}", document);
+            client.getDatabase("shadiao").getCollection("audit").insertOne(document);
 
         });
         return proceed;
