@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" xmlns="">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+
+    <link rel="icon" href="https://img.icons8.com/dotty/80/null/doge.png"/>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.2/dist/full.css" rel="stylesheet" type="text/css"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- jquery -->
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <title>bupt sha diao</title>
 
-    <style type="text/css">
+    <title>名字还没想好</title>
+
+    <style>
         .checkbox {
             vertical-align: middle;
             margin: auto;
@@ -40,18 +44,21 @@
         <div>
             <div class="navbar bg-base-100">
                 <div class="flex-1">
-                    <a class="btn btn-ghost normal-case text-xl">Sha Diao Elite</a>
+                    <a class="btn btn-ghost normal-case text-xl">名字还没想好</a>
                 </div>
                 <div class="flex-none">
-                    <ul class="menu menu-horizontal px-1" >
-                        <a href="https://github.com/wangzhigang1999/dailyHaha"  class="btn btn-success btn-md">Github</a>
-                    </ul>
+                    <div class="menu menu-horizontal px-1">
+                        <a href="https://github.com/wangzhigang1999/dailyHaha" class="btn btn-success btn-md">Github</a>
+                    </div>
                 </div>
             </div>
         </div>
         <div style="margin-top: 30px;margin-bottom: 60px;">
             <!-- img preview -->
-            <img id="img" width="200px" src="https://bbs.byr.cn/img/logo.gif" alt="" style="margin: auto;"/>
+            <!--            <img id="img" width="200px" src="https://bbs.byr.cn/img/logo.gif" alt="" style="margin: auto;"/>-->
+            <img id="img" width="200px"
+                 src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
+                 alt="" style="margin: auto;"/>
         </div>
         <div style="text-align: center; vertical-align: middle;">
             <div style="margin-top: 20px;margin-bottom: 20px;">
@@ -61,21 +68,18 @@
             <div>
                 <label>同时投稿</label>
                 <input type="checkbox" id="sub" checked="checked" class="checkbox checkbox-success "/>
-                <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success">
+                <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success btn-sm">
                     上传
                 </label>
 
                 <!-- Put this part before </body> tag -->
                 <input type="checkbox" id="my-modal" class="modal-toggle"/>
                 <div class="modal">
-                    <div class="modal-box w-11/12  max-w-5xl">
+                    <div class="modal-box ">
                         <h3 class="font-bold text-lg" id="title"></h3>
-                        <pre>
-          <p class="py-4" id="resp">
-          </p>
-        </pre>
+                        <div class="py-4" id="resp"></div>
                         <div class="modal-action">
-                            <label for="my-modal" class="btn btn-success">OK</label>
+                            <label for="my-modal" class="btn btn-success btn-sm">OK</label>
                         </div>
                     </div>
                 </div>
@@ -136,10 +140,10 @@
     }
 
     function render() {
-        var file = document.getElementById("file").files[0];
-        var reader = new FileReader();
+        const file = document.getElementById("file").files[0];
+        const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = function (e) {
+        reader.onload = function () {
             document.getElementById("img").src = this.result;
         }
     }
