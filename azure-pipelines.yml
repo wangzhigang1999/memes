@@ -6,6 +6,7 @@ trigger:
       - .gitignore
       - azure-pipelines.yml
       - deployments/*
+      - index.html
 
 resources:
   - repo: self
