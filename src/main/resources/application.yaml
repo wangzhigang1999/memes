@@ -13,3 +13,4 @@ qiniu:
   secretKey: ${sk}
   bucket: ${bucket}
   urlPrefix: ${urlPrefix}
+token: ${token}
