@@ -1,0 +1,15 @@
+spring:
+  data:
+    mongodb:
+      database: shadiao
+      uri: ${mongoUri}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+qiniu:
+  accessKey: ${ak}
+  secretKey: ${sk}
+  bucket: ${bucket}
+  urlPrefix: ${urlPrefix}
