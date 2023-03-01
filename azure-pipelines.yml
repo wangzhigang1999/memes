@@ -34,3 +34,7 @@ stages:
               command: 'buildAndPush'
               tags: '$(Build.BuildNumber)-$(SHORT_COMMIT)'
               Dockerfile: '**/Dockerfile'
+
+          - script: |
+              echo '$(Build.BuildNumber)-$(SHORT_COMMIT)'
+            displayName: 'echo'
