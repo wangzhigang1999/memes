@@ -10,13 +10,13 @@
 
 
 
-> 点击上传之后，对应的 ==markdown== 链接会被复制到剪切板
+> 点击上传之后，对应的 ==markdown== 链接会自动的复制到剪切板
 
 如果没有自动复制，手动复制即可
 
 Tips ： **~~悄悄话版面也能发图~~**
 
-![image-20230301184403411](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/image-20230301184403411.png)
+![image-20230301205401299](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/image-20230301205401299.png)
 
 ## FAQ
 

@@ -12,4 +12,5 @@ import java.util.Date;
 public class Image {
     String url;
     Date time;
+    Integer hash;
 }

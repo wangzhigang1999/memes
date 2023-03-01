@@ -8,7 +8,9 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -17,8 +19,8 @@ import javax.imageio.stream.ImageInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class QiNiuOss {
@@ -32,13 +34,27 @@ public class QiNiuOss {
     @Value("${qiniu.urlPrefix}")
     String urlPrefix;
 
+    final MongoTemplate mongoTemplate;
+
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(QiNiuOss.class);
+
 
     static UploadManager manager;
+
+    static Map<Integer, Image> map = new ConcurrentHashMap<>();
 
     static {
         Configuration cfg = new Configuration(Region.region1());
         cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
         manager = new UploadManager(cfg);
+    }
+
+    public QiNiuOss(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+
+        // init local cache
+        mongoTemplate.findAll(Image.class).forEach(image -> map.put(image.getHash(), image));
+        logger.info("init local cache. size: {}", map.size());
     }
 
 
@@ -54,16 +70,37 @@ public class QiNiuOss {
 
     }
 
-    public String putImg(InputStream stream) throws IOException {
+    public Image putImg(InputStream stream, boolean personal) throws IOException {
 
         byte[] bytes = stream.readAllBytes();
 
+        // local cache hit
+        if (map.containsKey(Arrays.hashCode(bytes))) {
+            logger.info("local cache hit. {}", map.get(Arrays.hashCode(bytes)).getUrl());
+            return map.get(Arrays.hashCode(bytes));
+        }
+
+        // local cache miss
         String type = imageTypeCheck(new ByteArrayInputStream(bytes));
         if (type == null) {
             return null;
         }
-        return putImg(bytes, type.toLowerCase());
+        var url = putImg(bytes, type.toLowerCase());
 
+        Image image = new Image();
+        image.setUrl(url);
+        image.setTime(Date.from(java.time.Instant.now()));
+        image.setHash(Arrays.hashCode(bytes));
+
+        // put into local cache
+        map.put(Arrays.hashCode(bytes), image);
+
+        // 如果是投稿，就存入数据库
+        if (!personal) {
+            mongoTemplate.save(image);
+        }
+
+        return image;
     }
 
     private String putImg(byte[] bytes, String ext) throws QiniuException {

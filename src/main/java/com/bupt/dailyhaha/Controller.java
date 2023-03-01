@@ -25,18 +25,7 @@ public class Controller {
 
     @RequestMapping("/upload")
     public Object upload(MultipartFile file, boolean personal) throws IOException {
-        String img = qiNiuOss.putImg(file.getInputStream());
-        if (img == null) {
-            return "error";
-        }
-
-        Image image = new Image();
-        image.setUrl(img);
-        image.setTime(Date.from(java.time.Instant.now()));
-        if (!personal) {
-            mongoTemplate.save(image);
-        }
-        return image;
+        return qiNiuOss.putImg(file.getInputStream(),personal);
     }
 
     @GetMapping("/today")
@@ -45,7 +34,6 @@ public class Controller {
         // now to 24h before
         Date now = Date.from(java.time.Instant.now());
         Date before = Date.from(now.toInstant().minusSeconds(24 * 60 * 60));
-
         return mongoTemplate.find(Query.query(Criteria.where("time").gte(before).lte(now)), Image.class);
     }
 
