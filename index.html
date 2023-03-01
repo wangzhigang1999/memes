@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- jquery -->
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <title>图片上传</title>
+    <title>bupt sha diao</title>
 
     <style type="text/css">
         .checkbox {
@@ -35,46 +35,48 @@
 
 <body>
 <div id="container">
-    <div style="margin-left: 20px;margin-right: 20px">
 
-        <div class="navbar bg-base-100">
-            <div class="flex-1">
-                <a class="btn btn-ghost normal-case text-xl">Sha Diao Elite</a>
-            </div>
-            <div class="flex-none">
-                <ul class="menu menu-horizontal px-1">
-                    <li><a>Item 1</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div style="margin-top: 30px;margin-bottom: 60px;">
-        <!-- img preview -->
-        <img id="img" width="200px" src="https://bbs.byr.cn/img/logo.gif" alt="" style="margin: auto;"/>
-    </div>
-    <div style="text-align: center; vertical-align: middle;">
-        <div style="margin-top: 20px;margin-bottom: 20px;">
-            <input type="file" id="file" accept="image/*"
-                   class="file-input file-input-bordered file-input-success w-full max-w-xs"/>
-        </div>
+    <div style="margin: 20px">
         <div>
-            <label>同时投稿</label>
-            <input type="checkbox" id="sub" checked="checked" class="checkbox checkbox-success "/>
-            <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success">
-                上传
-            </label>
+            <div class="navbar bg-base-100">
+                <div class="flex-1">
+                    <a class="btn btn-ghost normal-case text-xl">Sha Diao Elite</a>
+                </div>
+                <div class="flex-none">
+                    <ul class="menu menu-horizontal px-1" >
+                        <a href="https://github.com/wangzhigang1999/dailyHaha"  class="btn btn-success btn-md">Github</a>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px;margin-bottom: 60px;">
+            <!-- img preview -->
+            <img id="img" width="200px" src="https://bbs.byr.cn/img/logo.gif" alt="" style="margin: auto;"/>
+        </div>
+        <div style="text-align: center; vertical-align: middle;">
+            <div style="margin-top: 20px;margin-bottom: 20px;">
+                <input type="file" id="file" accept="image/*"
+                       class="file-input file-input-bordered file-input-success w-full max-w-xs"/>
+            </div>
+            <div>
+                <label>同时投稿</label>
+                <input type="checkbox" id="sub" checked="checked" class="checkbox checkbox-success "/>
+                <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success">
+                    上传
+                </label>
 
-            <!-- Put this part before </body> tag -->
-            <input type="checkbox" id="my-modal" class="modal-toggle"/>
-            <div class="modal">
-                <div class="modal-box w-11/12  max-w-5xl">
-                    <h3 class="font-bold text-lg" id="title"></h3>
-                    <pre>
+                <!-- Put this part before </body> tag -->
+                <input type="checkbox" id="my-modal" class="modal-toggle"/>
+                <div class="modal">
+                    <div class="modal-box w-11/12  max-w-5xl">
+                        <h3 class="font-bold text-lg" id="title"></h3>
+                        <pre>
           <p class="py-4" id="resp">
           </p>
         </pre>
-                    <div class="modal-action">
-                        <label for="my-modal" class="btn btn-success">OK</label>
+                        <div class="modal-action">
+                            <label for="my-modal" class="btn btn-success">OK</label>
+                        </div>
                     </div>
                 </div>
             </div>
