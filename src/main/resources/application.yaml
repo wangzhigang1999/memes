@@ -7,10 +7,20 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+  web:
+    resources:
+      static-locations: [ "classpath:/static/","file:./shadiao/" ]
+  webflux:
+    static-path-pattern: /static/**
+
 
 qiniu:
   accessKey: ${ak}
   secretKey: ${sk}
   bucket: ${bucket}
   urlPrefix: ${urlPrefix}
+
+local:
+  urlPrefix: ${urlPrefix}
+
 token: ${token}

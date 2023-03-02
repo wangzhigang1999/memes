@@ -1,5 +1,7 @@
-package com.bupt.dailyhaha;
+package com.bupt.dailyhaha.service;
 
+import com.bupt.dailyhaha.Image;
+import com.bupt.dailyhaha.Storage;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
@@ -10,20 +12,22 @@ import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.UUID;
 
-@Component
-public class QiNiuOss {
+import static com.bupt.dailyhaha.Image.imageTypeCheck;
+
+@Primary
+@Service("qiniu")
+public class QiNiuOssStorage implements Storage {
     @Value("${qiniu.accessKey}")
     String accessKey;
     @Value("${qiniu.secretKey}")
@@ -34,14 +38,13 @@ public class QiNiuOss {
     @Value("${qiniu.urlPrefix}")
     String urlPrefix;
 
-    final MongoTemplate mongoTemplate;
 
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(QiNiuOss.class);
+    final MongoTemplate mongoTemplate;
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(QiNiuOssStorage.class);
+    final CacheService cache;
 
 
     static UploadManager manager;
-
-    static Map<Integer, Image> map = new ConcurrentHashMap<>();
 
     static {
         Configuration cfg = new Configuration(Region.region1());
@@ -49,35 +52,20 @@ public class QiNiuOss {
         manager = new UploadManager(cfg);
     }
 
-    public QiNiuOss(MongoTemplate mongoTemplate) {
+    public QiNiuOssStorage(MongoTemplate mongoTemplate, CacheService cache) {
         this.mongoTemplate = mongoTemplate;
-
-        // init local cache
-        mongoTemplate.findAll(Image.class).forEach(image -> map.put(image.getHash(), image));
-        logger.info("init local cache. size: {}", map.size());
+        this.cache = cache;
     }
 
 
-    public static String imageTypeCheck(InputStream stream) {
-        try {
-            ImageInputStream image = ImageIO.createImageInputStream(stream);
-            Iterator<ImageReader> readers = ImageIO.getImageReaders(image);
-            return readers.next().getFormatName();
-
-        } catch (Exception e) {
-            return null;
-        }
-
-    }
-
-    public Image putImg(InputStream stream, boolean personal) throws IOException {
+    private Image putImg(InputStream stream, boolean personal) throws IOException {
 
         byte[] bytes = stream.readAllBytes();
 
         // local cache hit
-        if (map.containsKey(Arrays.hashCode(bytes))) {
-            logger.info("local cache hit. {}", map.get(Arrays.hashCode(bytes)).getUrl());
-            return map.get(Arrays.hashCode(bytes));
+        if (cache.contains(Arrays.hashCode(bytes))) {
+            logger.info("local cache hit. {}", cache.get(Arrays.hashCode(bytes)).getUrl());
+            return cache.get(Arrays.hashCode(bytes));
         }
 
         // local cache miss
@@ -93,7 +81,7 @@ public class QiNiuOss {
         image.setHash(Arrays.hashCode(bytes));
 
         // put into local cache
-        map.put(Arrays.hashCode(bytes), image);
+        cache.put(image);
 
         // 如果是投稿，就存入数据库
         if (!personal) {
@@ -110,6 +98,16 @@ public class QiNiuOss {
         Response response = manager.put(bytes, "shadiao/".concat(uuid).concat(".").concat(ext), upToken);
         DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
         return urlPrefix.concat(putRet.key);
+    }
+
+    @Override
+    public Image store(InputStream stream, boolean personal) {
+        try {
+            return putImg(stream, personal);
+        } catch (Exception e) {
+            logger.error("put image error", e);
+            return null;
+        }
     }
 
 }
