@@ -1,12 +1,20 @@
-# 名字还没想好
+# memes
 
 ## 如何使用
 
-> 从本地选择一张图片
-
 如果勾选了 ==同时投稿==，那么可能在凌晨被投稿至论坛的合集中，不勾选则不会
 
-![image-20230301184629079](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/image-20230301184629079.png)
+> 直接 Ctrl+V
+
+针对于复制的图片，直接CV然后点击上传即可
+
+![图片链接](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/af40237f-f669-47b7-9744-5ded25f0e393.png) 
+
+> 从本地选择一张图片
+
+针对本地的图片，选择上传
+
+![image-20230302081446226](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/image-20230302081446226.png)
 
 
 

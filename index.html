@@ -11,7 +11,7 @@
     <!-- jquery -->
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <title>名字还没想好</title>
+    <title>memes</title>
 
     <style>
         .checkbox {
@@ -44,7 +44,7 @@
         <div>
             <div class="navbar bg-base-100">
                 <div class="flex-1">
-                    <a class="btn btn-ghost normal-case text-xl">名字还没想好</a>
+                    <a class="btn btn-ghost normal-case text-xl">memes</a>
                 </div>
                 <div class="flex-none">
                     <div class="menu menu-horizontal px-1">
@@ -54,23 +54,25 @@
             </div>
         </div>
         <div style="margin-top: 30px;margin-bottom: 60px;">
-            <!-- img preview -->
-            <!--            <img id="img" width="200px" src="https://bbs.byr.cn/img/logo.gif" alt="" style="margin: auto;"/>-->
             <img id="img" width="200px"
                  src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
                  alt="" style="margin: auto;"/>
         </div>
         <div style="text-align: center; vertical-align: middle;">
+
             <div style="margin-top: 20px;margin-bottom: 20px;">
-                <input type="file" id="file" accept="image/*"
-                       class="file-input file-input-bordered file-input-success w-full max-w-xs"/>
+                <kbd class="kbd bg-success kbd-lg">ctrl</kbd>
+                +
+                <kbd class="kbd bg-success kbd-lg">V</kbd>
+
+                <kbd> Or </kbd>
+
+                <input type="file" id="file" accept="image/*" class="file-input file-input-bordered file-input-success w-full max-w-xs"/>
             </div>
             <div>
                 <label>同时投稿</label>
                 <input type="checkbox" id="sub" checked="checked" class="checkbox checkbox-success "/>
-                <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success btn-sm">
-                    上传
-                </label>
+                <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success btn-sm"> 上传 </label>
 
                 <!-- Put this part before </body> tag -->
                 <input type="checkbox" id="my-modal" class="modal-toggle"/>
@@ -93,22 +95,39 @@
 
 <script>
 
+    let file = null;
+
+    // paste event handler
+    document.addEventListener('paste', function (event) {
+        const items = event.clipboardData && event.clipboardData.items;
+        if (items && items.length) {
+            // 检索剪切板items
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    file = items[i].getAsFile();
+                    render(file)
+                    break;
+                }
+            }
+        }
+
+    });
+
+    // file change event handler
     $('#file').on('change', function () {
-        render();
+        file = document.getElementById("file").files[0]
+        render(file);
     })
 
     function upload() {
-        var file = document.getElementById("file").files[0];
-        var sub = document.getElementById("sub").checked;
-        var title = document.getElementById("title");
-        var resp = document.getElementById("resp");
-
+        const sub = document.getElementById("sub").checked;
+        const title = document.getElementById("title");
+        const resp = document.getElementById("resp");
         if (file == null) {
             title.innerHTML = "别急！";
             resp.innerHTML = "先选择文件";
             return
         }
-
         title.innerHTML = "上传中...";
         resp.innerHTML = "请稍后";
 
@@ -117,31 +136,30 @@
         formData.append("personal", !sub);
         $.ajax({
             url: "https://bupt.site/img/upload",
-            // url: "http://localhost:8080/img/upload",
             type: "POST",
             data: formData,
             processData: false,
             contentType: false,
             success: function (data) {
-
                 const title = document.getElementById("title");
                 const resp = document.getElementById("resp");
                 title.innerHTML = "上传成功,复制去发帖！";
-
                 const left = "[md]\n" + "\n" + "![图片链接](";
-
                 const right = ")\n" + "\n" + "[/md]";
                 const url = left + data.url + right;
-
                 resp.innerHTML = url;
                 navigator.clipboard.writeText(url);
-
+            },
+            error: function (data) {
+                const title = document.getElementById("title");
+                const resp = document.getElementById("resp");
+                title.innerHTML = "上传失败";
+                resp.innerHTML = "请重试";
             }
         });
     }
 
-    function render() {
-        const file = document.getElementById("file").files[0];
+    function render(file) {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = function () {
