@@ -30,7 +30,8 @@ public class LocalStorage implements Storage {
     public LocalStorage(CacheService cache) {
         File file = new File(localDir);
         if (!file.exists()) {
-            file.mkdir();
+            boolean mkdir = file.mkdir();
+            assert mkdir;
         }
         this.cache = cache;
     }
@@ -38,11 +39,12 @@ public class LocalStorage implements Storage {
 
     @Override
     public Image store(InputStream stream, boolean personal) {
-        byte[] bytes;
+        byte[] bytes = new byte[0];
         try {
             bytes = stream.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            logger.error("read stream failed. {}", stream.hashCode());
         }
 
         if (cache.contains(Arrays.hashCode(bytes))) {
@@ -53,6 +55,7 @@ public class LocalStorage implements Storage {
         // local cache miss
         String type = imageTypeCheck(new ByteArrayInputStream(bytes));
         if (type == null) {
+            logger.error("image type check failed. {}", stream.hashCode());
             return null;
         }
 
@@ -65,6 +68,8 @@ public class LocalStorage implements Storage {
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), file);
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error("save to local failed. {}", path);
+            return null;
         }
 
         var url = urlPrefix + path;

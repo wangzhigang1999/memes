@@ -18,7 +18,8 @@ public class CacheService {
 
     public CacheService(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
-        // init local cache
+        // 很简单的逻辑,就是把数据库里的数据全部读出来，放到内存里
+        // 不考虑哈希冲突的问题
         mongoTemplate.findAll(Image.class).forEach(image -> map.put(image.getHash(), image));
         logger.info("init local cache. size: {}", map.size());
     }
