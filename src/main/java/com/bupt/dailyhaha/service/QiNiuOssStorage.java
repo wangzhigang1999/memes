@@ -68,6 +68,8 @@ public class QiNiuOssStorage implements Storage {
             return cache.get(Arrays.hashCode(bytes));
         }
 
+        logger.info("local cache miss. {}", Arrays.hashCode(bytes));
+
         // local cache miss
         String type = imageTypeCheck(new ByteArrayInputStream(bytes));
         if (type == null) {
