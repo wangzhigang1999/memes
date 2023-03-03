@@ -35,7 +35,12 @@ public class Controller {
     }
 
     @RequestMapping("/upload")
-    public Object upload(MultipartFile file, boolean personal) throws IOException {
+    public Image upload(MultipartFile file, boolean personal) throws IOException {
+
+        if (file == null || file.isEmpty()) {
+            return new Image("---似乎发生了一些错误---", new Date(0), 0);
+        }
+
         return storage.store(file.getInputStream(), personal);
     }
 
