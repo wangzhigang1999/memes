@@ -42,5 +42,6 @@ for item in tqdm(results):
         f.write(item)
         f.write("\n")
         f.write("\n")
+    logger.info("done: {}", filename)
 
 logger.info("done")
