@@ -20,20 +20,6 @@
             height: 20px;
             padding: 0;
         }
-
-        html {
-            height: 100%;
-        }
-
-        body {
-            width: 100%;
-            height: 100%;
-        }
-
-        #container {
-            width: 100%;
-            height: 100%;
-        }
     </style>
 </head>
 
@@ -44,7 +30,7 @@
         <div>
             <div class="navbar bg-base-100">
                 <div class="flex-1">
-                    <a class="btn btn-ghost normal-case text-xl">memes</a>
+                    <a class="btn btn-ghost normal-case text-xl" href="">memes</a>
                 </div>
                 <div class="flex-none">
                     <div class="menu menu-horizontal px-1">
@@ -144,18 +130,25 @@
             success: function (data) {
                 const title = document.getElementById("title");
                 const resp = document.getElementById("resp");
-                title.innerHTML = "上传成功,复制去发帖！";
                 const left = "[md]\n" + "\n" + "![图片链接](";
                 const right = ")\n" + "\n" + "[/md]";
                 const url = left + data.url + right;
-                resp.innerHTML = url;
-                navigator.clipboard.writeText(url);
+                try {
+                    navigator.clipboard.writeText(url);
+                    title.innerHTML = "上传成功,Markdown 链接已经复制到剪切板！";
+                } catch (e) {
+                    title.innerHTML = "上传成功,复制下边的链接去发帖！";
+                    console.log(e)
+                } finally {
+                    resp.innerHTML = url;
+
+                }
             },
             error: function (data) {
                 const title = document.getElementById("title");
                 const resp = document.getElementById("resp");
                 title.innerHTML = "上传失败";
-                resp.innerHTML = "请重试";
+                resp.innerHTML = "稍后重试一下，或者去 " + "<a class='btn btn-xs btn-success' onclick='navigateTo(1)' >Github</a>" + " 提issue."
             }
         });
     }
@@ -166,6 +159,13 @@
         reader.onload = function () {
             document.getElementById("img").src = this.result;
         }
+    }
+
+    function navigateTo(idx) {
+        const jumpTable = {
+            1: "https://github.com/wangzhigang1999/dailyHaha"
+        };
+        window.open(jumpTable[idx])
     }
 </script>
 
