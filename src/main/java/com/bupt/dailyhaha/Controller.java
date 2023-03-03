@@ -43,26 +43,20 @@ public class Controller {
 
     @GetMapping("/today")
     public Object today(String token) {
-
         // 做鉴权
         if (!localToken.equals(token)) {
-            return List.of("???");
+            return List.of("https://oss-bbs.bupt.site/example.jpg");
         }
-
         var template = "[md] ![%d](%s) [/md]";
-
         List<String> ans = new ArrayList<>();
-
-        // now to 24h before
-        Date now = Date.from(Instant.now());
-        Date before = Date.from(now.toInstant().minusSeconds(24 * 60 * 60));
-        List<Image> time = mongoTemplate.find(Query.query(Criteria.where("time").gte(before).lte(now)), Image.class);
-
+        // from 00:00:00 to 23:59:59
+        Date from = Date.from(Instant.now().truncatedTo(java.time.temporal.ChronoUnit.DAYS));
+        Date to = Date.from(Instant.now());
+        List<Image> time = mongoTemplate.find(Query.query(Criteria.where("time").gte(from).lte(to)), Image.class);
         for (Image image : time) {
             ans.add(String.format(template, image.getHash(), image.getUrl()));
         }
         return ans;
     }
-
 
 }
