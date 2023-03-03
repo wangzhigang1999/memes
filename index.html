@@ -34,17 +34,18 @@
                 </div>
                 <div class="flex-none">
                     <div class="menu menu-horizontal px-1">
-                        <a href="https://github.com/wangzhigang1999/dailyHaha" class="btn btn-success btn-md">Github</a>
+                        <a href="https://github.com/wangzhigang1999/dailyHaha" class="btn btn-success btn-md" target="_blank">Github</a>
                     </div>
                 </div>
             </div>
         </div>
-        <div style="margin-top: 30px;margin-bottom: 60px;">
-            <img class="rounded-box" id="img" width="250px"
-                 src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
-                 alt="" style="margin: auto;"/>
-        </div>
-        <div style="text-align: center; vertical-align: middle;">
+        <div class="fixed top-1/2 origin-center w-full" style="transform: translateY(-50%);">
+            <div style="margin-top: 30px;margin-bottom: 60px;">
+                <img class="rounded-box" id="img" width="250px"
+                    src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
+                    alt="" style="margin: auto;"/>
+            </div>
+            <div style="text-align: center; vertical-align: middle;">
 
             <div style="margin-top: 20px;margin-bottom: 20px;">
                 <kbd class="kbd bg-success kbd-lg">ctrl</kbd>
@@ -56,7 +57,7 @@
                 <input type="file" id="file" accept="image/*" class="file-input file-input-bordered file-input-success w-full max-w-xs"/>
             </div>
             <div>
-                <label>同时投稿</label>
+                <label for="sub">同时投稿</label>
                 <input type="checkbox" id="sub" checked="checked" class="checkbox checkbox-success "/>
                 <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success btn-sm"> 上传 </label>
 
@@ -73,6 +74,7 @@
                 </div>
             </div>
         </div>
+      </div>
     </div>
 
 </div>
