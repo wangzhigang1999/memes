@@ -45,7 +45,9 @@ public class Audit {
         String ip = request.getRemoteAddr();
         String classMethod = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
 
+        long start = System.currentTimeMillis();
         Object proceed = joinPoint.proceed();
+        long end = System.currentTimeMillis();
 
         HttpServletResponse response = attributes.getResponse();
         assert response != null;
@@ -55,9 +57,11 @@ public class Audit {
                     .append("url", url)
                     .append("method", method)
                     .append("ip", ip)
-                    .append("classMethod", classMethod).append("detail", gson.toJson(proceed))
+                    .append("classMethod", classMethod)
+                    .append("detail", gson.toJson(proceed))
                     .append("parameterMap", gson.toJson(request.getParameterMap()))
-                    .append("status", status);
+                    .append("status", status)
+                    .append("time", end - start);
             client.getDatabase("shadiao").getCollection("audit").insertOne(document);
 
         });
