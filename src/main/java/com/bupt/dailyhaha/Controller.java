@@ -51,10 +51,11 @@ public class Controller {
         }
         var template = "[md] ![%d](%s) [/md]";
         List<String> ans = new ArrayList<>();
-        // from 00:00:00 to 23:59:59
-        Date from = Date.from(Instant.now().truncatedTo(ChronoUnit.DAYS));
-        Date to = Date.from(Instant.now());
-        List<Image> time = mongoTemplate.find(Query.query(Criteria.where("time").gte(from).lte(to)), Image.class);
+
+        // from 00:00:00 of today
+        var from = Date.from(Instant.now().truncatedTo(ChronoUnit.DAYS).plus(16, ChronoUnit.HOURS));
+
+        List<Image> time = mongoTemplate.find(Query.query(Criteria.where("time").gte(from)), Image.class);
         for (Image image : time) {
             ans.add(String.format(template, image.getHash(), image.getUrl()));
         }
