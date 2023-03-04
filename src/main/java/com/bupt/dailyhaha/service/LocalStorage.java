@@ -4,7 +4,15 @@ import com.bupt.dailyhaha.Image;
 import com.bupt.dailyhaha.Storage;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -19,23 +27,27 @@ import java.util.UUID;
 import static com.bupt.dailyhaha.Image.imageTypeCheck;
 
 @Service("local")
-public class LocalStorage implements Storage {
+@Conditional(LocalStorage.class)
+@Primary
+public class LocalStorage implements Storage, Condition {
+
+
+    static String localDir = "memes";
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(LocalStorage.class);
-    final CacheService cache;
-    String localDir = "shadiao/";
-    @Value("${local.urlPrefix}")
-    String urlPrefix;
 
-    public LocalStorage(CacheService cache) {
+    static {
         File file = new File(localDir);
         if (!file.exists()) {
             boolean mkdir = file.mkdir();
             assert mkdir;
         }
-        this.cache = cache;
     }
+    @Value("${local.urlPrefix}")
+    String urlPrefix;
 
+    @Autowired
+    CacheService cache;
 
     @Override
     public Image store(InputStream stream, boolean personal) {
@@ -60,8 +72,8 @@ public class LocalStorage implements Storage {
         }
 
         // save to local
-        String fileName = UUID.randomUUID().toString();
-        var path = localDir + fileName + "." + type;
+        String fileName = UUID.randomUUID() + "." + type;
+        var path = localDir + fileName;
 
         File file = new File(path);
         try {
@@ -72,9 +84,15 @@ public class LocalStorage implements Storage {
             return null;
         }
 
-        var url = urlPrefix + path;
+        var url = urlPrefix + fileName;
 
         return new Image(url, Date.from(Instant.now()), stream.hashCode());
     }
 
+    @Override
+    public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
+        Environment env = context.getEnvironment();
+        var property = env.getProperty("storage.type", String.class, "local");
+        return "local".equals(property);
+    }
 }

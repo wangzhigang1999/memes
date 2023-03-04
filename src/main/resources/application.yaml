@@ -9,10 +9,12 @@ spring:
       max-request-size: 1MB
   web:
     resources:
-      static-locations: [ "classpath:/static/","file:./shadiao/" ]
+      static-locations: [ "classpath:/static/","file:./memes/" ]
   webflux:
     static-path-pattern: /static/**
 
+storage:
+  type: ${storage}
 
 qiniu:
   accessKey: ${ak}

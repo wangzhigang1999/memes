@@ -11,9 +11,15 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -25,9 +31,9 @@ import java.util.UUID;
 
 import static com.bupt.dailyhaha.Image.imageTypeCheck;
 
-@Primary
 @Service("qiniu")
-public class QiNiuOssStorage implements Storage {
+@Conditional(QiNiuOssStorage.class)
+public class QiNiuOssStorage implements Storage, Condition {
     @Value("${qiniu.accessKey}")
     String accessKey;
     @Value("${qiniu.secretKey}")
@@ -39,9 +45,11 @@ public class QiNiuOssStorage implements Storage {
     String urlPrefix;
 
 
-    final MongoTemplate mongoTemplate;
+    @Autowired
+    MongoTemplate mongoTemplate;
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(QiNiuOssStorage.class);
-    final CacheService cache;
+    @Autowired
+    CacheService cache;
 
 
     static UploadManager manager;
@@ -50,11 +58,6 @@ public class QiNiuOssStorage implements Storage {
         Configuration cfg = new Configuration(Region.region1());
         cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
         manager = new UploadManager(cfg);
-    }
-
-    public QiNiuOssStorage(MongoTemplate mongoTemplate, CacheService cache) {
-        this.mongoTemplate = mongoTemplate;
-        this.cache = cache;
     }
 
 
@@ -112,4 +115,11 @@ public class QiNiuOssStorage implements Storage {
         }
     }
 
+    @Override
+    public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
+        Environment env = context.getEnvironment();
+        var property = env.getProperty("storage.type", String.class, "local");
+        logger.info("storage type: {}", property);
+        return "qiniu".equals(property);
+    }
 }

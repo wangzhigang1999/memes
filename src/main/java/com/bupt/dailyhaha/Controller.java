@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,8 +29,6 @@ public class Controller {
 
 
     public Controller(Storage storage, MongoTemplate mongoTemplate) {
-
-        System.out.println(storage.getClass().getCanonicalName());
         this.storage = storage;
         this.mongoTemplate = mongoTemplate;
     }
@@ -53,7 +52,7 @@ public class Controller {
         var template = "[md] ![%d](%s) [/md]";
         List<String> ans = new ArrayList<>();
         // from 00:00:00 to 23:59:59
-        Date from = Date.from(Instant.now().truncatedTo(java.time.temporal.ChronoUnit.DAYS));
+        Date from = Date.from(Instant.now().truncatedTo(ChronoUnit.DAYS));
         Date to = Date.from(Instant.now());
         List<Image> time = mongoTemplate.find(Query.query(Criteria.where("time").gte(from).lte(to)), Image.class);
         for (Image image : time) {
