@@ -86,7 +86,7 @@ function upload() {
     formData.append("file", globalFile);
     formData.append("personal", !sub);
     $.ajax({
-        url: "https://bupt.site/img/upload",
+        url: "img/upload",
         // url: "http://localhost:8080/img/upload",
         type: "POST",
         data: formData,
