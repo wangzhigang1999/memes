@@ -53,7 +53,7 @@ public class Controller {
         List<String> ans = new ArrayList<>();
 
         // from 00:00:00 of today
-        var from = Date.from(Instant.now().truncatedTo(ChronoUnit.DAYS).plus(16, ChronoUnit.HOURS));
+        var from = Instant.now().truncatedTo(ChronoUnit.DAYS).minus(8, ChronoUnit.HOURS);
 
         List<Image> time = mongoTemplate.find(Query.query(Criteria.where("time").gte(from)), Image.class);
         for (Image image : time) {
