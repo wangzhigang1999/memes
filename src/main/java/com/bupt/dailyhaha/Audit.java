@@ -61,7 +61,8 @@ public class Audit {
                     .append("detail", gson.toJson(proceed))
                     .append("parameterMap", gson.toJson(request.getParameterMap()))
                     .append("status", status)
-                    .append("time", end - start);
+                    .append("time", end - start)
+                    .append("timeStamp", System.currentTimeMillis());
             client.getDatabase("shadiao").getCollection("audit").insertOne(document);
 
         });
