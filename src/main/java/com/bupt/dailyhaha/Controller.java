@@ -1,5 +1,7 @@
 package com.bupt.dailyhaha;
 
+import com.mongodb.client.MongoClient;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -12,28 +14,35 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
-@RequestMapping("/img")
 public class Controller {
     final Storage storage;
     final MongoTemplate mongoTemplate;
+    final MongoClient client;
+    final static long start = System.currentTimeMillis();
 
 
     @Value("${token}")
     String localToken = UUID.randomUUID().toString();
 
 
-    public Controller(Storage storage, MongoTemplate mongoTemplate) {
+    public Controller(Storage storage, MongoTemplate mongoTemplate, MongoClient client) {
         this.storage = storage;
         this.mongoTemplate = mongoTemplate;
+        this.client = client;
+
+        /*
+            记录启动时间，因为render不保证24小时运行;需要统计宕机的时间
+         */
+        Document document = new Document("startTimestamp", start);
+        var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
+        document.append("startAt", str);
+        client.getDatabase("shadiao").getCollection("up").insertOne(document);
     }
 
-    @RequestMapping("/upload")
+    @RequestMapping("/img/upload")
     public Image upload(MultipartFile file, boolean personal) throws IOException {
 
         if (file == null || file.isEmpty()) {
@@ -43,7 +52,7 @@ public class Controller {
         return storage.store(file.getInputStream(), personal);
     }
 
-    @GetMapping("/today")
+    @GetMapping("/img/today")
     public Object today(String token) {
         // 做鉴权
         if (!localToken.equals(token)) {
@@ -60,6 +69,35 @@ public class Controller {
             ans.add(String.format(template, image.getHash(), image.getUrl()));
         }
         return ans;
+    }
+
+    @GetMapping("/up")
+    public Object up(String token) {
+        // 做鉴权
+        if (!localToken.equals(token)) {
+            return Map.of("status", "error", "msg", "token error");
+        }
+        long duration = System.currentTimeMillis() - start;
+
+        // convert start to yyyy-MM-dd HH:mm:ss with beijing time zone
+        var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
+
+        //convert duration to hours
+        var hours = duration / 1000 / 60 / 60;
+
+        if (hours > 24) {
+            return Map.of("status", "ok", "msg", "up " + hours / 24.0 + " days", "start at:", str);
+        } else if (hours > 1) {
+            return Map.of("status", "ok", "msg", "up " + hours + " hours", "start at:", str);
+        }
+
+        // convert duration to minutes
+        var minutes = duration / 1000 / 60;
+        if (minutes > 1) {
+            return Map.of("status", "ok", "msg", "up " + minutes + " minutes", "start at:", str);
+        } else {
+            return Map.of("status", "ok", "msg", "up " + duration / 1000 + " seconds", "start at:", str);
+        }
     }
 
 }
