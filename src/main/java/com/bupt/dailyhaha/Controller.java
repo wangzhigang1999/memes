@@ -38,7 +38,7 @@ public class Controller {
          */
         Document document = new Document("startTimestamp", start);
         var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
-        document.append("startAt", str);
+        document.append("startAt", str).append("env", Audit.env);
         client.getDatabase("shadiao").getCollection("up").insertOne(document);
     }
 

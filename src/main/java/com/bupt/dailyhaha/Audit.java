@@ -25,9 +25,16 @@ public class Audit {
 
     public final static Gson gson = new Gson();
 
+    public static String env = "";
+
 
     public Audit(MongoClient client) {
         this.client = client;
+        try {
+            env = System.getenv("env");
+        } catch (Exception e) {
+            env = "dev";
+        }
     }
 
     @Pointcut("execution(* com.bupt.dailyhaha.Controller.*(..))")
@@ -62,7 +69,8 @@ public class Audit {
                     .append("parameterMap", gson.toJson(request.getParameterMap()))
                     .append("status", status)
                     .append("time", end - start)
-                    .append("timeStamp", System.currentTimeMillis());
+                    .append("timeStamp", System.currentTimeMillis())
+                    .append("env", env);
             client.getDatabase("shadiao").getCollection("audit").insertOne(document);
 
         });
