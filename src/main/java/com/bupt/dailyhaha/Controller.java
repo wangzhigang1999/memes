@@ -1,7 +1,6 @@
 package com.bupt.dailyhaha;
 
 import com.mongodb.client.MongoClient;
-import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,12 +15,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static com.bupt.dailyhaha.Audit.start;
+
 @RestController
 public class Controller {
     final Storage storage;
     final MongoTemplate mongoTemplate;
     final MongoClient client;
-    final static long start = System.currentTimeMillis();
 
 
     @Value("${token}")
@@ -32,14 +32,6 @@ public class Controller {
         this.storage = storage;
         this.mongoTemplate = mongoTemplate;
         this.client = client;
-
-        /*
-            记录启动时间，因为render不保证24小时运行;需要统计宕机的时间
-         */
-        Document document = new Document("startTimestamp", start);
-        var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
-        document.append("startAt", str).append("env", Audit.env);
-        client.getDatabase("shadiao").getCollection("up").insertOne(document);
     }
 
     @RequestMapping("/img/upload")
