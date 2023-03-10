@@ -43,6 +43,7 @@ public class LocalStorage implements Storage, Condition {
             assert mkdir;
         }
     }
+
     @Value("${local.urlPrefix}")
     String urlPrefix;
 
@@ -73,7 +74,7 @@ public class LocalStorage implements Storage, Condition {
 
         // save to local
         String fileName = UUID.randomUUID() + "." + type;
-        var path = localDir + fileName;
+        var path = localDir + "/" + fileName;
 
         File file = new File(path);
         try {

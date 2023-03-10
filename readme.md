@@ -39,13 +39,21 @@ Tips ： **~~悄悄话版面也能发图~~**
 | urlPrefix | urlPrefix+（storage中的地址）= 用户可访问的真实地址 |        👍        |
 |   token   |                用于一些小功能的鉴权                 |        👎        |
 
+同时，也依赖于**MongoDB**
+
 ### Docker
 
+> local storage
 
+```shell
+docker run -p 8888:8080 -e storage=local -e mongoUri="XXX" -e urlPrefix=https://localhost:8080/ -e bupt2018/memes:latest
+```
 
+> 七牛云
 
-
-
+```sh
+docker run -p 8080:8080 -e storage=qiniu -e mongoUri="XXX" -e urlPrefix="xxx" -e ak="ak" -e sk="sk" -e bucket="bucket" bupt2018/memes:latest
+```
 
 ## FAQ
 
