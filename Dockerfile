@@ -8,10 +8,15 @@ COPY --from=MAVEN_BUILD /app/target/*.jar /app/application.jar
 EXPOSE 8080
 
 
-ENV ak=123
-ENV bucket=123
-ENV mongoUri=123
-ENV sk=123
-ENV urlPrefix=123
+ENV env=dev
+ENV storage=qiniu
+
+ENV ak=ak
+ENV sk=sk
+
+ENV bucket=bucket
+ENV mongoUri=mongo
+ENV urlPrefix=http://localhost:8080
+ENV token=hello
 
 ENTRYPOINT ["java", "-jar", "/app/application.jar"]
