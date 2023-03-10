@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.Instant;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -24,10 +25,22 @@ public class Audit {
     ThreadPoolExecutor pool = new ThreadPoolExecutor(10, 10, 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
 
     public final static Gson gson = new Gson();
+    final static long start = System.currentTimeMillis();
+
+    public String env;
 
 
     public Audit(MongoClient client) {
         this.client = client;
+
+        env = System.getenv("env");
+        /*
+            记录启动时间，因为render不保证24小时运行;需要统计宕机的时间
+         */
+        Document document = new Document("startTimestamp", start);
+        var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
+        document.append("startAt", str).append("env", env);
+        client.getDatabase("shadiao").getCollection("up").insertOne(document);
     }
 
     @Pointcut("execution(* com.bupt.dailyhaha.Controller.*(..))")
@@ -62,7 +75,8 @@ public class Audit {
                     .append("parameterMap", gson.toJson(request.getParameterMap()))
                     .append("status", status)
                     .append("time", end - start)
-                    .append("timeStamp", System.currentTimeMillis());
+                    .append("timeStamp", System.currentTimeMillis())
+                    .append("env", env);
             client.getDatabase("shadiao").getCollection("audit").insertOne(document);
 
         });
