@@ -55,7 +55,7 @@ public class QiNiuOssStorage implements Storage, Condition {
     static UploadManager manager;
 
     static {
-        Configuration cfg = new Configuration(Region.region1());
+        Configuration cfg = new Configuration(Region.autoRegion());
         cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
         manager = new UploadManager(cfg);
     }
