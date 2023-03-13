@@ -104,7 +104,7 @@ public class Controller {
         boolean disable = callback.getItems().get(0).getResult().isDisable();
 
         if (disable) {
-            imageOps.deleteByName(callback.getInputKey());
+            imageOps.addDeleteTask(callback.getInputKey());
         }
         return up(this.localToken);
     }

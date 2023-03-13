@@ -5,7 +5,9 @@ import com.bupt.dailyhaha.pojo.Image;
 import java.util.List;
 
 public interface ImageOps {
-    void deleteByName(String name);
+    boolean deleteByName(String name);
 
     List<Image> getToday();
+
+    void addDeleteTask(String name);
 }

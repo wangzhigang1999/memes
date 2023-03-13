@@ -23,7 +23,7 @@ public class Image {
     Date time;
     Integer hash;
     String name;
-    boolean deleted = false;
+    Boolean deleted = false;
 
     public static String imageTypeCheck(InputStream stream) {
         try {
