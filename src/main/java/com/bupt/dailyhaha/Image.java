@@ -22,6 +22,8 @@ public class Image {
     String url;
     Date time;
     Integer hash;
+    String name;
+    boolean deleted = false;
 
     public static String imageTypeCheck(InputStream stream) {
         try {

@@ -61,6 +61,14 @@ public class QiNiuOssStorage implements Storage, Condition {
     }
 
 
+    /**
+     * 上传图片
+     *
+     * @param stream   图片流
+     * @param personal 是否是个人投稿
+     * @return 图片信息
+     * @throws IOException 上传失败
+     */
     private Image putImg(InputStream stream, boolean personal) throws IOException {
 
         byte[] bytes = stream.readAllBytes();
@@ -78,12 +86,14 @@ public class QiNiuOssStorage implements Storage, Condition {
         if (type == null) {
             return null;
         }
-        var url = putImg(bytes, type.toLowerCase());
+        var fileName = putImg(bytes, type.toLowerCase());
+        var url = urlPrefix.concat(fileName);
 
         Image image = new Image();
         image.setUrl(url);
         image.setTime(Date.from(java.time.Instant.now()));
         image.setHash(Arrays.hashCode(bytes));
+        image.setName(fileName);
 
         // put into local cache
         cache.put(image);
@@ -96,13 +106,21 @@ public class QiNiuOssStorage implements Storage, Condition {
         return image;
     }
 
+    /**
+     * 上传图片到七牛云
+     *
+     * @param bytes 图片字节数组
+     * @param ext   图片后缀/扩展名
+     * @return 七牛云上的图片名=文件路径+文件名
+     * @throws QiniuException 上传失败
+     */
     private String putImg(byte[] bytes, String ext) throws QiniuException {
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucket);
         String uuid = UUID.randomUUID().toString();
         Response response = manager.put(bytes, "shadiao/".concat(uuid).concat(".").concat(ext), upToken);
         DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
-        return urlPrefix.concat(putRet.key);
+        return putRet.key;
     }
 
     @Override

@@ -87,7 +87,7 @@ public class LocalStorage implements Storage, Condition {
 
         var url = urlPrefix + fileName;
 
-        return new Image(url, Date.from(Instant.now()), stream.hashCode());
+        return new Image(url, Date.from(Instant.now()), stream.hashCode(),fileName,false);
     }
 
     @Override
