@@ -1,4 +1,6 @@
-package com.bupt.dailyhaha;
+package com.bupt.dailyhaha.service;
+
+import com.bupt.dailyhaha.pojo.Image;
 
 import java.io.InputStream;
 

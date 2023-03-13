@@ -1,7 +1,7 @@
-package com.bupt.dailyhaha.service;
+package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Image;
-import com.bupt.dailyhaha.Storage;
+import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.service.Storage;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.bupt.dailyhaha.Image.imageTypeCheck;
+import static com.bupt.dailyhaha.pojo.Image.imageTypeCheck;
 
 @Service("local")
 @Conditional(LocalStorage.class)

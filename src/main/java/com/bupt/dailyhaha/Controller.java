@@ -1,11 +1,14 @@
 package com.bupt.dailyhaha;
 
+import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.pojo.ImageReviewCallback;
+import com.bupt.dailyhaha.service.ImageOps;
+import com.bupt.dailyhaha.service.Storage;
+import com.google.gson.Gson;
 import com.mongodb.client.MongoClient;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static com.bupt.dailyhaha.Audit.start;
@@ -24,25 +26,26 @@ public class Controller {
     final Storage storage;
     final MongoTemplate mongoTemplate;
     final MongoClient client;
+    final ImageOps imageOps;
+    final static Gson gson = new Gson();
 
 
     @Value("${token}")
     String localToken = UUID.randomUUID().toString();
 
 
-    public Controller(Storage storage, MongoTemplate mongoTemplate, MongoClient client) {
+    public Controller(Storage storage, MongoTemplate mongoTemplate, MongoClient client, ImageOps imageOps) {
         this.storage = storage;
         this.mongoTemplate = mongoTemplate;
         this.client = client;
+        this.imageOps = imageOps;
     }
 
     @RequestMapping("/img/upload")
     public Image upload(MultipartFile file, boolean personal) throws IOException {
-
         if (file == null || file.isEmpty()) {
             return new Image("---似乎发生了一些错误---", new Date(0), 0, "", false);
         }
-
         return storage.store(file.getInputStream(), personal);
     }
 
@@ -54,12 +57,8 @@ public class Controller {
         }
         var template = "[md] ![%d](%s) [/md]";
         List<String> ans = new ArrayList<>();
-
-        // from 00:00:00 of today
-        var from = Instant.now().truncatedTo(ChronoUnit.DAYS).minus(9, ChronoUnit.HOURS);
-
-        List<Image> time = mongoTemplate.find(Query.query(Criteria.where("time").gte(from)), Image.class);
-        for (Image image : time) {
+        List<Image> images = imageOps.getToday();
+        for (Image image : images) {
             ans.add(String.format(template, image.getHash(), image.getUrl()));
         }
         return ans;
@@ -96,9 +95,17 @@ public class Controller {
 
     @RequestMapping("/img/reviewCallback")
     public Object reviewCallback(@RequestBody Map<String, Object> map) {
+        ImageReviewCallback callback = gson.fromJson(gson.toJson(map), ImageReviewCallback.class);
+
+        // write to mongodb
         client.getDatabase("shadiao").getCollection("ReviewCallback").insertOne(new Document(map));
-        // todo del the img from database or mark it deleted
+
+        // check if the image is disabled
+        boolean disable = callback.getItems().get(0).getResult().isDisable();
+
+        if (disable) {
+            imageOps.deleteByName(callback.getInputKey());
+        }
         return up(this.localToken);
     }
-
 }

@@ -1,7 +1,7 @@
-package com.bupt.dailyhaha.service;
+package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Image;
-import com.bupt.dailyhaha.Storage;
+import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.service.Storage;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.bupt.dailyhaha.Image.imageTypeCheck;
+import static com.bupt.dailyhaha.pojo.Image.imageTypeCheck;
 
 @Service("qiniu")
 @Conditional(QiNiuOssStorage.class)

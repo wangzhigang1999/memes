@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha;
+package com.bupt.dailyhaha.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

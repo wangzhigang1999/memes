@@ -1,6 +1,6 @@
-package com.bupt.dailyhaha.service;
+package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Image;
+import com.bupt.dailyhaha.pojo.Image;
 import org.slf4j.Logger;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
