@@ -28,8 +28,8 @@ public class Audit implements CommandLineRunner {
     ThreadPoolExecutor pool = new ThreadPoolExecutor(10, 10, 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
 
     public final static Gson gson = new Gson();
-    final static long start = System.currentTimeMillis();
-    final static String uuid = UUID.randomUUID().toString();
+    public final static long start = System.currentTimeMillis();
+    public final static String uuid = UUID.randomUUID().toString();
 
     public String env;
 
@@ -39,7 +39,7 @@ public class Audit implements CommandLineRunner {
         env = System.getenv("env");
     }
 
-    @Pointcut("execution(* com.bupt.dailyhaha.Controller.*(..))")
+    @Pointcut("execution(* com.bupt.dailyhaha.controller.Controller.*(..))")
     public void controller() {
     }
 

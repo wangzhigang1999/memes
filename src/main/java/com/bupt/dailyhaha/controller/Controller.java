@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha;
+package com.bupt.dailyhaha.controller;
 
 import com.bupt.dailyhaha.pojo.Image;
 import com.bupt.dailyhaha.pojo.ImageReviewCallback;
