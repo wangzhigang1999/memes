@@ -1,11 +1,13 @@
 package com.bupt.dailyhaha;
 
 import com.mongodb.client.MongoClient;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,6 +92,13 @@ public class Controller {
         } else {
             return Map.of("status", "ok", "msg", "up " + duration / 1000 + " seconds", "start at:", str);
         }
+    }
+
+    @RequestMapping("/img/reviewCallback")
+    public Object reviewCallback(@RequestBody Map<String, Object> map) {
+        client.getDatabase("shadiao").getCollection("ReviewCallback").insertOne(new Document(map));
+        // todo del the img from database or mark it deleted
+        return up(this.localToken);
     }
 
 }
