@@ -100,6 +100,10 @@ public class Controller {
         // write to mongodb
         client.getDatabase("shadiao").getCollection("ReviewCallback").insertOne(new Document(map));
 
+        // code!= 0 means review failed
+        if (callback.getCode() != 0) {
+            return up(this.localToken);
+        }
         // check if the image is disabled
         boolean disable = callback.getItems().get(0).getResult().isDisable();
 
