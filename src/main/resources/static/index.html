@@ -21,6 +21,17 @@
             padding: 0;
         }
     </style>
+
+    <script>
+        const _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?635911abaa8e5e52324f6ea4b815eaa0";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
 </head>
 
 <body>
@@ -42,39 +53,40 @@
         <div class="fixed top-1/2 origin-center w-full" style="transform: translateY(-50%);">
             <div style="margin-top: 30px;margin-bottom: 60px;">
                 <img class="rounded-box" id="img" width="250px"
-                    src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
-                    alt="" style="margin: auto;"/>
+                     src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
+                     alt="" style="margin: auto;"/>
             </div>
             <div style="text-align: center; vertical-align: middle;">
 
-            <div style="margin-top: 20px;margin-bottom: 20px;">
-                <kbd class="kbd bg-success kbd-lg">ctrl</kbd>
-                +
-                <kbd class="kbd bg-success kbd-lg">V</kbd>
+                <div style="margin-top: 20px;margin-bottom: 20px;">
+                    <kbd class="kbd bg-success kbd-lg">ctrl</kbd>
+                    +
+                    <kbd class="kbd bg-success kbd-lg">V</kbd>
 
-                <kbd> Or </kbd>
+                    <kbd> Or </kbd>
 
-                <input type="file" id="file" accept="image/*" class="file-input file-input-bordered file-input-success w-full max-w-xs"/>
-            </div>
-            <div>
-                <label for="sub">同时投稿</label>
-                <input type="checkbox" id="sub" checked="checked" class="checkbox checkbox-success "/>
-                <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success btn-sm"> 上传 </label>
+                    <input type="file" id="file" accept="image/*"
+                           class="file-input file-input-bordered file-input-success w-full max-w-xs"/>
+                </div>
+                <div>
+                    <label for="sub">同时投稿</label>
+                    <input type="checkbox" id="sub" checked="checked" class="checkbox checkbox-success "/>
+                    <label for="my-modal" style="margin-left: 20px;" onclick="upload()" class="btn   btn-success btn-sm"> 上传 </label>
 
-                <!-- Put this part before </body> tag -->
-                <input type="checkbox" id="my-modal" class="modal-toggle"/>
-                <div class="modal">
-                    <div class="modal-box ">
-                        <h3 class="font-bold text-lg" id="title"></h3>
-                        <div class="py-4" id="resp"></div>
-                        <div class="modal-action">
-                            <label for="my-modal" class="btn btn-success btn-sm">OK</label>
+                    <!-- Put this part before </body> tag -->
+                    <input type="checkbox" id="my-modal" class="modal-toggle"/>
+                    <div class="modal">
+                        <div class="modal-box ">
+                            <h3 class="font-bold text-lg" id="title"></h3>
+                            <div class="py-4" id="resp"></div>
+                            <div class="modal-action">
+                                <label for="my-modal" class="btn btn-success btn-sm">OK</label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-      </div>
     </div>
 
 </div>
