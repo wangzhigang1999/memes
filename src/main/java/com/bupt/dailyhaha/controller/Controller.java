@@ -101,7 +101,7 @@ public class Controller {
         client.getDatabase("shadiao").getCollection("ReviewCallback").insertOne(new Document(map));
 
         // code!= 0 means review failed
-        if (callback.getCode() != 0) {
+        if (callback == null || callback.getCode() != 0) {
             return up(this.localToken);
         }
         // check if the image is disabled
