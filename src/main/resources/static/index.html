@@ -51,12 +51,8 @@
             <div style="text-align: center; vertical-align: middle;">
 
                 <div style="margin-top: 20px;margin-bottom: 20px;">
-                    <kbd class="kbd bg-success kbd-lg">ctrl</kbd>
-                    +
-                    <kbd class="kbd bg-success kbd-lg">V</kbd>
-
-                    <kbd> Or </kbd>
-
+                    <kbd id="cv" class="kbd bg-success kbd-lg">Ctrl+V</kbd>
+                    <kbd id="or"> 或者 </kbd>
                     <input type="file" id="file" accept="image/*"
                            class="file-input file-input-bordered file-input-success w-full max-w-xs" style="margin-top: 10px"/>
                 </div>
@@ -136,6 +132,21 @@
             1: "https://github.com/wangzhigang1999/dailyHaha"
         };
         window.open(jumpTable[idx])
+    }
+
+
+    // 检测用户设备类型，返回"android"或"desktop"
+    function getDeviceType() {
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            return "mobile";
+        } else {
+            return "desktop";
+        }
+    }
+
+    if (getDeviceType() !== "desktop") {
+        document.getElementById("cv").remove();
+        document.getElementById("or").remove();
     }
 </script>
 
