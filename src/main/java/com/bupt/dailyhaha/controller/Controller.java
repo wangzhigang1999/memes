@@ -9,10 +9,7 @@ import com.mongodb.client.MongoClient;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -49,6 +46,16 @@ public class Controller {
         return storage.store(file.getInputStream(), personal);
     }
 
+    @PostMapping("/img/delete")
+    public Object delete(String token, String name) {
+        // 做鉴权
+        if (!localToken.equals(token)) {
+            return Map.of("status", "error", "msg", "token error");
+        }
+        boolean delete = imageOps.deleteByName(name);
+        return Map.of("status", "ok", "msg", delete ? "delete success" : "delete failed");
+    }
+
     @GetMapping("/img/today")
     public Object today(String token) {
         // 做鉴权
@@ -62,6 +69,15 @@ public class Controller {
             ans.add(String.format(template, image.getHash(), image.getUrl()));
         }
         return ans;
+    }
+
+    @GetMapping("/img/today/raw")
+    public Object todayRaw(String token) {
+        // 做鉴权
+        if (!localToken.equals(token)) {
+            return List.of();
+        }
+        return imageOps.getToday();
     }
 
     @GetMapping("/up")

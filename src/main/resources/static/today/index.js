@@ -1,5 +1,5 @@
 function getData(token) {
-    let url = "/img/today?token=" + token;
+    let url = "/img/today/raw?token=" + token;
     let resp = null;
     $.ajax({
         url: url,
@@ -15,6 +15,26 @@ function getData(token) {
     return resp;
 }
 
+function deleteImg(name) {
+    let token = localStorage.getItem("token");
+    let url = "/img/delete"
+    let data = {
+        "token": token,
+        "name": name
+    }
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: data,
+        success: function (data) {
+            console.log(data)
+            alert("删除成功");
+        }
+    })
+
+
+}
+
 
 function renderBase(token) {
     // get the data from the server
@@ -26,10 +46,12 @@ function renderBase(token) {
     let html = "";
     for (let i = 0; i < data.length; i++) {
         // get url
-        let url = String(data[i]).split("](")[1].split(")")[0];
+        let url = data[i].url;
+        let imgName = data[i].name;
         // show image with a delete button below it
         html += "<div id=\"" + i + "\" class=\"img-container\">\n" +
             "    <img id='img' src=\"" + url + "\" alt=\"\">\n" +
+            "    <button id=\"delete\" class='btn btn-error btn-wide' style='margin-top: 10px;' onclick='deleteImg(" + '"' + imgName + '"' + ")'>删除</button>\n" +
             "</div>"
     }
     div.innerHTML = html;
