@@ -38,9 +38,9 @@ function renderBase(token) {
 function renderSetToken() {
     let div = document.getElementById("frame");
     div.innerHTML =
-        "<div class=\"set-token\">\n" +
+        "<div class=\"set-token\" style='text-align: center; vertical-align: middle;'>\n" +
         "    <input type=\"text\" id=\"token\" class='input input-bordered input-accent' placeholder=\"请输入token\">\n" +
-        "    <button id=\"submit\" class='btn btn-accent'>提交</button>\n" +
+        "    <button id=\"submit\" class='btn btn-accent' style='margin-top: 10px'>提交</button>\n" +
         "</div>";
     let submit = document.getElementById("submit");
     submit.onclick = function () {
