@@ -53,7 +53,10 @@ function findImgExt(file) {
 }
 
 
-function checkFileSize(file) {
+function checkFileSize(fileType, file) {
+    if (fileType === "gif") {
+        return file.size <= 1024 * 2000;
+    }
     return file.size <= 1024 * maxFileSizeKB;
 }
 
@@ -68,12 +71,12 @@ function upload() {
         return
     }
     let fileType = findImgExt(globalFile)
-    if (fileType == null || fileType === "gif") {
+    if (fileType == null) {
         title.innerHTML = "出错啦！";
         resp.innerHTML = "不支持的文件格式！";
         return
     }
-    if (!checkFileSize(globalFile)) {
+    if (!checkFileSize(fileType, globalFile)) {
         title.innerHTML = "出错啦！";
         resp.innerHTML = "文件过大,最大支持" + maxFileSizeKB + "KB";
         return

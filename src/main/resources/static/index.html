@@ -122,6 +122,13 @@
             globalFile = file;
             return;
         }
+        // do not compress if gif
+        if (file.type === "image/gif") {
+            console.log("file type is gif, no need to compress")
+            document.getElementById("img").src = window.URL.createObjectURL(file);
+            globalFile = file;
+            return;
+        }
         compressImg(file, compressRate).then(res => {
             document.getElementById("img").src = window.URL.createObjectURL(res.file);
         })

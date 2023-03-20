@@ -5,8 +5,8 @@ spring:
       uri: ${mongoUri}
   servlet:
     multipart:
-      max-file-size: 1MB
-      max-request-size: 1MB
+      max-file-size: 2MB
+      max-request-size: 2MB
   web:
     resources:
       static-locations: [ "classpath:/static/","file:./memes/" ]
