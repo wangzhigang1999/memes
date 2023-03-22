@@ -1,15 +1,18 @@
 spring:
-  application:
-    name: memes
   data:
     mongodb:
       database: memes-dev
 
 storage:
-  type: local
+  type: ${storage}
 
+qiniu:
+  accessKey: ${ak}
+  secretKey: ${sk}
+  bucket: ${bucket}
+  urlPrefix: ${urlPrefix}
 
 local:
-  urlPrefix: "http://192.168.31.25:8080/"
+  urlPrefix: ${urlPrefix}
 
-token: "hello"
+token: ${token}
