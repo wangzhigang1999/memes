@@ -1,21 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!--    set max width-->
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
     <link rel="icon" href="https://img.icons8.com/dotty/80/null/doge.png"/>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.2/dist/full.css" rel="stylesheet" type="text/css"/>
-    <link href="index.css" rel="stylesheet" type="text/css"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- jquery -->
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="index.js"></script>
-    <title>今日投稿</title>
+    <title>管理</title>
 
+    <style>
+        .img-container {
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            width: 350px;
+            /*height: 600px;*/
+            float: left;
+            /*  fix width and height,place img center */
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .set-token {
+            /*    put the div in the center*/
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
 
 </head>
 <body>
+
+
 <div id="container">
 
     <div style="margin: 20px">
@@ -39,26 +61,20 @@
             </div>
         </div>
 
-        <div id="today">
-            <div id="default" class="card w-fit  bg-base-100 shadow-xl img-container" style="margin-top: 20px">
-                <figure class="figure-padding">
-                    <img src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
-                         class="rounded-xl" alt=""/>
-                </figure>
-                <div id="card-body-height">
-                    <div class="card-actions opt-btn-container" style="font-size: larger">
-                        🤖 来的太早了，还没有人投稿 🤖
-                    </div>
+        <div id="stat" style="text-align: center;margin: 20px;font-size: larger">
 
-                    <a href="/" class="btn  btn-success" style="margin-top: 10px">去投稿</a>
-
-                </div>
-
-            </div>
         </div>
+
+        <div id="frame">
+
+        </div>
+
+        <div id="=token"></div>
     </div>
 
 </div>
+
+<script src="index.js"></script>
 
 </body>
 </html>

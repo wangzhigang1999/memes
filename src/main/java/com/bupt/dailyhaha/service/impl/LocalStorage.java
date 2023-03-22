@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -50,25 +51,29 @@ public class LocalStorage implements Storage, Condition {
     @Autowired
     CacheService cache;
 
+    @Autowired
+    MongoTemplate mongoTemplate;
+
     @Override
     public Image store(InputStream stream, boolean personal) {
         byte[] bytes = new byte[0];
+        int hashCode = Arrays.hashCode(bytes);
         try {
             bytes = stream.readAllBytes();
         } catch (IOException e) {
             e.printStackTrace();
-            logger.error("read stream failed. {}", stream.hashCode());
+            logger.error("read stream failed. {}", hashCode);
         }
 
         if (cache.contains(Arrays.hashCode(bytes))) {
-            logger.info("local cache hit. {}", cache.get(Arrays.hashCode(bytes)).getUrl());
+            logger.info("local cache hit. {}", cache.get(hashCode).getUrl());
             return cache.get(Arrays.hashCode(bytes));
         }
 
         // local cache miss
         String type = imageTypeCheck(new ByteArrayInputStream(bytes));
         if (type == null) {
-            logger.error("image type check failed. {}", stream.hashCode());
+            logger.error("image type check failed. {}", hashCode);
             return null;
         }
 
@@ -87,7 +92,11 @@ public class LocalStorage implements Storage, Condition {
 
         var url = urlPrefix + fileName;
 
-        return new Image(url, Date.from(Instant.now()), stream.hashCode(),fileName,false);
+        Image image = new Image(url, Date.from(Instant.now()), hashCode, fileName, false);
+        if (!personal) {
+            mongoTemplate.save(image);
+        }
+        return image;
     }
 
     @Override

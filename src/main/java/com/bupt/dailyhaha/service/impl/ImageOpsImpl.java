@@ -2,6 +2,7 @@ package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.pojo.Image;
 import com.bupt.dailyhaha.service.ImageOps;
+import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -66,5 +67,19 @@ public class ImageOpsImpl implements ImageOps {
     @Override
     public void addDeleteTask(String name) {
         queue.add(name);
+    }
+
+    @Override
+    public boolean vote(String name, boolean up) {
+        // if up is true, then vote up, else vote down
+        var query = new Query(Criteria.where("name").is(name));
+        var update = new Update();
+        if (up) {
+            update.inc("up", 1);
+        } else {
+            update.inc("down", 1);
+        }
+        UpdateResult first = mongoTemplate.update(Image.class).matching(query).apply(update).first();
+        return first.getMatchedCount() > 0;
     }
 }

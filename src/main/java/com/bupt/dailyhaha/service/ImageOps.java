@@ -10,4 +10,6 @@ public interface ImageOps {
     List<Image> getToday();
 
     void addDeleteTask(String name);
+
+    boolean vote(String name, boolean up);
 }

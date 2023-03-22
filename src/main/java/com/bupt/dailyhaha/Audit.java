@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -31,6 +32,9 @@ public class Audit implements CommandLineRunner {
     public final static long start = System.currentTimeMillis();
     public final static String uuid = UUID.randomUUID().toString();
 
+    @Value("${spring.data.mongodb.database}")
+    public String database;
+
     public String env;
 
 
@@ -39,7 +43,7 @@ public class Audit implements CommandLineRunner {
         env = System.getenv("env");
     }
 
-    @Pointcut("execution(* com.bupt.dailyhaha.controller.Controller.*(..))")
+    @Pointcut("execution(* com.bupt.dailyhaha.controller.*.*(..))")
     public void controller() {
     }
 
@@ -70,11 +74,11 @@ public class Audit implements CommandLineRunner {
                     .append("detail", gson.toJson(proceed))
                     .append("parameterMap", gson.toJson(request.getParameterMap()))
                     .append("status", status)
-                    .append("time", end - start)
+                    .append("timeCost", end - start)
                     .append("timeStamp", System.currentTimeMillis())
                     .append("env", env)
-                    .append("uuid", uuid);
-            client.getDatabase("shadiao").getCollection("audit").insertOne(document);
+                    .append("instanceUUID", uuid);
+            client.getDatabase(database).getCollection("audit").insertOne(document);
         });
         return proceed;
     }
@@ -87,7 +91,7 @@ public class Audit implements CommandLineRunner {
         Document document = new Document("startTimestamp", start);
         var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
         document.append("startAt", str).append("env", env).append("uuid", uuid);
-        client.getDatabase("shadiao").getCollection("up").insertOne(document);
+        client.getDatabase(database).getCollection("up").insertOne(document);
     }
 
     @PreDestroy
@@ -102,8 +106,8 @@ public class Audit implements CommandLineRunner {
         duration /= 1000.0 * 60 * 60;
         document.append("alive", duration);
 
-        client.getDatabase("shadiao").getCollection("up").updateOne(
-                new Document("uuid", uuid),
+        client.getDatabase(database).getCollection("up").updateOne(
+                new Document("instanceUUID", uuid),
                 new Document("$set", document)
         );
     }

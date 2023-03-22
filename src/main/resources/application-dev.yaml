@@ -3,13 +3,13 @@ spring:
     name: memes
   data:
     mongodb:
-      database: shadiao-dev
+      database: memes-dev
 
 storage:
   type: local
 
 
 local:
-  urlPrefix: "http://localhost:8080/"
+  urlPrefix: "http://192.168.31.25:8080/"
 
 token: "hello"

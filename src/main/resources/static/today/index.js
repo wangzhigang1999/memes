@@ -1,93 +1,122 @@
-function getData(token) {
-    let url = "/img/today/raw?token=" + token;
+let cardTemplate = `<div class="card w-fit  bg-base-100 shadow-xl img-container"  style="margin-top: 20px">
+                        <figure class="figure-padding" >
+                            <img src="" class="rounded-xl" alt=""/>
+                        </figure>
+                        <div id="card-body-height">
+                            <div class="card-actions opt-btn-container ">
+                                <button class="btn horrible btn-circle btn-ghost" >🥵</button>
+                                <button class="btn downvote btn-circle btn-ghost" >😤</button>
+                                <button class="btn upvote btn-circle btn-ghost"  >🤣</button>
+                            </div>
+                        </div>
+                    </div>`
+
+
+const getImgUrl = "/img/today/raw", voteUrl = "/img/vote"
+
+function getToday() {
     let resp = null;
+    let uuid = localStorage.getItem("uuid")
+    if (uuid === null) {
+        uuid = Math.random().toString(36);
+        localStorage.setItem("uuid", uuid)
+    }
+
     $.ajax({
-        url: url,
+        url: `${getImgUrl}?uuid=${uuid}`,
         type: "GET",
         async: false,
         success: function (data) {
             resp = data;
         },
         error: function () {
-            resp = ["https://oss-bbs.bupt.site/example.jpg"];
+            resp = [];
         }
     })
+    console.log(resp)
     return resp;
 }
 
-function deleteImg(name) {
-    let token = localStorage.getItem("token");
-    let url = "/img/delete"
-    let data = {
-        "token": token,
-        "name": name
+
+function vote(name, up = true) {
+    let uuid = localStorage.getItem("uuid")
+    if (uuid === null) {
+        uuid = Math.random().toString(36);
+        localStorage.setItem("uuid", uuid)
     }
+
+
     $.ajax({
-        url: url,
+        url: `${voteUrl}?uuid=${uuid}`,
         type: "POST",
-        data: data,
+        data: {
+            name: name,
+            up: up
+        },
         success: function (data) {
             console.log(data)
-            alert("删除成功");
+        },
+        error: function () {
+            alert("error")
         }
     })
-
-
 }
 
+function upVote(name) {
+    vote(name, true)
+}
 
-function renderBase(token) {
-    // get the data from the server
-    const data = getData(token);
-    // render statistics
-    let statistics = document.getElementById("stat");
-    statistics.innerHTML = "今日已上传" + data.length + "张图片";
-    let div = document.getElementById("frame");
-    let html = "";
-    for (let i = 0; i < data.length; i++) {
-        // get url
-        let url = data[i].url;
-        let imgName = data[i].name;
-        // show image with a delete button below it
-        html += "<div id=\"" + i + "\" class=\"img-container\">\n" +
-            "    <img id='img' src=\"" + url + "\" alt=\"\">\n" +
-            "    <button id=\"delete\" class='btn btn-error btn-wide' style='margin-top: 10px;' onclick='deleteImg(" + '"' + imgName + '"' + ")'>删除</button>\n" +
-            "</div>"
+function downVote(name) {
+    vote(name, false)
+}
+
+function horribleVote(name) {
+    vote(name, false)
+}
+
+let arr = getToday()
+
+
+// wait window load
+window.onload = function () {
+    // id="today"
+    let today = document.getElementById("today")
+    console.assert(today !== null, "today is null")
+
+    if (arr.length === 0) {
+        return
     }
-    div.innerHTML = html;
-}
 
-function renderSetToken() {
-    let div = document.getElementById("frame");
-    div.innerHTML =
-        "<div class=\"set-token\" style='text-align: center; vertical-align: middle;'>\n" +
-        "    <input type=\"text\" id=\"token\" class='input input-bordered input-accent' placeholder=\"请输入token\">\n" +
-        "    <button id=\"submit\" class='btn btn-accent' style='margin-top: 10px'>提交</button>\n" +
-        "</div>";
-    let submit = document.getElementById("submit");
-    submit.onclick = function () {
-        let token = document.getElementById("token").value;
+    // remove default card
+    let defaultCard = document.getElementById("default")
+    today.removeChild(defaultCard)
 
-        if (token === "") {
-            alert("请输入token");
-            return;
+    for (let i = 0; i < arr.length; i++) {
+        let card = document.createElement("div")
+        card.innerHTML = cardTemplate
+
+        let img = card.querySelector("img")
+        img.src = arr[i].url
+
+        // set click event
+        let upvote = card.querySelector(".upvote")
+        upvote.onclick = function () {
+            upVote(arr[i].name)
+        }
+        let downvote = card.querySelector(".downvote")
+        downvote.onclick = function () {
+            downVote(arr[i].name)
         }
 
-        // store the token in the local storage
-        localStorage.setItem("token", token);
-        render()
-    }
+        let horrible = card.querySelector(".horrible")
+        horrible.onclick = function () {
+            horribleVote(arr[i].name)
+        }
 
-}
+        upvote.id = `${arr[i].name}-upvote`
+        downvote.id = `${arr[i].name}-downvote`
+        horrible.id = `${arr[i].name}-horrible`
 
-function render() {
-    const token = localStorage.getItem("token");
-    console.log("token: " + token)
-    if (token) {
-        renderBase(token)
-    } else {
-        renderSetToken()
+        today.appendChild(card)
     }
 }
-
-render()
