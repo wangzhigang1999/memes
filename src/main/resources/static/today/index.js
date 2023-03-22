@@ -12,6 +12,22 @@ let cardTemplate = `<div class="card w-fit  bg-base-100 shadow-xl img-container"
                     </div>`
 
 
+let more=`<div id="default" class="card w-fit  bg-base-100 shadow-xl img-container" style="margin-top: 20px">
+                <figure class="figure-padding">
+                    <img src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
+                         class="rounded-xl" alt=""/>
+                </figure>
+                <div id="card-body-height">
+                    <div class="card-actions opt-btn-container" style="font-size: larger">
+                        🤖 ~没有更多了~ 🤖
+                    </div>
+
+                    <a href="/" class="btn  btn-success" style="margin-top: 10px">去投稿</a>
+
+                </div>
+
+            </div>`
+
 const getImgUrl = "/img/today/raw", voteUrl = "/img/vote"
 
 function getToday() {
@@ -83,13 +99,6 @@ window.onload = function () {
     let today = document.getElementById("today")
     console.assert(today !== null, "today is null")
 
-    if (arr.length === 0) {
-        return
-    }
-
-    // remove default card
-    let defaultCard = document.getElementById("default")
-    today.removeChild(defaultCard)
 
     for (let i = 0; i < arr.length; i++) {
         let card = document.createElement("div")
@@ -119,4 +128,8 @@ window.onload = function () {
 
         today.appendChild(card)
     }
+    // add more
+    let moreCard = document.createElement("div")
+    moreCard.innerHTML = more
+    today.appendChild(moreCard)
 }
