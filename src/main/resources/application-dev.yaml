@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: memes
+  data:
+    mongodb:
+      database: shadiao-dev
+
+storage:
+  type: local
+
+
+local:
+  urlPrefix: "http://localhost:8080/"
+
+token: "hello"

@@ -1,0 +1,17 @@
+spring:
+  data:
+    mongodb:
+      database: memes-dev
+storage:
+  type: ${storage}
+
+qiniu:
+  accessKey: ${ak}
+  secretKey: ${sk}
+  bucket: ${bucket}
+  urlPrefix: ${urlPrefix}
+
+local:
+  urlPrefix: ${urlPrefix}
+
+token: ${token}

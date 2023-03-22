@@ -1,8 +1,9 @@
 spring:
-  data:
-    mongodb:
-      database: shadiao
-      uri: ${mongoUri}
+  application:
+    name: memes
+  profiles:
+    active: ${env}
+
   servlet:
     multipart:
       max-file-size: 1MB
@@ -12,17 +13,6 @@ spring:
       static-locations: [ "classpath:/static/","file:./memes/" ]
   webflux:
     static-path-pattern: /static/**
-
-storage:
-  type: ${storage}
-
-qiniu:
-  accessKey: ${ak}
-  secretKey: ${sk}
-  bucket: ${bucket}
-  urlPrefix: ${urlPrefix}
-
-local:
-  urlPrefix: ${urlPrefix}
-
-token: ${token}
+  data:
+    mongodb:
+      uri: ${mongoUri}
