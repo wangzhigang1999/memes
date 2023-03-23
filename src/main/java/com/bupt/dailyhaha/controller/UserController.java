@@ -50,7 +50,7 @@ public class UserController {
      */
 
     @GetMapping("/img/content")
-    public Object todayRaw(String uuid) {
+    public Object content(String uuid) {
         if (uuid == null || uuid.isEmpty()) {
             return Map.of("status", "error", "msg", "uuid error");
         }
