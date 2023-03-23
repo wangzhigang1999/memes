@@ -88,9 +88,13 @@ function upload() {
     const formData = new FormData();
     formData.append("file", globalFile);
     formData.append("personal", !sub);
+    let uuid = localStorage.getItem("uuid")
+    if (uuid === null) {
+        uuid = Math.random().toString(36);
+        localStorage.setItem("uuid", uuid)
+    }
     $.ajax({
-        url: "img/upload",
-        // url: "http://localhost:8080/img/upload",
+        url: "img/upload?uuid=" + uuid,
         type: "POST",
         data: formData,
         processData: false,
@@ -114,7 +118,7 @@ function upload() {
 
             }
         },
-        error: function (data) {
+        error: function () {
             const title = document.getElementById("title");
             const resp = document.getElementById("resp");
             title.innerHTML = "上传失败";

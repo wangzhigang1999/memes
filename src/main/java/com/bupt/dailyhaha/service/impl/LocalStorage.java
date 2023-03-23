@@ -92,7 +92,7 @@ public class LocalStorage implements Storage, Condition {
 
         var url = urlPrefix + fileName;
 
-        Image image = new Image(url, Date.from(Instant.now()), hashCode, fileName, false);
+        Image image = new Image(url, Date.from(Instant.now()), hashCode, fileName, false,System.currentTimeMillis());
         if (!personal) {
             mongoTemplate.save(image);
         }

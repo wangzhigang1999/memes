@@ -1,4 +1,4 @@
-let url = "/img/today/raw"
+let url = "/img/today"
 
 function getData(token) {
     let uuid = localStorage.getItem("uuid")

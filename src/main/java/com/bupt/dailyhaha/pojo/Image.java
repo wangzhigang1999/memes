@@ -24,6 +24,7 @@ public class Image {
     Integer hash;
     String name;
     Boolean deleted = false;
+    long timestamp;
 
     public static String imageTypeCheck(InputStream stream) {
         try {

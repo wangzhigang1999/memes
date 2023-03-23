@@ -12,4 +12,14 @@ public interface ImageOps {
     void addDeleteTask(String name);
 
     boolean vote(String name, boolean up);
+
+    /**
+     * 获取历史记录的最后一条
+     */
+    List<Image> getLastHistory();
+
+    /**
+     * 更新历史记录
+     */
+    boolean updateHistory(String date, List<Image> images);
 }

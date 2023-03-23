@@ -13,7 +13,7 @@ public class Controller {
     }
 
     @RequestMapping("/admin")
-    public String history() {
+    public String admin() {
         // redirect to history/index.html
         return "redirect:/admin/index.html";
     }

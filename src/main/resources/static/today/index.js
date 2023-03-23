@@ -12,7 +12,7 @@ let cardTemplate = `<div class="card w-fit  bg-base-100 shadow-xl img-container"
                     </div>`
 
 
-let more=`<div id="default" class="card w-fit  bg-base-100 shadow-xl img-container" style="margin-top: 20px">
+let more = `<div id="default" class="card w-fit  bg-base-100 shadow-xl img-container" style="margin-top: 20px">
                 <figure class="figure-padding">
                     <img src="https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1120w,f_auto,q_auto:best/rockcms/2022-01/210602-doge-meme-nft-mb-1715-8afb7e.jpg"
                          class="rounded-xl" alt=""/>
@@ -28,7 +28,7 @@ let more=`<div id="default" class="card w-fit  bg-base-100 shadow-xl img-contain
 
             </div>`
 
-const getImgUrl = "/img/today/raw", voteUrl = "/img/vote"
+const getImgUrl = "/img/content", voteUrl = "/img/vote"
 
 function getToday() {
     let resp = null;
