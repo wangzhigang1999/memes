@@ -94,6 +94,7 @@ public class QiNiuOssStorage implements Storage, Condition {
         image.setTime(Date.from(java.time.Instant.now()));
         image.setHash(Arrays.hashCode(bytes));
         image.setName(fileName);
+        image.setTimestamp(System.currentTimeMillis());
 
         // put into local cache
         cache.put(image);
