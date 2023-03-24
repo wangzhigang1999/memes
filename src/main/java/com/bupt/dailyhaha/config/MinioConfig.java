@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(MinioProp.class)
+@EnableConfigurationProperties(MinioProperties.class)
 public class MinioConfig {
 
-    private final MinioProp minioProp;
+    private final MinioProperties minioProperties;
 
-    public MinioConfig(MinioProp minioProp) {
-        this.minioProp = minioProp;
+    public MinioConfig(MinioProperties minioProperties) {
+        this.minioProperties = minioProperties;
     }
 
     /**
@@ -21,8 +21,8 @@ public class MinioConfig {
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
-                .endpoint(minioProp.getEndpoint())
-                .credentials(minioProp.getAccessKey(), minioProp.getSecretKey())
+                .endpoint(minioProperties.getEndpoint())
+                .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
                 .build();
     }
 

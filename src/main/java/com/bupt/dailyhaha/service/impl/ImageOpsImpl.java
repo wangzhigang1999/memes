@@ -59,11 +59,14 @@ public class ImageOpsImpl implements ImageOps {
 
     @Override
     public List<Image> getToday() {
-        // from 00:00:00 of today
+        // 00:00:00 of today
         var start = Utils.getTodayStartUnixEpochMilli();
         // 向前推两个小时
         var from = start - 2 * 60 * 60 * 1000;
-        return   mongoTemplate.find(Query.query(Criteria.where("timestamp").gte(from).and("deleted").ne(true)), Image.class);
+
+        // 向后推22个小时
+        var to = start + 22 * 60 * 60 * 1000;
+        return mongoTemplate.find(Query.query(Criteria.where("timestamp").gte(from).lte(to).and("deleted").ne(true)), Image.class);
     }
 
     @Override

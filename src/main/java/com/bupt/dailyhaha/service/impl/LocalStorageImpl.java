@@ -28,14 +28,14 @@ import java.util.UUID;
 import static com.bupt.dailyhaha.pojo.Image.imageTypeCheck;
 
 @Service("local")
-@Conditional(LocalStorage.class)
+@Conditional(LocalStorageImpl.class)
 @Primary
-public class LocalStorage implements Storage, Condition {
+public class LocalStorageImpl implements Storage, Condition {
 
 
     static String localDir = "memes";
 
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(LocalStorage.class);
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(LocalStorageImpl.class);
 
     static {
         File file = new File(localDir);
@@ -49,10 +49,8 @@ public class LocalStorage implements Storage, Condition {
     String urlPrefix;
 
     @Autowired
-    CacheService cache;
-
-    @Autowired
     MongoTemplate mongoTemplate;
+
 
     @Override
     public Image store(InputStream stream, boolean personal) {
@@ -65,12 +63,6 @@ public class LocalStorage implements Storage, Condition {
             logger.error("read stream failed. {}", hashCode);
         }
 
-        if (cache.contains(Arrays.hashCode(bytes))) {
-            logger.info("local cache hit. {}", cache.get(hashCode).getUrl());
-            return cache.get(Arrays.hashCode(bytes));
-        }
-
-        // local cache miss
         String type = imageTypeCheck(new ByteArrayInputStream(bytes));
         if (type == null) {
             logger.error("image type check failed. {}", hashCode);
@@ -91,8 +83,7 @@ public class LocalStorage implements Storage, Condition {
         }
 
         var url = urlPrefix + fileName;
-
-        Image image = new Image(url, Date.from(Instant.now()), hashCode, fileName, false,System.currentTimeMillis());
+        Image image = new Image(url, Date.from(Instant.now()), hashCode, fileName, false, System.currentTimeMillis());
         if (!personal) {
             mongoTemplate.save(image);
         }

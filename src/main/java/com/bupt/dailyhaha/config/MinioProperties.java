@@ -7,18 +7,10 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "minio")
-public class MinioProp {
-    /**
-     * 连接地址
-     */
+public class MinioProperties {
+
     private String endpoint;
-    /**
-     * 用户名
-     */
     private String accessKey;
-    /**
-     * 密码
-     */
     private String secretKey;
 
 }

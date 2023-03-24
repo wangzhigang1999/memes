@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static com.bupt.dailyhaha.pojo.Image.imageTypeCheck;
 
@@ -61,7 +62,7 @@ public class MinioStorageImpl implements Storage, Condition {
             return null;
         }
 
-        String objectName = String.format("%s/%s.%s", "memes", java.util.UUID.randomUUID(), type);
+        String objectName = String.format("%s/%s.%s", "memes", UUID.randomUUID(), type);
         String contentType = String.format("image/%s", type);
 
 

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class Audit implements CommandLineRunner {
     final MongoClient client;
 
-    ThreadPoolExecutor pool = new ThreadPoolExecutor(10, 10, 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
+    ThreadPoolExecutor pool = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors(), 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
 
     public final static Gson gson = new Gson();
     public final static long start = System.currentTimeMillis();

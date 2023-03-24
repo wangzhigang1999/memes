@@ -32,8 +32,8 @@ import java.util.UUID;
 import static com.bupt.dailyhaha.pojo.Image.imageTypeCheck;
 
 @Service("qiniu")
-@Conditional(QiNiuOssStorage.class)
-public class QiNiuOssStorage implements Storage, Condition {
+@Conditional(QiNiuStorageImpl.class)
+public class QiNiuStorageImpl implements Storage, Condition {
     @Value("${qiniu.accessKey}")
     String accessKey;
     @Value("${qiniu.secretKey}")
@@ -47,9 +47,7 @@ public class QiNiuOssStorage implements Storage, Condition {
 
     @Autowired
     MongoTemplate mongoTemplate;
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(QiNiuOssStorage.class);
-    @Autowired
-    CacheService cache;
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(QiNiuStorageImpl.class);
 
 
     static UploadManager manager;
@@ -72,16 +70,9 @@ public class QiNiuOssStorage implements Storage, Condition {
     private Image putImg(InputStream stream, boolean personal) throws IOException {
 
         byte[] bytes = stream.readAllBytes();
+        int hashCode = Arrays.hashCode(bytes);
 
-        // local cache hit
-        if (cache.contains(Arrays.hashCode(bytes))) {
-            logger.info("local cache hit. {}", cache.get(Arrays.hashCode(bytes)).getUrl());
-            return cache.get(Arrays.hashCode(bytes));
-        }
 
-        logger.info("local cache miss. {}", Arrays.hashCode(bytes));
-
-        // local cache miss
         String type = imageTypeCheck(new ByteArrayInputStream(bytes));
         if (type == null) {
             return null;
@@ -92,12 +83,9 @@ public class QiNiuOssStorage implements Storage, Condition {
         Image image = new Image();
         image.setUrl(url);
         image.setTime(Date.from(java.time.Instant.now()));
-        image.setHash(Arrays.hashCode(bytes));
+        image.setHash(hashCode);
         image.setName(fileName);
         image.setTimestamp(System.currentTimeMillis());
-
-        // put into local cache
-        cache.put(image);
 
         // 如果是投稿，就存入数据库
         if (!personal) {
