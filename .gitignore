@@ -36,3 +36,5 @@ build/
 /.VSCodeCounter/
 
 memes
+monitor.json
+/benckmark.py

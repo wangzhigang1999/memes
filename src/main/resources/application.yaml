@@ -6,32 +6,11 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 2MB
-      max-request-size: 2MB
+      max-file-size: 3MB
+      max-request-size: 3MB
   web:
     resources:
       static-locations: [ "classpath:/static/","file:./memes/" ]
   webflux:
     static-path-pattern: /static/**
-  data:
-    mongodb:
-      uri: ${mongoUri}
-
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  influx:
-    metrics:
-      export:
-        bucket: ${influxBucket}
-        org: ${influxOrg}
-        token: ${influxToken}
-        enabled: true
-        step: 10s
-        retention-policy: autogen
-        uri: ${influxUrl}
-        auto-create-db: true
 
