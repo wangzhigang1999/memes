@@ -2,14 +2,14 @@ spring:
   data:
     mongodb:
       database: memes-dev
-      host: 10.112.169.94
-      port: 30332
-      username: root
-      password: root
+      host: ${mongoHost}
+      port: ${mongoPort}
+      username: ${mongoUser}
+      password: ${mongoPassword}
       authentication-database: admin
 
 storage:
-  type: local
+  type: ${storage}
 
 qiniu:
   accessKey: ${ak}
