@@ -90,7 +90,7 @@ public class MinioStorageImpl implements Storage, Condition {
     @Override
     public boolean matches(ConditionContext context, @NotNull AnnotatedTypeMetadata metadata) {
         Environment env = context.getEnvironment();
-        var property = env.getProperty("storage.type", String.class, "minio");
+        var property = env.getProperty("storage.type", String.class, "local");
         return "minio".equals(property);
     }
 }

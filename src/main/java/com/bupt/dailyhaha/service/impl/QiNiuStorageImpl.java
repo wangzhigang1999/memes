@@ -126,7 +126,6 @@ public class QiNiuStorageImpl implements Storage, Condition {
     public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
         Environment env = context.getEnvironment();
         var property = env.getProperty("storage.type", String.class, "local");
-        logger.info("storage type: {}", property);
         return "qiniu".equals(property);
     }
 }
