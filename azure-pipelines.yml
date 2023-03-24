@@ -34,6 +34,6 @@ stages:
 
 
 
-#          - script: |
-#              curl --location --request PUT --X PUT 'http://cd.bupt.site:30303/api/v1/deployments' --header 'Content-Type: application/json'  --header 'key: FBrOlirJtxsSqzArkRnOUAtyYIFrgEaLfImpXFMjlpAjICcLXoFtVxeGAqnBjkne'    --header 'value: token-wanz-pigeon-java-pigeon-java-c851b51a'      --data '{ "namespace":"wanz","deployment":"pigeon-java","container": "pigeon-java","image": "registry.cn-beijing.aliyuncs.com/$(image-repo):$(Build.BuildNumber)-$(SHORT_COMMIT)"}'
-#            displayName: 'send curl'
+          - script: |
+              curl --location --request PUT --X PUT 'http://cd.bupt.site:30303/api/v1/deployments' --header 'Content-Type: application/json'  --header 'key: xHykNahAJEdmbWNvsUjnGGyNDRwTKBhCupLsawKlBOOueNgsYWwxgSrUNFGfAvIY'    --header 'value: token-wanz-memes-memes-babdcb03'      --data '{ "namespace":"wanz","deployment":"memes","container": "memes","image": "registry.cn-beijing.aliyuncs.com/$(image-repo):$(Build.BuildNumber)-$(SHORT_COMMIT)"}'
+            displayName: 'send curl'
