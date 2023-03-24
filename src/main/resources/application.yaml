@@ -17,21 +17,3 @@ spring:
     mongodb:
       uri: ${mongoUri}
 
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  influx:
-    metrics:
-      export:
-        bucket: ${influxBucket}
-        org: ${influxOrg}
-        token: ${influxToken}
-        enabled: true
-        step: 10s
-        retention-policy: autogen
-        uri: ${influxUrl}
-        auto-create-db: true
-
