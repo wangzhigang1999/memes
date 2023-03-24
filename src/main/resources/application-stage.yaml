@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      database: shadiao
+      database: memes-stage
       uri: ${mongoUri}
 storage:
   type: ${storage}
@@ -25,7 +25,7 @@ management:
   influx:
     metrics:
       export:
-        bucket: ${influxBucket}
+        bucket: ${influxBucket}-stage
         org: ${influxOrg}
         token: ${influxToken}
         enabled: true

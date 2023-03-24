@@ -13,7 +13,4 @@ spring:
       static-locations: [ "classpath:/static/","file:./memes/" ]
   webflux:
     static-path-pattern: /static/**
-  data:
-    mongodb:
-      uri: ${mongoUri}
 
