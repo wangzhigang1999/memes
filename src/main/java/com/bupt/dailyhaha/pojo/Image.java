@@ -2,7 +2,6 @@ package com.bupt.dailyhaha.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,7 +16,6 @@ import java.util.Iterator;
 @Accessors
 @Document(collection = "Image")
 @AllArgsConstructor
-@NoArgsConstructor
 public class Image {
     String url;
     Date time;
@@ -25,6 +23,11 @@ public class Image {
     String name;
     Boolean deleted = false;
     long timestamp;
+
+    public Image() {
+        this.timestamp = System.currentTimeMillis();
+        this.time = Date.from(java.time.Instant.now());
+    }
 
     public static String imageTypeCheck(InputStream stream) {
         try {
