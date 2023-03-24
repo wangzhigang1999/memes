@@ -17,6 +17,14 @@ qiniu:
   bucket: ${bucket}
   urlPrefix: ${urlPrefix}
 
+
+minio:
+  endpoint: ${endpoint}
+  accessKey: ${ak}
+  secretKey: ${sk}
+  bucket: ${bucket}
+  urlPrefix: ${urlPrefix}
+
 local:
   urlPrefix: ${urlPrefix}
 
