@@ -10,25 +10,22 @@
         flex-direction: column;
     }
 
+    .horrible, .downvote, .upvote {
+        height: 4rem;
+        width: 4rem;
+        font-size: xxx-large;
+    }
+
     .horrible {
         margin-right: 40px;
-        font-size: xxx-large;
-        background-color: transparent;
-        border: none;
     }
 
 
     .downvote {
-        font-size: xxx-large;
-        background-color: transparent;
-        border: none;
     }
 
     .upvote {
         margin-left: 40px;
-        font-size: xxx-large;
-        background-color: transparent;
-        border: none;
     }
 
 
@@ -63,25 +60,16 @@
     }
 
 
+    .horrible, .downvote, .upvote {
+        font-size: xx-large;
+    }
+
     .horrible {
         margin-right: 30px;
-        font-size: xx-large;
-        background-color: transparent;
-        /*border: none;*/
     }
 
-   .downvote {
-        font-size: xx-large;
-        background-color: transparent;
-        /*border: none;*/
-    }
-
-   .upvote {
-        /*    near the right edge */
+    .upvote {
         margin-left: 30px;
-        font-size: xx-large;
-        background-color: transparent;
-        /*border: none;*/
     }
 
 

@@ -78,16 +78,50 @@ function vote(name, up = true) {
     })
 }
 
+function active(id) {
+    let upvote = document.getElementById(id)
+    upvote.classList.remove("btn-circle");
+    upvote.classList.add("btn-square", "btn-success", "btn-outline");
+    upvote.classList.remove("btn-ghost");
+}
+
+function deactive(id) {
+    let upvote = document.getElementById(id)
+    upvote.classList.remove("btn-square", "btn-success", "btn-outline");
+    upvote.classList.add("btn-circle", "btn-ghost");
+}
+
 function upVote(name) {
     vote(name, true)
+    // add btn-square css class remove btn-circle
+    let upvote = document.getElementById(`${name}-upvote`)
+    let downvote = document.getElementById(`${name}-downvote`)
+    let horrible = document.getElementById(`${name}-horrible`)
+    active(upvote.id)
+    deactive(downvote.id)
+    deactive(horrible.id)
 }
 
 function downVote(name) {
     vote(name, false)
+    let upvote = document.getElementById(`${name}-upvote`)
+    let downvote = document.getElementById(`${name}-downvote`)
+    let horrible = document.getElementById(`${name}-horrible`)
+    active(downvote.id)
+    deactive(upvote.id)
+    deactive(horrible.id)
+
+
 }
 
 function horribleVote(name) {
     vote(name, false)
+    let upvote = document.getElementById(`${name}-upvote`)
+    let downvote = document.getElementById(`${name}-downvote`)
+    let horrible = document.getElementById(`${name}-horrible`)
+    active(horrible.id)
+    deactive(upvote.id)
+    deactive(downvote.id)
 }
 
 let arr = getToday()
