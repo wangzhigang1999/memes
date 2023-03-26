@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service;
 
-import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.pojo.submission.Image;
 
 import java.util.List;
 

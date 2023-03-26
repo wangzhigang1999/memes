@@ -1,7 +1,7 @@
-package com.bupt.dailyhaha.pojo;
+package com.bupt.dailyhaha.pojo.submission;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,24 +9,26 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Iterator;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors
 @Document(collection = "Image")
-@AllArgsConstructor
-public class Image {
-    String url;
-    Date time;
-    Integer hash;
-    String name;
-    Boolean deleted = false;
-    long timestamp;
+public class Image extends Submission {
+    public Image(String url, String fileName, int hashCode) {
+
+        this.timestamp = System.currentTimeMillis();
+        this.submissionType = SubmissionType.IMAGE;
+
+        this.url = url;
+        this.name = fileName;
+        this.hash = hashCode;
+    }
 
     public Image() {
         this.timestamp = System.currentTimeMillis();
-        this.time = Date.from(java.time.Instant.now());
+        this.submissionType = SubmissionType.IMAGE;
     }
 
     public static String imageTypeCheck(InputStream stream) {

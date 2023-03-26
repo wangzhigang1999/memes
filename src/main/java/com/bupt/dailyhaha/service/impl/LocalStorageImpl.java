@@ -1,6 +1,8 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.Utils;
+import com.bupt.dailyhaha.pojo.submission.Image;
+import com.bupt.dailyhaha.pojo.submission.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -20,12 +22,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.UUID;
 
-import static com.bupt.dailyhaha.pojo.Image.imageTypeCheck;
+import static com.bupt.dailyhaha.pojo.submission.Image.imageTypeCheck;
 
 @Service("local")
 @Conditional(LocalStorageImpl.class)
@@ -83,12 +83,46 @@ public class LocalStorageImpl implements Storage, Condition {
         }
 
         var url = urlPrefix + fileName;
-        Image image = new Image(url, Date.from(Instant.now()), hashCode, fileName, false, System.currentTimeMillis());
+        Image image = new Image(url, fileName, hashCode);
         if (!personal) {
             mongoTemplate.save(image);
         }
         return image;
     }
+
+
+    @Override
+    public Submission store(InputStream stream, String mime, boolean personal) {
+        byte[] bytes = Utils.readAllBytes(stream);
+        if (bytes == null) {
+            return null;
+        }
+
+        int code = Arrays.hashCode(bytes);
+        String type = mime.split("/")[1];
+
+        // save to local
+        String fileName = UUID.randomUUID() + "." + type;
+        var path = localDir + "/" + fileName;
+
+        boolean saved = Utils.saveFile(bytes, path);
+        if (!saved) {
+            return null;
+        }
+
+        var url = urlPrefix + fileName;
+        Submission submission = new Submission();
+        submission.setUrl(url);
+        submission.setName(fileName);
+        submission.setHash(code);
+        submission.setSubmissionType(mime);
+
+        if (!personal) {
+            mongoTemplate.save(submission);
+        }
+        return submission;
+    }
+
 
     @Override
     public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {

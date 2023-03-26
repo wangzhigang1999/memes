@@ -1,9 +1,15 @@
 package com.bupt.dailyhaha;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.Map;
 
-import static com.bupt.dailyhaha.Audit.start;
+import static com.bupt.dailyhaha.aspect.Audit.start;
 
 public class Utils {
 
@@ -47,12 +53,37 @@ public class Utils {
 
     /**
      * get today in the format of YYYY-MM-DD
+     *
      * @return today in the format of YYYY-MM-DD
      */
     public static String getYMD() {
         var now = Instant.now();
         var today = now.atZone(java.time.ZoneId.of("Asia/Shanghai")).toLocalDate();
         return today.toString();
+    }
+
+
+    /**
+     * read all bytes from input stream
+     *
+     * @param stream input stream
+     * @return byte array
+     */
+    public static byte[] readAllBytes(InputStream stream) {
+        try {
+            return stream.readAllBytes();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public static boolean saveFile(byte[] bytes, String path) {
+        try {
+            FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), new File(path));
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     public static void main(String[] args) {

@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.controller;
 
-import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.pojo.submission.Image;
 import com.bupt.dailyhaha.service.ImageOps;
 import com.bupt.dailyhaha.service.Storage;
 import com.mongodb.client.MongoClient;
@@ -37,7 +37,7 @@ public class UserController {
     public Image upload(MultipartFile file, boolean personal, String uuid) throws IOException {
         assert uuid != null;
         if (file == null || file.isEmpty()) {
-            return new Image("---似乎发生了一些错误---", new Date(0), 0, "", false, System.currentTimeMillis());
+            return new Image();
         }
         return storage.store(file.getInputStream(), personal);
     }

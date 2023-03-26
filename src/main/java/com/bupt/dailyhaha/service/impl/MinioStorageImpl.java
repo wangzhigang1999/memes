@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.pojo.submission.Image;
 import com.bupt.dailyhaha.service.Storage;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static com.bupt.dailyhaha.pojo.Image.imageTypeCheck;
+import static com.bupt.dailyhaha.pojo.submission.Image.imageTypeCheck;
 
 @Service("minio")
 @Conditional(MinioStorageImpl.class)

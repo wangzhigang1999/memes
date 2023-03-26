@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.controller;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.pojo.submission.Image;
 import com.bupt.dailyhaha.pojo.ImageReviewCallback;
 import com.bupt.dailyhaha.service.ImageOps;
 import com.bupt.dailyhaha.service.Storage;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.bupt.dailyhaha.Audit.start;
+import static com.bupt.dailyhaha.aspect.Audit.start;
 
 @RestController
 public class AdminController {

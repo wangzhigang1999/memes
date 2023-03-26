@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha;
+package com.bupt.dailyhaha.aspect;
 
 import com.google.gson.Gson;
 import com.mongodb.client.MongoClient;
@@ -30,7 +30,7 @@ public class Audit implements CommandLineRunner {
 
     public final static Gson gson = new Gson();
     public final static long start = System.currentTimeMillis();
-    public final static String uuid = UUID.randomUUID().toString();
+    public final static String instanceUUID = UUID.randomUUID().toString();
 
     @Value("${spring.data.mongodb.database}")
     public String database;
@@ -58,6 +58,9 @@ public class Audit implements CommandLineRunner {
         String ip = request.getRemoteAddr();
         String classMethod = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
 
+        // get uuid from headers
+        var uuid = request.getHeader("uuid");
+
         long start = System.currentTimeMillis();
         Object proceed = joinPoint.proceed();
         long end = System.currentTimeMillis();
@@ -73,6 +76,7 @@ public class Audit implements CommandLineRunner {
                     .append("classMethod", classMethod)
                     .append("detail", gson.toJson(proceed))
                     .append("parameterMap", gson.toJson(request.getParameterMap()))
+                    .append("uuid", uuid)
                     .append("status", status)
                     .append("timeCost", end - start)
                     .append("timeStamp", System.currentTimeMillis())
@@ -90,7 +94,7 @@ public class Audit implements CommandLineRunner {
          */
         Document document = new Document("startTimestamp", start);
         var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
-        document.append("startAt", str).append("env", env).append("uuid", uuid);
+        document.append("startAt", str).append("env", env).append("uuid", instanceUUID);
         client.getDatabase(database).getCollection("up").insertOne(document);
     }
 
@@ -107,7 +111,7 @@ public class Audit implements CommandLineRunner {
         document.append("alive", duration);
 
         client.getDatabase(database).getCollection("up").updateOne(
-                new Document("instanceUUID", uuid),
+                new Document("instanceUUID", instanceUUID),
                 new Document("$set", document)
         );
     }

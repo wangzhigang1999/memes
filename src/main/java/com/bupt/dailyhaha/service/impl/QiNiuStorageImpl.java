@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.pojo.Image;
+import com.bupt.dailyhaha.pojo.submission.Image;
 import com.bupt.dailyhaha.service.Storage;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
@@ -26,10 +26,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.UUID;
 
-import static com.bupt.dailyhaha.pojo.Image.imageTypeCheck;
+import static com.bupt.dailyhaha.pojo.submission.Image.imageTypeCheck;
 
 @Service("qiniu")
 @Conditional(QiNiuStorageImpl.class)
@@ -82,7 +81,6 @@ public class QiNiuStorageImpl implements Storage, Condition {
 
         Image image = new Image();
         image.setUrl(url);
-        image.setTime(Date.from(java.time.Instant.now()));
         image.setHash(hashCode);
         image.setName(fileName);
         image.setTimestamp(System.currentTimeMillis());
