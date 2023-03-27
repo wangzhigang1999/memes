@@ -42,4 +42,6 @@ public interface SubmissionService {
      * 更新历史记录
      */
     boolean updateHistory(String date, List<Submission> submissions);
+
+    Submission storeTextFormatSubmission(String url, String mime);
 }

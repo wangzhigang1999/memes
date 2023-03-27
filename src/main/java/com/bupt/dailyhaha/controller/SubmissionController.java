@@ -1,5 +1,6 @@
 package com.bupt.dailyhaha.controller;
 
+import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.ResultData;
 import com.bupt.dailyhaha.pojo.ReturnCode;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/submission")
+@CrossOrigin(origins = "*")
 public class SubmissionController {
 
     final Storage storage;
@@ -28,21 +30,30 @@ public class SubmissionController {
     }
 
     @PostMapping("")
-    public ResultData<Submission> upload(MultipartFile file,  String mime, boolean personal) throws IOException {
-        if (file.isEmpty() || mime == null) {
+    public ResultData<Submission> upload(MultipartFile file, String uri, String mime, boolean personal) throws IOException {
+        if (mime == null || mime.isEmpty()) {
             return ResultData.fail(ReturnCode.RC400);
         }
-
+        // file is null and uri is null,bad request
+        if (file == null && uri == null) {
+            return ResultData.fail(ReturnCode.RC400);
+        }
+        if (mime.startsWith("text")) {
+            return ResultData.success(service.storeTextFormatSubmission(uri, mime));
+        }
+        if (file == null) {
+            return ResultData.fail(ReturnCode.RC400);
+        }
         InputStream inputStream = file.getInputStream();
-        Submission store = storage.store(inputStream,  mime, personal);
+        Submission store = storage.store(inputStream, mime, personal);
         return store == null ? ResultData.fail(ReturnCode.RC500) : ResultData.success(store);
     }
 
-    @DeleteMapping("/{name}")
-    @AuthRequired
-    public ResultData<Boolean> delete(@PathVariable("name") String name) {
-        return ResultData.success(service.deleteByName(name));
+    @PostMapping("/vote/{name}/{up}")
+    public ResultData<Boolean> vote(@PathVariable("name") String name, @PathVariable("up") boolean up) {
+        return ResultData.success(service.vote(name, up));
     }
+
 
     @GetMapping("/{date}")
     public ResultData<List<Submission>> getSubmission(@PathVariable("date") String date) {
@@ -53,5 +64,21 @@ public class SubmissionController {
     @AuthRequired
     public ResultData<List<Submission>> review() {
         return ResultData.success(service.getTodaySubmissions());
+    }
+
+    @DeleteMapping("/{name}")
+    @AuthRequired
+    public ResultData<Boolean> delete(@PathVariable("name") String name) {
+        return ResultData.success(service.deleteByName(name));
+    }
+
+    @RequestMapping("/release")
+    @AuthRequired
+    public Object release() {
+        List<Submission> today = service.getTodaySubmissions();
+        boolean history = service.updateHistory(Utils.getYMD(), today);
+
+        return !history ? ResultData.fail(ReturnCode.RC500) : ResultData.success(true);
+
     }
 }

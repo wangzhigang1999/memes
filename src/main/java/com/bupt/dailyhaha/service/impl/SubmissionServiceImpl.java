@@ -89,4 +89,16 @@ public class SubmissionServiceImpl implements SubmissionService {
         UpdateResult result = mongoTemplate.upsert(Query.query(Criteria.where("date").is(date)), update, History.class);
         return result.getUpsertedId() != null || result.getModifiedCount() > 0;
     }
+
+    @Override
+    public Submission storeTextFormatSubmission(String uri, String mime) {
+        Submission submission = new Submission();
+        submission.setSubmissionType(mime);
+        submission.setName(uri);
+        submission.setUrl(uri);
+        submission.setHash(uri.hashCode());
+
+        mongoTemplate.save(submission);
+        return submission;
+    }
 }

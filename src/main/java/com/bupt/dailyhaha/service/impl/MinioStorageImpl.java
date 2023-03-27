@@ -1,6 +1,8 @@
 package com.bupt.dailyhaha.service.impl;
 
+import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.submission.Image;
+import com.bupt.dailyhaha.pojo.submission.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -66,16 +68,7 @@ public class MinioStorageImpl implements Storage, Condition {
         String contentType = String.format("image/%s", type);
 
 
-        PutObjectArgs objectArgs = PutObjectArgs.builder()
-                .bucket(bucket)
-                .object(objectName)
-                .stream(new ByteArrayInputStream(bytes), -1, 10485760)
-                .contentType(contentType)
-                .build();
-        try {
-            client.putObject(objectArgs);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        if (putObject(contentType, bytes, objectName)) {
             return null;
         }
 
@@ -85,6 +78,49 @@ public class MinioStorageImpl implements Storage, Condition {
         image.setHash(hashCode);
         mongoTemplate.save(image);
         return image;
+    }
+
+
+    @Override
+    public Submission store(InputStream stream, String mime, boolean personal) {
+        byte[] bytes = Utils.readAllBytes(stream);
+        if (bytes == null) {
+            return null;
+        }
+
+        int code = Arrays.hashCode(bytes);
+        String type = mime.split("/")[1];
+
+
+        String objectName = String.format("%s/%s.%s", "memes", UUID.randomUUID(), type);
+
+        if (putObject(mime, bytes, objectName)) {
+            return null;
+        }
+
+        Submission submission = new Submission();
+        submission.setUrl(urlPrefix + bucket + "/" + objectName);
+        submission.setName(objectName);
+        submission.setHash(code);
+        submission.setSubmissionType(mime);
+        mongoTemplate.save(submission);
+        return submission;
+    }
+
+    private boolean putObject(String mime, byte[] bytes, String objectName) {
+        PutObjectArgs objectArgs = PutObjectArgs.builder()
+                .bucket(bucket)
+                .object(objectName)
+                .stream(new ByteArrayInputStream(bytes), -1, 10485760)
+                .contentType(mime)
+                .build();
+        try {
+            client.putObject(objectArgs);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return true;
+        }
+        return false;
     }
 
     @Override

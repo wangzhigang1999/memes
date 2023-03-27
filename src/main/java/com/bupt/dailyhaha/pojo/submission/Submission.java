@@ -29,7 +29,7 @@ public class Submission {
             this.submissionType = SubmissionType.IMAGE;
         } else if (mime.startsWith("video")) {
             this.submissionType = SubmissionType.VIDEO;
-        } else if (mime.startsWith("bilibili")) {
+        } else if (mime.startsWith("text/bilibili")) {
             this.submissionType = SubmissionType.BILIBILI;
         }
     }
