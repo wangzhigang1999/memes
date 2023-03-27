@@ -81,7 +81,7 @@ public class Audit implements CommandLineRunner {
                     .append("timeCost", end - start)
                     .append("timeStamp", System.currentTimeMillis())
                     .append("env", env)
-                    .append("instanceUUID", uuid);
+                    .append("instanceUUID", instanceUUID);
             client.getDatabase(database).getCollection("audit").insertOne(document);
             System.out.println(document);
         });
