@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      database: memes-stage
+      uri: ${mongoUri}
+storage:
+  type: ${storage}
+
+qiniu:
+  accessKey: ${ak}
+  secretKey: ${sk}
+  bucket: ${bucket}
+  urlPrefix: ${urlPrefix}
+
+
+token: ${token}

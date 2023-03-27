@@ -20,10 +20,10 @@ import java.util.UUID;
  */
 @Component
 @Aspect
-public class CheckToken {
+public class Auth {
     @Value("${token}")
     String localToken = UUID.randomUUID().toString();
-    final Logger logger = LoggerFactory.getLogger(CheckToken.class);
+    final Logger logger = LoggerFactory.getLogger(Auth.class);
 
     @Pointcut("@annotation(com.bupt.dailyhaha.anno.AuthRequired)")
     public void auth() {

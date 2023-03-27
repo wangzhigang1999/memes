@@ -12,8 +12,6 @@ public class History {
     String date;
     int count;
     List<Image> images;
-    List<Video> videos;
-    List<Bilibili> bilibilis;
 
     List<Submission> submissions;
 

@@ -83,6 +83,7 @@ public class Audit implements CommandLineRunner {
                     .append("env", env)
                     .append("instanceUUID", uuid);
             client.getDatabase(database).getCollection("audit").insertOne(document);
+            System.out.println(document);
         });
         return proceed;
     }

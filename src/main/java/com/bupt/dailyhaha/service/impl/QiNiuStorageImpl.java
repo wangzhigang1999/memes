@@ -1,6 +1,8 @@
 package com.bupt.dailyhaha.service.impl;
 
+import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.submission.Image;
+import com.bupt.dailyhaha.pojo.submission.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
@@ -118,6 +120,31 @@ public class QiNiuStorageImpl implements Storage, Condition {
             logger.error("put image error", e);
             return null;
         }
+    }
+
+    @Override
+    public Submission store(InputStream stream, String mime, boolean personal) {
+        byte[] bytes = Utils.readAllBytes(stream);
+        if (bytes == null) {
+            return null;
+        }
+        int code = Arrays.hashCode(bytes);
+        String type = mime.split("/")[1];
+        String fileName;
+        try {
+            fileName = putImg(bytes, type.toLowerCase());
+        } catch (QiniuException e) {
+            logger.error("put image error", e);
+            return null;
+        }
+        var url = urlPrefix.concat(fileName);
+        Submission submission = new Submission();
+        submission.setUrl(url);
+        submission.setName(fileName);
+        submission.setHash(code);
+        submission.setSubmissionType(mime);
+        mongoTemplate.save(submission);
+        return submission;
     }
 
     @Override
