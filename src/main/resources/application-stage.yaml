@@ -12,5 +12,21 @@ qiniu:
   bucket: ${bucket}
   urlPrefix: ${urlPrefix}
 
-
 token: ${token}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  influx:
+    metrics:
+      export:
+        bucket: ${influxBucket}-stage
+        org: ${influxOrg}
+        token: ${influxToken}
+        enabled: true
+        step: 5s
+        retention-policy: autogen
+        uri: ${influxUrl}
+        auto-create-db: true

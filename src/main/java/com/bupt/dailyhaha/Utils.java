@@ -7,38 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.Map;
-
-import static com.bupt.dailyhaha.aspect.Audit.start;
 
 public class Utils {
-
-    /**
-     * get uptime
-     *
-     * @param duration duration in milli
-     * @return map of status, msg, start at
-     */
-    public static Map<String, Object> up(long duration) {
-        // convert start to yyyy-MM-dd HH:mm:ss with beijing time zone
-        var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
-
-        //convert duration to hours
-        var hours = duration / 1000 / 60 / 60;
-        if (hours > 24) {
-            return Map.of("status", "ok", "msg", "up " + hours / 24.0 + " days", "start at:", str);
-        } else if (hours > 1) {
-            return Map.of("status", "ok", "msg", "up " + hours + " hours", "start at:", str);
-        }
-
-        // convert duration to minutes
-        var minutes = duration / 1000 / 60;
-        if (minutes > 1) {
-            return Map.of("status", "ok", "msg", "up " + minutes + " minutes", "start at:", str);
-        } else {
-            return Map.of("status", "ok", "msg", "up " + duration / 1000 + " seconds", "start at:", str);
-        }
-    }
 
     /**
      * get today start unix epoch milli

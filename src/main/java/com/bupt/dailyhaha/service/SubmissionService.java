@@ -1,13 +1,11 @@
 package com.bupt.dailyhaha.service;
 
-import com.bupt.dailyhaha.pojo.submission.Submission;
+import com.bupt.dailyhaha.pojo.Submission;
 
 import java.util.List;
 
 public interface SubmissionService {
 
-
-    boolean deleteByName(String name);
 
     boolean deleteByHashcode(int hashcode);
 
@@ -25,11 +23,6 @@ public interface SubmissionService {
      * @return 是否成功
      */
     boolean vote(int hashcode, boolean up);
-
-    /**
-     * 获取历史记录的最后一条
-     */
-    List<Submission> getLastHistory();
 
 
     /**

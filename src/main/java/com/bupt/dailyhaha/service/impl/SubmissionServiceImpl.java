@@ -1,8 +1,8 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.submission.History;
-import com.bupt.dailyhaha.pojo.submission.Submission;
+import com.bupt.dailyhaha.pojo.History;
+import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.SubmissionService;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
@@ -24,14 +24,6 @@ public class SubmissionServiceImpl implements SubmissionService {
         this.mongoTemplate = mongoTemplate;
     }
 
-
-    @Override
-    public boolean deleteByName(String name) {
-        var query = new Query(Criteria.where("name").is(name));
-        mongoTemplate.update(Submission.class).matching(query).apply(new Update().set("deleted", true)).all();
-        Submission one = mongoTemplate.findOne(query, Submission.class);
-        return one != null && one.getDeleted();
-    }
 
     @Override
     public boolean deleteByHashcode(int hashcode) {
@@ -67,16 +59,6 @@ public class SubmissionServiceImpl implements SubmissionService {
         }
         UpdateResult first = mongoTemplate.update(Submission.class).matching(query).apply(update).first();
         return first.getMatchedCount() > 0;
-    }
-
-    @Override
-    public List<Submission> getLastHistory() {
-        // 查询history表中最后一条记录
-        History history = mongoTemplate.findOne(
-                Query.query(Criteria.where("timestamp").exists(true))
-                        .limit(1)
-                        .with(Sort.by(Sort.Direction.DESC, "timestamp")), History.class);
-        return history == null ? new ArrayList<>() : history.getSubmissions();
     }
 
     @Override

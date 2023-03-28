@@ -4,7 +4,7 @@ import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.ResultData;
 import com.bupt.dailyhaha.pojo.ReturnCode;
-import com.bupt.dailyhaha.pojo.submission.Submission;
+import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
 import org.springframework.web.bind.annotation.*;

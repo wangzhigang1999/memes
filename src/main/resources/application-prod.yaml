@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      database: shadiao
+      database: memes
       uri: ${mongoUri}
 storage:
   type: ${storage}
@@ -12,8 +12,6 @@ qiniu:
   bucket: ${bucket}
   urlPrefix: ${urlPrefix}
 
-local:
-  urlPrefix: ${urlPrefix}
 
 token: ${token}
 

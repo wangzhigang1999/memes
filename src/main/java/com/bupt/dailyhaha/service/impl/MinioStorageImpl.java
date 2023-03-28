@@ -1,8 +1,7 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.submission.Image;
-import com.bupt.dailyhaha.pojo.submission.Submission;
+import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -19,12 +18,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static com.bupt.dailyhaha.pojo.submission.Image.imageTypeCheck;
 
 @Service("minio")
 @Conditional(MinioStorageImpl.class)
@@ -45,40 +42,6 @@ public class MinioStorageImpl implements Storage, Condition {
     @Autowired
     MongoTemplate mongoTemplate;
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(MinioStorageImpl.class);
-
-
-    @Override
-    public Image store(InputStream stream, boolean personal) {
-
-        byte[] bytes = new byte[0];
-        try {
-            bytes = stream.readAllBytes();
-        } catch (IOException e) {
-            logger.error("读取文件失败", e);
-        }
-        int hashCode = Arrays.hashCode(bytes);
-
-        String type = imageTypeCheck(new ByteArrayInputStream(bytes));
-        if (type == null) {
-            logger.error("文件类型不支持");
-            return null;
-        }
-
-        String objectName = String.format("%s/%s.%s", "memes", UUID.randomUUID(), type);
-        String contentType = String.format("image/%s", type);
-
-
-        if (putObject(contentType, bytes, objectName)) {
-            return null;
-        }
-
-        Image image = new Image();
-        image.setUrl(urlPrefix + bucket + "/" + objectName);
-        image.setName(objectName);
-        image.setHash(hashCode);
-        mongoTemplate.save(image);
-        return image;
-    }
 
 
     @Override

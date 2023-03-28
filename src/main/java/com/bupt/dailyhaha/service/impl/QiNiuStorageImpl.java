@@ -1,8 +1,7 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.submission.Image;
-import com.bupt.dailyhaha.pojo.submission.Submission;
+import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
@@ -24,13 +23,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static com.bupt.dailyhaha.pojo.submission.Image.imageTypeCheck;
 
 @Service("qiniu")
 @Conditional(QiNiuStorageImpl.class)
@@ -60,40 +56,6 @@ public class QiNiuStorageImpl implements Storage, Condition {
     }
 
 
-    /**
-     * 上传图片
-     *
-     * @param stream   图片流
-     * @param personal 是否是个人投稿
-     * @return 图片信息
-     * @throws IOException 上传失败
-     */
-    private Image putImg(InputStream stream, boolean personal) throws IOException {
-
-        byte[] bytes = stream.readAllBytes();
-        int hashCode = Arrays.hashCode(bytes);
-
-
-        String type = imageTypeCheck(new ByteArrayInputStream(bytes));
-        if (type == null) {
-            return null;
-        }
-        var fileName = putImg(bytes, type.toLowerCase());
-        var url = urlPrefix.concat(fileName);
-
-        Image image = new Image();
-        image.setUrl(url);
-        image.setHash(hashCode);
-        image.setName(fileName);
-        image.setTimestamp(System.currentTimeMillis());
-
-        // 如果是投稿，就存入数据库
-        if (!personal) {
-            mongoTemplate.save(image);
-        }
-
-        return image;
-    }
 
     /**
      * 上传图片到七牛云
@@ -112,15 +74,7 @@ public class QiNiuStorageImpl implements Storage, Condition {
         return putRet.key;
     }
 
-    @Override
-    public Image store(InputStream stream, boolean personal) {
-        try {
-            return putImg(stream, personal);
-        } catch (Exception e) {
-            logger.error("put image error", e);
-            return null;
-        }
-    }
+
 
     @Override
     public Submission store(InputStream stream, String mime, boolean personal) {

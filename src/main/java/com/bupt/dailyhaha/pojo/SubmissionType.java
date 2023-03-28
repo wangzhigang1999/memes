@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha.pojo.submission;
+package com.bupt.dailyhaha.pojo;
 
 public enum SubmissionType {
     IMAGE, VIDEO, BILIBILI
