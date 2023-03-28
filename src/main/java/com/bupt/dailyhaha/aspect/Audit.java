@@ -78,12 +78,16 @@ public class Audit implements CommandLineRunner {
                     .append("parameterMap", gson.toJson(request.getParameterMap()))
                     .append("uuid", uuid)
                     .append("status", status)
-                    .append("timeCost", end - start)
+                    .append("timeCost", end - start) // ms
                     .append("timeStamp", System.currentTimeMillis())
                     .append("env", env)
                     .append("instanceUUID", instanceUUID);
             client.getDatabase(database).getCollection("audit").insertOne(document);
-            System.out.println(document);
+
+            if (!env.equals("prod")) {
+                System.out.println(document.toJson());
+            }
+
         });
         return proceed;
     }

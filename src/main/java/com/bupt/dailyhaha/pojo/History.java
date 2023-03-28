@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha.pojo.submission;
+package com.bupt.dailyhaha.pojo;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,8 +11,6 @@ public class History {
     long timestamp;
     String date;
     int count;
-    List<Image> images;
-
     List<Submission> submissions;
 
 }
