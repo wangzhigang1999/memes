@@ -58,7 +58,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public boolean vote(int hashcode, boolean up) {
         // if up is true, then vote up, else vote down
-        var query = new Query(Criteria.where("name").is(hashcode));
+        var query = new Query(Criteria.where("hash").is(hashcode));
         var update = new Update();
         if (up) {
             update.inc("up", 1);
