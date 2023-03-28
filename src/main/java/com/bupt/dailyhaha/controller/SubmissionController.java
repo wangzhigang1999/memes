@@ -29,6 +29,16 @@ public class SubmissionController {
         this.service = service;
     }
 
+    /**
+     * upload file
+     *
+     * @param file     file,非必须
+     * @param uri      uri,可能是一个url,将来会被嵌入到iframe中
+     * @param mime     mime,type
+     * @param personal personal or not
+     * @return ResultData
+     * @throws IOException IOException
+     */
     @PostMapping("")
     public ResultData<Submission> upload(MultipartFile file, String uri, String mime, boolean personal) throws IOException {
         if (mime == null || mime.isEmpty()) {
@@ -49,36 +59,66 @@ public class SubmissionController {
         return store == null ? ResultData.fail(ReturnCode.RC500) : ResultData.success(store);
     }
 
-    @PostMapping("/vote/{name}/{up}")
-    public ResultData<Boolean> vote(@PathVariable("name") String name, @PathVariable("up") boolean up) {
-        return ResultData.success(service.vote(name, up));
+    @PostMapping("/vote/{hash}/{up}")
+    public ResultData<Boolean> vote(@PathVariable("hash") int hash, @PathVariable("up") boolean up) {
+        return ResultData.success(service.vote(hash, up));
     }
 
 
+    /**
+     * 获取所有的历史日期
+     *
+     * @return ResultData
+     */
+    @GetMapping("/history")
+    public ResultData<List<String>> getHistory() {
+        return ResultData.success(service.getHistoryDates(7));
+    }
+
+    /**
+     * 获取某一天的提交
+     *
+     * @param date 日期 YYYY-MM-DD
+     * @return ResultData
+     */
     @GetMapping("/{date}")
     public ResultData<List<Submission>> getSubmission(@PathVariable("date") String date) {
         return ResultData.success(service.getHistory(date));
     }
 
+    /**
+     * 实时获取今天的提交
+     *
+     * @return ResultData
+     */
     @GetMapping("/review")
     @AuthRequired
     public ResultData<List<Submission>> review() {
         return ResultData.success(service.getTodaySubmissions());
     }
 
-    @DeleteMapping("/{name}")
+    /**
+     * 删除某一个提交
+     *
+     * @param hash 可以认为是唯一的一个表示符
+     * @return ResultData
+     */
+    @DeleteMapping("/{hash}")
     @AuthRequired
-    public ResultData<Boolean> delete(@PathVariable("name") String name) {
-        return ResultData.success(service.deleteByName(name));
+    public ResultData<Boolean> delete(@PathVariable("hash") int hash) {
+        return ResultData.success(service.deleteByHashcode(hash));
     }
 
+    /**
+     * 发布今天的提交
+     *
+     * @return ResultData
+     */
     @RequestMapping("/release")
     @AuthRequired
-    public Object release() {
+    public ResultData<Boolean> release() {
         List<Submission> today = service.getTodaySubmissions();
         boolean history = service.updateHistory(Utils.getYMD(), today);
-
         return !history ? ResultData.fail(ReturnCode.RC500) : ResultData.success(true);
-
     }
 }

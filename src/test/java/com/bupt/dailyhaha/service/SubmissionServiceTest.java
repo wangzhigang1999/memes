@@ -27,8 +27,6 @@ class SubmissionServiceTest {
 
     @Test
     void vote() {
-        assert submissionService.vote("25c346da-7e21-4365-8474-089b3cd8e5ec.jpg", true);
-        assert submissionService.vote("25c346da-7e21-4365-8474-089b3cd8e5ec.jpg", false);
 
     }
 

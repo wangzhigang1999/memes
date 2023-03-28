@@ -28,7 +28,15 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public boolean deleteByName(String name) {
         var query = new Query(Criteria.where("name").is(name));
-        mongoTemplate.update(Submission.class).matching(query).apply(new Update().set("deleted", true)).first();
+        mongoTemplate.update(Submission.class).matching(query).apply(new Update().set("deleted", true)).all();
+        Submission one = mongoTemplate.findOne(query, Submission.class);
+        return one != null && one.getDeleted();
+    }
+
+    @Override
+    public boolean deleteByHashcode(int hashcode) {
+        var query = new Query(Criteria.where("hash").is(hashcode));
+        mongoTemplate.update(Submission.class).matching(query).apply(new Update().set("deleted", true)).all();
         Submission one = mongoTemplate.findOne(query, Submission.class);
         return one != null && one.getDeleted();
     }
@@ -48,9 +56,9 @@ public class SubmissionServiceImpl implements SubmissionService {
 
 
     @Override
-    public boolean vote(String name, boolean up) {
+    public boolean vote(int hashcode, boolean up) {
         // if up is true, then vote up, else vote down
-        var query = new Query(Criteria.where("name").is(name));
+        var query = new Query(Criteria.where("name").is(hashcode));
         var update = new Update();
         if (up) {
             update.inc("up", 1);
@@ -75,6 +83,24 @@ public class SubmissionServiceImpl implements SubmissionService {
     public List<Submission> getHistory(String date) {
         History history = mongoTemplate.findOne(Query.query(Criteria.where("date").is(date)), History.class);
         return history == null ? new ArrayList<>() : history.getSubmissions();
+    }
+
+    /**
+     * 获取所有的历史记录的日期
+     *
+     * @param limit 限制数量
+     * @return 日期列表
+     */
+    @Override
+    public List<String> getHistoryDates(int limit) {
+        List<History> histories = mongoTemplate.find(Query.query(Criteria.where("date").exists(true))
+                .limit(limit)
+                .with(Sort.by(Sort.Direction.DESC, "timestamp")), History.class);
+        List<String> dates = new ArrayList<>();
+        for (History history : histories) {
+            dates.add(history.getDate());
+        }
+        return dates;
     }
 
     @Override
