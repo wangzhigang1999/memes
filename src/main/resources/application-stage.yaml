@@ -26,7 +26,7 @@ management:
         org: ${influxOrg}
         token: ${influxToken}
         enabled: true
-        step: 5s
+        step: 10s
         retention-policy: autogen
         uri: ${influxUrl}
         auto-create-db: true
