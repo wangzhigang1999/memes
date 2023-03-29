@@ -2,6 +2,7 @@ package com.bupt.dailyhaha.service;
 
 import com.bupt.dailyhaha.pojo.Submission;
 
+import java.io.InputStream;
 import java.util.List;
 
 public interface SubmissionService {
@@ -47,4 +48,7 @@ public interface SubmissionService {
     boolean updateHistory(String date, List<Submission> submissions);
 
     Submission storeTextFormatSubmission(String url, String mime);
+
+
+    Submission storeStreamSubmission(InputStream stream, String mime, boolean personal);
 }

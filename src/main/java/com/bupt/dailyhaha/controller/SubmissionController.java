@@ -53,7 +53,7 @@ public class SubmissionController {
             return ResultData.fail(ReturnCode.RC400);
         }
         InputStream inputStream = file.getInputStream();
-        Submission store = storage.store(inputStream, mime, personal);
+        Submission store = service.storeStreamSubmission(inputStream, mime, personal);
         return store == null ? ResultData.fail(ReturnCode.RC500) : ResultData.success(store);
     }
 

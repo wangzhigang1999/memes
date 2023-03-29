@@ -1,6 +1,5 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import com.google.gson.Gson;
@@ -12,19 +11,15 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.UUID;
 
 
@@ -41,9 +36,6 @@ public class QiNiuStorageImpl implements Storage, Condition {
     @Value("${qiniu.urlPrefix}")
     String urlPrefix;
 
-
-    @Autowired
-    MongoTemplate mongoTemplate;
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(QiNiuStorageImpl.class);
 
 
@@ -54,7 +46,6 @@ public class QiNiuStorageImpl implements Storage, Condition {
         cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
         manager = new UploadManager(cfg);
     }
-
 
 
     /**
@@ -75,14 +66,8 @@ public class QiNiuStorageImpl implements Storage, Condition {
     }
 
 
-
     @Override
-    public Submission store(InputStream stream, String mime, boolean personal) {
-        byte[] bytes = Utils.readAllBytes(stream);
-        if (bytes == null) {
-            return null;
-        }
-        int code = Arrays.hashCode(bytes);
+    public Submission store(byte[] bytes, String mime) {
         String type = mime.split("/")[1];
         String fileName;
         try {
@@ -95,9 +80,7 @@ public class QiNiuStorageImpl implements Storage, Condition {
         Submission submission = new Submission();
         submission.setUrl(url);
         submission.setName(fileName);
-        submission.setHash(code);
         submission.setSubmissionType(mime);
-        mongoTemplate.save(submission);
         return submission;
     }
 
