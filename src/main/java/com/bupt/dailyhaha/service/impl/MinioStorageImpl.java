@@ -1,6 +1,5 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import io.minio.MinioClient;
@@ -14,12 +13,9 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.UUID;
 
 
@@ -39,34 +35,20 @@ public class MinioStorageImpl implements Storage, Condition {
     @Autowired
     MinioClient client;
 
-    @Autowired
-    MongoTemplate mongoTemplate;
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(MinioStorageImpl.class);
 
 
     @Override
-    public Submission store(InputStream stream, String mime, boolean personal) {
-        byte[] bytes = Utils.readAllBytes(stream);
-        if (bytes == null) {
-            return null;
-        }
-
-        int code = Arrays.hashCode(bytes);
+    public Submission store(byte[] bytes, String mime) {
         String type = mime.split("/")[1];
-
-
         String objectName = String.format("%s/%s.%s", "memes", UUID.randomUUID(), type);
-
         if (putObject(mime, bytes, objectName)) {
             return null;
         }
-
         Submission submission = new Submission();
         submission.setUrl(urlPrefix + bucket + "/" + objectName);
         submission.setName(objectName);
-        submission.setHash(code);
         submission.setSubmissionType(mime);
-        mongoTemplate.save(submission);
         return submission;
     }
 

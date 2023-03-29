@@ -3,7 +3,6 @@ package com.bupt.dailyhaha.service.impl;
 import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -11,13 +10,10 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.UUID;
 
 
@@ -40,39 +36,21 @@ public class LocalStorageImpl implements Storage, Condition {
     @Value("${local.urlPrefix}")
     String urlPrefix;
 
-    @Autowired
-    MongoTemplate mongoTemplate;
-
 
     @Override
-    public Submission store(InputStream stream, String mime, boolean personal) {
-        byte[] bytes = Utils.readAllBytes(stream);
-        if (bytes == null) {
-            return null;
-        }
-
-        int code = Arrays.hashCode(bytes);
+    public Submission store(byte[] bytes, String mime) {
         String type = mime.split("/")[1];
-
-        // save to local
         String fileName = UUID.randomUUID() + "." + type;
         var path = localDir + "/" + fileName;
-
         boolean saved = Utils.saveFile(bytes, path);
         if (!saved) {
             return null;
         }
-
         var url = urlPrefix + fileName;
         Submission submission = new Submission();
         submission.setUrl(url);
         submission.setName(fileName);
-        submission.setHash(code);
         submission.setSubmissionType(mime);
-
-        if (!personal) {
-            mongoTemplate.save(submission);
-        }
         return submission;
     }
 

@@ -3,6 +3,7 @@ package com.bupt.dailyhaha.service.impl;
 import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.History;
 import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
@@ -12,16 +13,24 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class SubmissionServiceImpl implements SubmissionService {
 
     final MongoTemplate mongoTemplate;
 
-    public SubmissionServiceImpl(MongoTemplate mongoTemplate) {
+    final Storage storage;
+
+    final static ConcurrentHashMap<Integer, Submission> cache = new ConcurrentHashMap<>();
+
+    public SubmissionServiceImpl(MongoTemplate mongoTemplate, Storage storage) {
         this.mongoTemplate = mongoTemplate;
+        this.storage = storage;
     }
 
 
@@ -100,13 +109,51 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public Submission storeTextFormatSubmission(String uri, String mime) {
-        Submission submission = new Submission();
+
+        // check if the submission already exists
+        Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(uri.hashCode())), Submission.class);
+        if (submission != null) {
+            return submission;
+        }
+
+        submission = new Submission();
         submission.setSubmissionType(mime);
         submission.setName(uri);
         submission.setUrl(uri);
         submission.setHash(uri.hashCode());
 
         mongoTemplate.save(submission);
+        return submission;
+    }
+
+    @Override
+    public Submission storeStreamSubmission(InputStream stream, String mime, boolean personal) {
+        byte[] bytes = Utils.readAllBytes(stream);
+        if (bytes == null) {
+            return null;
+        }
+        int code = Arrays.hashCode(bytes);
+        if (cache.containsKey(code)) {
+            return cache.get(code);
+        }
+
+        // check if the submission already exists
+        Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(code)), Submission.class);
+        if (submission != null) {
+            cache.put(code, submission);
+            return submission;
+        }
+
+        submission = storage.store(bytes, mime);
+        if (submission == null) {
+            return null;
+        }
+        submission.setHash(code);
+        if (!personal) {
+            mongoTemplate.save(submission);
+        }
+
+        cache.put(code, submission);
         return submission;
     }
 }
