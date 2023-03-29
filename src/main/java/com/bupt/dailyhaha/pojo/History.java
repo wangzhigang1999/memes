@@ -11,5 +11,6 @@ public class History {
     long timestamp;
     String date;
     int count;
-    List<Image> images;
+    List<Submission> submissions;
+
 }

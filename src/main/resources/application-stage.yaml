@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      database: memes
+      database: memes-stage
       uri: ${mongoUri}
 storage:
   type: ${storage}
@@ -11,7 +11,6 @@ qiniu:
   secretKey: ${sk}
   bucket: ${bucket}
   urlPrefix: ${urlPrefix}
-
 
 token: ${token}
 
@@ -23,7 +22,7 @@ management:
   influx:
     metrics:
       export:
-        bucket: ${influxBucket}
+        bucket: ${influxBucket}-stage
         org: ${influxOrg}
         token: ${influxToken}
         enabled: true
