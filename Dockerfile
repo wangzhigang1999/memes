@@ -9,14 +9,15 @@ EXPOSE 8080
 
 
 ENV env=dev
-ENV storage=qiniu
 
-ENV ak=ak
-ENV sk=sk
+ENV storage=local;
 
-ENV bucket=bucket
-ENV mongoUri=mongo
-ENV urlPrefix=http://localhost:8080
-ENV token=hello
+ENV mongoHost=localhost;
+ENV mongoUser=root;
+ENV mongoPassword=root;
+ENV mongoPort=27017;
+
+ENV token=hello;
+ENV urlPrefix="http://localhost:8080/"
 
 ENTRYPOINT ["java", "-jar", "/app/application.jar"]
