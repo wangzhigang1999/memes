@@ -65,6 +65,11 @@ public class Audit implements CommandLineRunner {
         Object proceed = joinPoint.proceed();
         long end = System.currentTimeMillis();
 
+        // do not audit if uuid is null
+        if (uuid == null || uuid.isEmpty()) {
+            return proceed;
+        }
+
         HttpServletResponse response = attributes.getResponse();
         assert response != null;
         int status = response.getStatus();
@@ -99,7 +104,7 @@ public class Audit implements CommandLineRunner {
          */
         Document document = new Document("startTimestamp", start);
         var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
-        document.append("startAt", str).append("env", env).append("uuid", instanceUUID);
+        document.append("startAt", str).append("env", env).append("instanceUUID", instanceUUID);
         client.getDatabase(database).getCollection("up").insertOne(document);
     }
 
