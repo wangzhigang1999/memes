@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.aspect;
 
-import com.google.gson.Gson;
+import com.bupt.dailyhaha.pojo.LogDocument;
 import com.mongodb.client.MongoClient;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +11,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -26,10 +27,11 @@ import java.util.concurrent.TimeUnit;
 public class Audit implements CommandLineRunner {
     final MongoClient client;
 
+    final MongoTemplate template;
+
     ThreadPoolExecutor pool = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors(), 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
 
-    public final static Gson gson = new Gson();
-    public final static long start = System.currentTimeMillis();
+    public final static long instanceStartTime = System.currentTimeMillis();
     public final static String instanceUUID = UUID.randomUUID().toString();
 
     @Value("${spring.data.mongodb.database}")
@@ -38,8 +40,9 @@ public class Audit implements CommandLineRunner {
     public String env;
 
 
-    public Audit(MongoClient client) {
+    public Audit(MongoTemplate template, MongoClient client) {
         this.client = client;
+        this.template = template;
         env = System.getenv("env");
     }
 
@@ -74,23 +77,22 @@ public class Audit implements CommandLineRunner {
         assert response != null;
         int status = response.getStatus();
         pool.submit(() -> {
-            Document document = new Document()
-                    .append("url", url)
-                    .append("method", method)
-                    .append("ip", ip)
-                    .append("classMethod", classMethod)
-                    .append("detail", gson.toJson(proceed))
-                    .append("parameterMap", gson.toJson(request.getParameterMap()))
-                    .append("uuid", uuid)
-                    .append("status", status)
-                    .append("timeCost", end - start) // ms
-                    .append("timeStamp", System.currentTimeMillis())
-                    .append("env", env)
-                    .append("instanceUUID", instanceUUID);
-            client.getDatabase(database).getCollection("audit").insertOne(document);
-
+            LogDocument document = new LogDocument();
+            document.setUrl(url)
+                    .setMethod(method)
+                    .setIp(ip)
+                    .setClassMethod(classMethod)
+                    .setDetail(proceed)
+                    .setParameterMap(request.getParameterMap())
+                    .setUuid(uuid)
+                    .setStatus(status)
+                    .setTimecost(end - start)
+                    .setTimestamp(start)
+                    .setEnv(env)
+                    .setInstanceUUID(instanceUUID);
+            template.save(document);
             if (!env.equals("prod")) {
-                System.out.println(document.toJson());
+                System.out.println(document);
             }
 
         });
@@ -102,8 +104,8 @@ public class Audit implements CommandLineRunner {
         /*
             记录启动时间，因为render不保证24小时运行;需要统计宕机的时间
          */
-        Document document = new Document("startTimestamp", start);
-        var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
+        Document document = new Document("startTimestamp", instanceStartTime);
+        var str = Instant.ofEpochMilli(instanceStartTime).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
         document.append("startAt", str).append("env", env).append("instanceUUID", instanceUUID);
         client.getDatabase(database).getCollection("up").insertOne(document);
     }
@@ -112,10 +114,10 @@ public class Audit implements CommandLineRunner {
     public void exit() {
         pool.shutdown();
         Document document = new Document("endTimestamp", System.currentTimeMillis());
-        var str = Instant.ofEpochMilli(start).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
+        var str = Instant.ofEpochMilli(instanceStartTime).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
         document.append("endAt", str);
 
-        var duration = System.currentTimeMillis() - start;
+        var duration = System.currentTimeMillis() - instanceStartTime;
         // convert to hours
         duration /= 1000.0 * 60 * 60;
         document.append("alive", duration);

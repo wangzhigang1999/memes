@@ -5,11 +5,13 @@ import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.ResultData;
 import com.bupt.dailyhaha.pojo.ReturnCode;
 import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.service.StatisticService;
 import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/submission")
@@ -19,9 +21,12 @@ public class AdminController {
 
     final SubmissionService service;
 
-    public AdminController(Storage storage, SubmissionService service) {
+    final StatisticService statistic;
+
+    public AdminController(Storage storage, SubmissionService service, StatisticService statistic) {
         this.storage = storage;
         this.service = service;
+        this.statistic = statistic;
     }
 
 
@@ -59,5 +64,14 @@ public class AdminController {
         List<Submission> today = service.getTodaySubmissions();
         boolean history = service.updateHistory(Utils.getYMD(), today);
         return !history ? ResultData.fail(ReturnCode.RC500) : ResultData.success(true);
+    }
+
+    /**
+     * 统计从00:00:00到现在的状态
+     */
+    @RequestMapping("/statistic")
+    @AuthRequired
+    public ResultData<Map<String, Object>> statistic() {
+        return ResultData.success(statistic.statistic());
     }
 }
