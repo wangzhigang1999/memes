@@ -3,7 +3,6 @@ package com.bupt.dailyhaha.controller;
 import com.bupt.dailyhaha.pojo.ResultData;
 import com.bupt.dailyhaha.pojo.ReturnCode;
 import com.bupt.dailyhaha.pojo.Submission;
-import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,13 +16,11 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class SubmissionController {
 
-    final Storage storage;
 
     final SubmissionService service;
 
 
-    public SubmissionController(Storage storage, SubmissionService service) {
-        this.storage = storage;
+    public SubmissionController(SubmissionService service) {
         this.service = service;
     }
 
