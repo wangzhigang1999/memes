@@ -139,8 +139,7 @@ public class SubmissionServiceImpl implements SubmissionService {
         submission.setUrl(uri);
         submission.setHash(uri.hashCode());
 
-        mongoTemplate.save(submission);
-        return submission;
+        return insertSubmission(submission);
     }
 
     @Override
@@ -155,6 +154,8 @@ public class SubmissionServiceImpl implements SubmissionService {
         }
 
         // check if the submission already exists
+        // 为什么需要这个？因为Pod会重启，重启之后会丢失缓存的信息，所以需要从数据库中查询
+        // 也可以使用redis来做缓存，但是这个项目没有必要
         Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(code)), Submission.class);
         if (submission != null) {
             cache.put(code, submission);
@@ -172,16 +173,17 @@ public class SubmissionServiceImpl implements SubmissionService {
             return submission;
         }
 
-        // 保存到数据库,但是要防止重复,在数据库层面上加上了唯一索引
+        cache.put(code, insertSubmission(submission));
+        return submission;
+    }
+
+    private Submission insertSubmission(Submission submission) {
         try {
             mongoTemplate.save(submission);
         } catch (DuplicateKeyException e) {
-            logger.info("duplicate submission, hash: {}", code);
-            submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(code)), Submission.class);
+            logger.info("duplicate submission, hash: {}", submission.getHash());
+            submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(submission.getHash())), Submission.class);
         }
-
-        assert submission != null;
-        cache.put(code, submission);
         return submission;
     }
 }
