@@ -5,6 +5,7 @@ import com.bupt.dailyhaha.pojo.History;
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
+import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
@@ -165,10 +166,21 @@ public class SubmissionServiceImpl implements SubmissionService {
             return null;
         }
         submission.setHash(code);
-        if (!personal) {
-            mongoTemplate.save(submission);
+
+        // 当做图床用的时候，不入库
+        if (personal) {
+            return submission;
         }
 
+        // 保存到数据库,但是要防止重复,在数据库层面上加上了唯一索引
+        try {
+            mongoTemplate.save(submission);
+        } catch (DuplicateKeyException e) {
+            logger.info("duplicate submission, hash: {}", code);
+            submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(code)), Submission.class);
+        }
+
+        assert submission != null;
         cache.put(code, submission);
         return submission;
     }
