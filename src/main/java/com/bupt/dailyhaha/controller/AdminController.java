@@ -6,7 +6,6 @@ import com.bupt.dailyhaha.pojo.ResultData;
 import com.bupt.dailyhaha.pojo.ReturnCode;
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.StatisticService;
-import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,14 +16,11 @@ import java.util.Map;
 @RequestMapping("/submission")
 @CrossOrigin(origins = "*")
 public class AdminController {
-    final Storage storage;
-
     final SubmissionService service;
 
     final StatisticService statistic;
 
-    public AdminController(Storage storage, SubmissionService service, StatisticService statistic) {
-        this.storage = storage;
+    public AdminController(SubmissionService service, StatisticService statistic) {
         this.service = service;
         this.statistic = statistic;
     }
