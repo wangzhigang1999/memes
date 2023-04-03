@@ -2,15 +2,14 @@ package com.bupt.dailyhaha.service;
 
 import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.LogDocument;
+import com.bupt.dailyhaha.pojo.Pair;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.DoubleSummaryStatistics;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 
 @Service
 public class StatisticService {
@@ -40,6 +39,33 @@ public class StatisticService {
         return documents;
     }
 
+
+    public static Map<String, Long> getCountMap(List<LogDocument> logDocuments, Function<LogDocument, String> keyExtractor) {
+        Map<String, Long> countMap = new HashMap<>();
+        for (LogDocument logDocument : logDocuments) {
+            String key = keyExtractor.apply(logDocument);
+            Long count = countMap.get(key);
+            if (count == null) {
+                count = 0L;
+            }
+            count = count + 1L;
+            countMap.put(key, count);
+        }
+        return countMap;
+    }
+
+    /**
+     * flatten the map and sort it by value
+     *
+     * @param map the map to be flattened
+     * @return List<Pair < String, Long>>
+     */
+    public static List<Pair<String, Long>> flattenAndSort(Map<String, Long> map) {
+        var list = new ArrayList<>(map.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).toList());
+        list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+        return list;
+    }
+
     public Map<String, Object> statistic() {
         // start is the timestamp of 00:00:00 of today asia/shanghai
         long start = Utils.getTodayStartUnixEpochMilli();
@@ -51,31 +77,15 @@ public class StatisticService {
         // count the number of records
         map.put("reqNumber", logDocuments.size());
 
-        // frequency of each url
-        HashMap<String, Object> urlCountMap = new HashMap<>();
-        logDocuments.stream().map(LogDocument::getUrl).distinct().forEach(url -> {
-            long count = logDocuments.stream().filter(logDocument -> logDocument.getUrl().equals(url)).count();
-            urlCountMap.put(url, count);
-        });
-
-        // frequency of each ip
-        HashMap<String, Object> ipCountMap = new HashMap<>();
-        logDocuments.stream().map(LogDocument::getIp).distinct().forEach(ip -> {
-            long count = logDocuments.stream().filter(logDocument -> logDocument.getIp().equals(ip)).count();
-            ipCountMap.put(ip, count);
-        });
+        // usage
+        Map<String, Long> urlCountMap = getCountMap(logDocuments, LogDocument::getUrl);
+        Map<String, Long> ipCountMap = getCountMap(logDocuments, LogDocument::getIp);
+        Map<String, Long> uuidCountMap = getCountMap(logDocuments, LogDocument::getUuid);
 
 
-        // most frequent uuid
-        Map<String, Object> uuidCountMap = new HashMap<>();
-        logDocuments.stream().map(LogDocument::getUuid).distinct().forEach(uuid -> {
-            long count = logDocuments.stream().filter(logDocument -> logDocument.getUuid().equals(uuid)).count();
-            uuidCountMap.put(uuid, count);
-        });
-
-        map.put("uuidCountMap", uuidCountMap);
-        map.put("urlCountMap", urlCountMap);
-        map.put("ipCountMap", ipCountMap);
+        map.put("uuidCountMap", flattenAndSort(uuidCountMap));
+        map.put("urlCountMap", flattenAndSort(urlCountMap));
+        map.put("ipCountMap", flattenAndSort(ipCountMap));
 
 
         // count the average cost,max cost,min cost
