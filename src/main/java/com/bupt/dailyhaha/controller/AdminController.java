@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/submission")
+@RequestMapping("/admin")
 @CrossOrigin(origins = "*")
 public class AdminController {
     final SubmissionService service;
