@@ -29,4 +29,7 @@ public interface ReviewService {
      */
     boolean rejectSubmission(int hashcode);
 
+
+    boolean release();
+
 }

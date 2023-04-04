@@ -1,14 +1,12 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.History;
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -16,9 +14,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -30,7 +26,6 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(SubmissionServiceImpl.class);
     final static ConcurrentHashMap<Integer, Submission> cache = new ConcurrentHashMap<>();
-    final static ConcurrentHashMap<String, History> dateHistoryCache = new ConcurrentHashMap<>();
 
     public SubmissionServiceImpl(MongoTemplate mongoTemplate, Storage storage) {
         this.mongoTemplate = mongoTemplate;
@@ -38,30 +33,6 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
 
-    @Override
-    public boolean deleteByHashcode(int hashcode) {
-        var query = new Query(Criteria.where("hash").is(hashcode));
-        mongoTemplate.update(Submission.class).matching(query).apply(new Update().set("deleted", true)).all();
-        Submission one = mongoTemplate.findOne(query, Submission.class);
-        return one != null && one.getDeleted();
-    }
-
-
-    @Override
-    public List<Submission> getTodaySubmissions() {
-        // 00:00:00 of today
-        var start = Utils.getTodayStartUnixEpochMilli();
-        // 向前推两个小时
-        var from = start - 2 * 60 * 60 * 1000;
-
-        // 向后推22个小时
-        var to = start + 22 * 60 * 60 * 1000;
-        Criteria criteria = Criteria.
-                where("timestamp").gte(from).lte(to)
-                .and("deleted").ne(true)
-                .and("reviewed").ne(false);
-        return mongoTemplate.find(Query.query(criteria), Submission.class);
-    }
 
 
     @Override
@@ -78,55 +49,6 @@ public class SubmissionServiceImpl implements SubmissionService {
         return first.getMatchedCount() > 0;
     }
 
-    @Override
-    public List<Submission> getHistory(String date) {
-        if (dateHistoryCache.containsKey(date)) {
-            logger.info("cache hit,date: {}", date);
-            return dateHistoryCache.get(date).getSubmissions();
-        }
-        History history = mongoTemplate.findOne(Query.query(Criteria.where("date").is(date)), History.class);
-        if (history != null) {
-            logger.info("cache miss, date: {},will update it.", date);
-            dateHistoryCache.put(date, history);
-        }
-        return history == null ? new ArrayList<>() : history.getSubmissions();
-    }
-
-    /**
-     * 获取所有的历史记录的日期
-     *
-     * @param limit 限制数量
-     * @return 日期列表 ["2020-01-01", "2020-01-02", ...]
-     */
-    @Override
-    public List<String> getHistoryDates(int limit) {
-        List<History> histories = mongoTemplate.find(Query.query(Criteria.where("date").exists(true))
-                .limit(limit)
-                .with(Sort.by(Sort.Direction.DESC, "timestamp")), History.class);
-        List<String> dates = new ArrayList<>();
-        for (History history : histories) {
-            dates.add(history.getDate());
-        }
-        return dates;
-    }
-
-    @Override
-    public boolean updateHistory(String date, List<Submission> Submissions) {
-        History history = new History();
-        history.setDate(date);
-        history.setSubmissions(Submissions);
-        history.setTimestamp(System.currentTimeMillis());
-
-        Update update = new Update().set("Submissions", Submissions).set("timestamp", System.currentTimeMillis()).set("count", Submissions.size());
-        UpdateResult result = mongoTemplate.upsert(Query.query(Criteria.where("date").is(date)), update, History.class);
-        var res = result.getUpsertedId() != null || result.getModifiedCount() > 0;
-
-        if (res) {
-            logger.info("update history success,update cache date: {}", date);
-            dateHistoryCache.put(date, history);
-        }
-        return res;
-    }
 
     @Override
     public Submission storeTextFormatSubmission(String uri, String mime) {
