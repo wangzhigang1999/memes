@@ -3,17 +3,8 @@ package com.bupt.dailyhaha.service;
 import com.bupt.dailyhaha.pojo.Submission;
 
 import java.io.InputStream;
-import java.util.List;
 
 public interface SubmissionService {
-
-
-    boolean deleteByHashcode(int hashcode);
-
-    /**
-     * 获取今日的提交,只有管理员才能看到
-     */
-    List<Submission> getTodaySubmissions();
 
 
     /**
@@ -27,28 +18,22 @@ public interface SubmissionService {
 
 
     /**
-     * 获取历史记录
+     * 存储文本类型的投稿
      *
-     * @param date 日期 YYYY-MM-DD
-     * @return 历史记录
+     * @param url  url
+     * @param mime mime
+     * @return Submission
      */
-    List<Submission> getHistory(String date);
-
-    /**
-     * 获取所有的历史记录的日期
-     *
-     * @param limit 限制数量
-     * @return 日期列表
-     */
-    List<String> getHistoryDates(int limit);
-
-    /**
-     * 更新历史记录
-     */
-    boolean updateHistory(String date, List<Submission> submissions);
-
     Submission storeTextFormatSubmission(String url, String mime);
 
 
+    /**
+     * 存储图片、视频类型的投稿
+     *
+     * @param stream   输入流
+     * @param mime     mime
+     * @param personal 是否是个人投稿
+     * @return Submission
+     */
     Submission storeStreamSubmission(InputStream stream, String mime, boolean personal);
 }

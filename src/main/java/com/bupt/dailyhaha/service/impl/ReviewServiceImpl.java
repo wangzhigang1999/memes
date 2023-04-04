@@ -2,6 +2,7 @@ package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.service.HistoryService;
 import com.bupt.dailyhaha.service.ReviewService;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,8 +17,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     final MongoTemplate template;
 
-    public ReviewServiceImpl(MongoTemplate template) {
+    final HistoryService historyService;
+
+    public ReviewServiceImpl(MongoTemplate template, HistoryService historyService) {
         this.template = template;
+        this.historyService = historyService;
     }
 
     @Override
@@ -40,6 +44,20 @@ public class ReviewServiceImpl implements ReviewService {
         return updateSubmission(hashcode, true);
     }
 
+    @Override
+    public boolean release() {
+        // 00:00:00 of today
+        var start = Utils.getTodayStartUnixEpochMilli();
+        // 向前推两个小时
+        var from = start - 2 * 60 * 60 * 1000;
+        // 向后推22个小时
+        var to = start + 22 * 60 * 60 * 1000;
+        Criteria criteria = Criteria.where("timestamp").gte(from).lte(to).and("deleted").ne(true).and("reviewed").ne(false);
+        List<Submission> submissions = template.find(Query.query(criteria), Submission.class);
+        String date = Utils.getYMD();
+
+        return historyService.updateHistory(date, submissions);
+    }
 
 
     private boolean updateSubmission(int hashcode, boolean deleted) {

@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha.service.impl;
+package com.bupt.dailyhaha.service.impl.storageImpl;
 
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.Storage;

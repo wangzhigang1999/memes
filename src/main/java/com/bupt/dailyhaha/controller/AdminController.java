@@ -1,53 +1,33 @@
 package com.bupt.dailyhaha.controller;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.ResultData;
 import com.bupt.dailyhaha.pojo.ReturnCode;
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.service.ReviewService;
 import com.bupt.dailyhaha.service.StatisticService;
 import com.bupt.dailyhaha.service.SubmissionService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/submission")
+@RequestMapping("/admin")
 @CrossOrigin(origins = "*")
 public class AdminController {
     final SubmissionService service;
 
     final StatisticService statistic;
 
-    public AdminController(SubmissionService service, StatisticService statistic) {
+    final ReviewService reviewService;
+
+    public AdminController(SubmissionService service, StatisticService statistic, ReviewService reviewService) {
         this.service = service;
         this.statistic = statistic;
+        this.reviewService = reviewService;
     }
 
-
-    /**
-     * 实时获取今天的所有提交
-     *
-     * @return ResultData
-     */
-    @GetMapping("/review")
-    @AuthRequired
-    public ResultData<List<Submission>> review() {
-        return ResultData.success(service.getTodaySubmissions());
-    }
-
-    /**
-     * 删除某一个提交
-     *
-     * @param hash 可以认为是唯一的一个表示符
-     * @return ResultData
-     */
-    @DeleteMapping("/{hash}")
-    @AuthRequired
-    public ResultData<Boolean> delete(@PathVariable("hash") int hash) {
-        return ResultData.success(service.deleteByHashcode(hash));
-    }
 
     /**
      * 发布今天的提交
@@ -57,9 +37,7 @@ public class AdminController {
     @RequestMapping("/release")
     @AuthRequired
     public ResultData<Boolean> release() {
-        List<Submission> today = service.getTodaySubmissions();
-        boolean history = service.updateHistory(Utils.getYMD(), today);
-        return !history ? ResultData.fail(ReturnCode.RC500) : ResultData.success(true);
+        return !reviewService.release() ? ResultData.fail(ReturnCode.RC500) : ResultData.success(true);
     }
 
     /**

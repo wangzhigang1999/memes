@@ -3,6 +3,7 @@ package com.bupt.dailyhaha.controller;
 import com.bupt.dailyhaha.pojo.ResultData;
 import com.bupt.dailyhaha.pojo.ReturnCode;
 import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.service.HistoryService;
 import com.bupt.dailyhaha.service.SubmissionService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,9 +20,12 @@ public class SubmissionController {
 
     final SubmissionService service;
 
+    final HistoryService historyService;
 
-    public SubmissionController(SubmissionService service) {
+
+    public SubmissionController(SubmissionService service, HistoryService historyService) {
         this.service = service;
+        this.historyService = historyService;
     }
 
     /**
@@ -54,6 +58,14 @@ public class SubmissionController {
         return store == null ? ResultData.fail(ReturnCode.RC500) : ResultData.success(store);
     }
 
+    /**
+     * 点赞或者踩
+     *
+     * @param hash hash
+     * @param up   up or down
+     * @return ResultData
+     */
+
     @PostMapping("/vote/{hash}/{up}")
     public ResultData<Boolean> vote(@PathVariable("hash") int hash, @PathVariable("up") boolean up) {
         return ResultData.success(service.vote(hash, up));
@@ -67,7 +79,7 @@ public class SubmissionController {
      */
     @GetMapping("/history")
     public ResultData<List<String>> getHistory() {
-        return ResultData.success(service.getHistoryDates(7));
+        return ResultData.success(historyService.getHistoryDates(7));
     }
 
     /**
@@ -78,7 +90,7 @@ public class SubmissionController {
      */
     @GetMapping("/{date}")
     public ResultData<List<Submission>> getSubmission(@PathVariable("date") String date) {
-        return ResultData.success(service.getHistory(date));
+        return ResultData.success(historyService.getHistory(date));
     }
 
 }
