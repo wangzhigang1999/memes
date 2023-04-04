@@ -56,7 +56,11 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         // 向后推22个小时
         var to = start + 22 * 60 * 60 * 1000;
-        return mongoTemplate.find(Query.query(Criteria.where("timestamp").gte(from).lte(to).and("deleted").ne(true)), Submission.class);
+        Criteria criteria = Criteria.
+                where("timestamp").gte(from).lte(to)
+                .and("deleted").ne(true)
+                .and("reviewed").ne(false);
+        return mongoTemplate.find(Query.query(criteria), Submission.class);
     }
 
 
