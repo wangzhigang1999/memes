@@ -14,6 +14,7 @@ public class Submission {
     Integer hash;
     String name;
     Boolean deleted = false;
+    Boolean reviewed = false;
     long timestamp;
 
     long up;
