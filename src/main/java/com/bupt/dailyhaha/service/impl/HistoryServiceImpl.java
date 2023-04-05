@@ -1,5 +1,6 @@
 package com.bupt.dailyhaha.service.impl;
 
+import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.History;
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.HistoryService;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class HistoryServiceImpl implements HistoryService {
@@ -56,14 +59,13 @@ public class HistoryServiceImpl implements HistoryService {
      */
     @Override
     public List<String> getHistoryDates(int limit) {
-        List<History> histories = mongoTemplate.find(Query.query(Criteria.where("date").exists(true))
-                .limit(limit)
-                .with(Sort.by(Sort.Direction.DESC, "timestamp")), History.class);
-        List<String> dates = new ArrayList<>();
-        for (History history : histories) {
-            dates.add(history.getDate());
-        }
-        return dates;
+        Query query = Query.query(Criteria.where("date").exists(true));
+        query.limit(limit).with(Sort.by(Sort.Direction.DESC, "timestamp")).fields().include("date").exclude("_id");
+
+        return mongoTemplate.find(query, Map.class, "history").stream()
+                .map(map -> map.get("date").toString())
+                .filter(date -> !date.equals(Utils.getYMD()))
+                .collect(Collectors.toList());
     }
 
     @Override
