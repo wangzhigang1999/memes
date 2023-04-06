@@ -45,6 +45,17 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public int batchAcceptSubmission(List<Integer> hashcode) {
+        int count = 0;
+        for (int i : hashcode) {
+            if (acceptSubmission(i)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Override
     public boolean release() {
         // 00:00:00 of today
         var start = Utils.getTodayStartUnixEpochMilli();
