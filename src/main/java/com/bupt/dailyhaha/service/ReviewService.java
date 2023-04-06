@@ -30,6 +30,9 @@ public interface ReviewService {
     boolean rejectSubmission(int hashcode);
 
 
+    int batchAcceptSubmission(List<Integer> hashcode);
+
+
     boolean release();
 
 }

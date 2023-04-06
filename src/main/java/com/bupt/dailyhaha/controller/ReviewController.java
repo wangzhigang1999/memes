@@ -35,4 +35,10 @@ public class ReviewController {
     public ResultData<Boolean> reject(@PathVariable("hashcode") int hashcode) {
         return ResultData.success(service.rejectSubmission(hashcode));
     }
+
+    @PostMapping("/accept/batch")
+    @AuthRequired
+    public ResultData<Integer> batchAccept(@RequestBody List<Integer> hashcode) {
+        return ResultData.success(service.batchAcceptSubmission(hashcode));
+    }
 }
