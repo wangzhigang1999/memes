@@ -30,9 +30,21 @@ public interface ReviewService {
     boolean rejectSubmission(int hashcode);
 
 
+    /**
+     * 批量审核通过submission，因为在所有的投稿中，绝大多数都是有效的，
+     * 因此在剔除了无效的之后，剩下的批量通过，节省时间
+     *
+     * @param hashcode submission的hashcode列表
+     * @return 成功审核的数量
+     */
     int batchAcceptSubmission(List<Integer> hashcode);
 
 
+    /**
+     * 发布当日，指从昨天的22：00到今日的22：00的所有已经过审核的submission
+     *
+     * @return 是否发布成功
+     */
     boolean release();
 
 }

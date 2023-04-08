@@ -6,6 +6,7 @@ import com.bupt.dailyhaha.pojo.ReturnCode;
 import com.bupt.dailyhaha.service.ReviewService;
 import com.bupt.dailyhaha.service.StatisticService;
 import com.bupt.dailyhaha.service.SubmissionService;
+import com.bupt.dailyhaha.service.SysConfig;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,10 +23,14 @@ public class AdminController {
 
     final ReviewService reviewService;
 
-    public AdminController(SubmissionService service, StatisticService statistic, ReviewService reviewService) {
+    final SysConfig sysConfig;
+
+
+    public AdminController(SubmissionService service, StatisticService statistic, ReviewService reviewService, SysConfig sysConfig) {
         this.service = service;
         this.statistic = statistic;
         this.reviewService = reviewService;
+        this.sysConfig = sysConfig;
     }
 
 
@@ -47,5 +52,22 @@ public class AdminController {
     @AuthRequired
     public ResultData<Map<String, Object>> statistic() {
         return ResultData.success(statistic.statistic());
+    }
+
+    @RequestMapping("/bot/enable")
+    @AuthRequired
+    public ResultData<Boolean> stopBot() {
+        return ResultData.success(sysConfig.disableBot());
+    }
+
+    @RequestMapping("/bot/disable")
+    @AuthRequired
+    public ResultData<Boolean> startBot() {
+        return ResultData.success(sysConfig.enableBot());
+    }
+
+    @RequestMapping("/bot/status")
+    public ResultData<Boolean> botStatus() {
+        return ResultData.success(sysConfig.botStatus());
     }
 }
