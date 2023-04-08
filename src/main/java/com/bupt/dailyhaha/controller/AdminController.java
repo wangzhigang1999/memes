@@ -57,13 +57,13 @@ public class AdminController {
     @RequestMapping("/bot/enable")
     @AuthRequired
     public ResultData<Boolean> stopBot() {
-        return ResultData.success(sysConfig.disableBot());
+        return ResultData.success(sysConfig.enableBot());
     }
 
     @RequestMapping("/bot/disable")
     @AuthRequired
     public ResultData<Boolean> startBot() {
-        return ResultData.success(sysConfig.enableBot());
+        return ResultData.success(sysConfig.disableBot());
     }
 
     @RequestMapping("/bot/status")
