@@ -34,4 +34,17 @@ public class Submission {
             this.submissionType = SubmissionType.BILIBILI;
         }
     }
+
+    @Override
+    public int hashCode() {
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Submission) {
+            return ((Submission) obj).getHash().equals(this.hash);
+        }
+        return false;
+    }
 }
