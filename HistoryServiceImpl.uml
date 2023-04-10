@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.bupt.dailyhaha.service.impl.HistoryServiceImpl</OriginalElement>
+  <nodes>
+    <node x="676.0005004206606" y="-792.885911179173">com.bupt.dailyhaha.controller.AdminController</node>
+    <node x="1288.501501261982" y="-155.44931087289433">com.bupt.dailyhaha.service.impl.HistoryServiceImpl</node>
+    <node x="345.00000000000006" y="-158.80624808575806">com.bupt.dailyhaha.service.impl.storageImpl.QiNiuStorageImpl</node>
+    <node x="565.0" y="-158.80624808575806">com.bupt.dailyhaha.service.impl.storageImpl.MinioStorageImpl</node>
+    <node x="382.0" y="-281.71638591117915">com.bupt.dailyhaha.service.Storage</node>
+    <node x="978.5010008413212" y="-410.8744294141002">com.bupt.dailyhaha.service.impl.ReviewServiceImpl</node>
+    <node x="125.00000000000006" y="-158.80624808575806">com.bupt.dailyhaha.service.impl.storageImpl.LocalStorageImpl</node>
+    <node x="1318.001501261982" y="-281.71638591117915">com.bupt.dailyhaha.service.HistoryService</node>
+    <node x="339.5" y="-545.6937212863705">com.bupt.dailyhaha.service.SubmissionService</node>
+    <node x="1304.501501261982" y="-793.885911179173">com.bupt.dailyhaha.controller.HistoryController</node>
+    <node x="323.5" y="-420.95252679938733">com.bupt.dailyhaha.service.impl.SubmissionServiceImpl</node>
+    <node x="981.0010008413212" y="-793.885911179173">com.bupt.dailyhaha.controller.ReviewController</node>
+    <node x="330.0" y="-792.885911179173">com.bupt.dailyhaha.controller.SubmissionController</node>
+    <node x="994.5010008413212" y="-545.6937212863705">com.bupt.dailyhaha.service.ReviewService</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.bupt.dailyhaha.controller.ReviewController" target="com.bupt.dailyhaha.service.ReviewService" relationship="TO_ONE">
+      <point x="0.0" y="15.0" />
+      <point x="0.0" y="-14.0" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.service.impl.SubmissionServiceImpl" target="com.bupt.dailyhaha.service.SubmissionService" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.service.impl.storageImpl.MinioStorageImpl" target="com.bupt.dailyhaha.service.Storage" relationship="REALIZATION">
+      <point x="0.0" y="-13.999751914241955" />
+      <point x="658.0" y="-206.0" />
+      <point x="438.0" y="-206.0" />
+      <point x="0.0" y="14.000385911179137" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.controller.SubmissionController" target="com.bupt.dailyhaha.service.SubmissionService" relationship="TO_ONE">
+      <point x="0.0" y="14.0" />
+      <point x="0.0" y="-14.0" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.controller.HistoryController" target="com.bupt.dailyhaha.service.HistoryService" relationship="TO_ONE">
+      <point x="14.999927183181171" y="15.0" />
+      <point x="14.999927183181171" y="-14.0" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.service.impl.ReviewServiceImpl" target="com.bupt.dailyhaha.service.HistoryService" relationship="TO_ONE">
+      <point x="-8.41321252664784E-7" y="13.999947932618682" />
+      <point x="1076.501" y="-267.71638591117915" />
+      <point x="1087.865083333333" y="-267.71638591117915" />
+      <point x="1087.865083333333" y="-265.0856481481512" />
+      <point x="-83.92048274346416" y="2.6307377630279234" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.service.impl.SubmissionServiceImpl" target="com.bupt.dailyhaha.service.Storage" relationship="TO_ONE">
+      <point x="0.0" y="14.0" />
+      <point x="0.0" y="-14.0" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.service.impl.storageImpl.QiNiuStorageImpl" target="com.bupt.dailyhaha.service.Storage" relationship="REALIZATION">
+      <point x="-5.6843418860808015E-14" y="-13.999751914241955" />
+      <point x="0.0" y="14.000385911179137" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.controller.AdminController" target="com.bupt.dailyhaha.service.ReviewService" relationship="TO_ONE">
+      <point x="87.50049957933936" y="-8.882082693162374E-5" />
+      <point x="917.0" y="-778.886" />
+      <point x="917.0" y="-531.694" />
+      <point x="-82.00000084132125" y="-2.787136294273296E-4" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.service.impl.storageImpl.LocalStorageImpl" target="com.bupt.dailyhaha.service.Storage" relationship="REALIZATION">
+      <point x="-5.6843418860808015E-14" y="-13.999751914241955" />
+      <point x="218.0" y="-206.0" />
+      <point x="438.0" y="-206.0" />
+      <point x="0.0" y="14.000385911179137" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.service.impl.ReviewServiceImpl" target="com.bupt.dailyhaha.service.ReviewService" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.service.impl.HistoryServiceImpl" target="com.bupt.dailyhaha.service.HistoryService" relationship="REALIZATION">
+      <point x="13.5" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="com.bupt.dailyhaha.controller.AdminController" target="com.bupt.dailyhaha.service.SubmissionService" relationship="TO_ONE">
+      <point x="4.9994995793393855" y="14.0" />
+      <point x="768.5" y="-531.694" />
+      <point x="98.5" y="-2.787136294273296E-4" />
+    </edge>
+  </edges>
+  <settings layout="分层紧凑" zoom="1.0892589017589018" showDependencies="true" x="827.943532307692" y="-426.62418461538323" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
