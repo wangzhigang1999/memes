@@ -1,8 +1,13 @@
 package com.bupt.dailyhaha.service;
 
+import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.pojo.Sys;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class SysConfig {
@@ -17,6 +22,11 @@ public class SysConfig {
             this.sys = new Sys();
             mongoTemplate.save(this.sys);
         }
+        // check whether fields is null
+        if (this.sys.getTopSubmission() == null) {
+            this.sys.setTopSubmission(Set.of());
+        }
+        mongoTemplate.save(this.sys);
     }
 
     public Boolean disableBot() {
@@ -33,5 +43,29 @@ public class SysConfig {
 
     public boolean botStatus() {
         return this.sys.getBotUp();
+    }
+
+    public boolean addTop(int hashcode) {
+        Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(hashcode)), Submission.class);
+        if (submission == null) {
+            return false;
+        }
+        sys.getTopSubmission().add(submission);
+        mongoTemplate.save(sys);
+        return true;
+    }
+
+    public boolean removeTop(int hashcode) {
+        Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(hashcode)), Submission.class);
+        if (submission == null) {
+            return false;
+        }
+        sys.getTopSubmission().remove(submission);
+        mongoTemplate.save(sys);
+        return true;
+    }
+
+    public Set<Submission> getTop() {
+        return sys.getTopSubmission();
     }
 }
