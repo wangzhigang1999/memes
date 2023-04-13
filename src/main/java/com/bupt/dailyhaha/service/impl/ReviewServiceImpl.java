@@ -3,7 +3,10 @@ package com.bupt.dailyhaha.service.impl;
 import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.service.HistoryService;
+import com.bupt.dailyhaha.service.ReleaseStrategy;
 import com.bupt.dailyhaha.service.ReviewService;
+import com.bupt.dailyhaha.service.SysConfig;
+import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,18 +14,21 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 
     final MongoTemplate template;
 
     final HistoryService historyService;
 
-    public ReviewServiceImpl(MongoTemplate template, HistoryService historyService) {
-        this.template = template;
-        this.historyService = historyService;
-    }
+    final Map<String, ReleaseStrategy> releaseStrategyMap;
+
+    final SysConfig config;
+
 
     @Override
     public List<Submission> listSubmissions() {
@@ -56,18 +62,28 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public boolean release() {
+    public int release() {
+
+        String date = Utils.getYMD();
         // 00:00:00 of today
         var start = Utils.getTodayStartUnixEpochMilli();
         // 向前推两个小时
         var from = start - 2 * 60 * 60 * 1000;
         // 向后推22个小时
         var to = start + 22 * 60 * 60 * 1000;
+
         Criteria criteria = Criteria.where("timestamp").gte(from).lte(to).and("deleted").ne(true).and("reviewed").ne(false);
         List<Submission> submissions = template.find(Query.query(criteria), Submission.class);
-        String date = Utils.getYMD();
 
-        return historyService.updateHistory(date, submissions);
+        List<Submission> history = historyService.getHistory(date);
+        List<Submission> newSubmissions = findDiff(history, submissions);
+
+        var strategy = releaseStrategyMap.get(config.sys.getSelectedReleaseStrategy());
+        if (strategy != null) {
+            submissions = strategy.release(history, newSubmissions);
+        }
+        boolean updateHistory = historyService.updateHistory(date, submissions);
+        return updateHistory ? submissions.size() : -1;
     }
 
 
@@ -76,6 +92,10 @@ public class ReviewServiceImpl implements ReviewService {
         template.update(Submission.class).matching(query).apply(new Update().set("deleted", deleted).set("reviewed", true)).all();
         Submission one = template.findOne(query, Submission.class);
         return one != null && one.getDeleted();
+    }
+
+    private static List<Submission> findDiff(List<Submission> currentSubmissions, List<Submission> newSubmissions) {
+        return newSubmissions.stream().filter(newSubmission -> currentSubmissions.stream().noneMatch(currentSubmission -> Objects.equals(currentSubmission, newSubmission))).toList();
     }
 
 }

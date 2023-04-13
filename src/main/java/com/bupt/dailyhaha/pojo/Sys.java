@@ -11,5 +11,10 @@ public class Sys {
     private String id = "sys";
     Boolean botUp = true;
 
+    int MAX_SUBMISSIONS = 50;
+
+    Set<String> releaseStrategy = Set.of();
+    String selectedReleaseStrategy = "default";
+
     Set<Submission> topSubmission = Set.of();
 }

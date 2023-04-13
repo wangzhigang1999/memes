@@ -45,6 +45,6 @@ public interface ReviewService {
      *
      * @return 是否发布成功
      */
-    boolean release();
+    int release();
 
 }

@@ -56,6 +56,11 @@ public class Utils {
         }
     }
 
+    public  static int getCurrentHour() {
+        var now = Instant.now();
+        return now.atZone(java.time.ZoneId.of("Asia/Shanghai")).getHour();
+    }
+
     public static void main(String[] args) {
         System.out.println(getTodayStartUnixEpochMilli());
         System.out.println(getYMD());

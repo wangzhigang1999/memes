@@ -41,8 +41,9 @@ public class AdminController {
      */
     @RequestMapping("/release")
     @AuthRequired
-    public ResultData<Boolean> release() {
-        return !reviewService.release() ? ResultData.fail(ReturnCode.RC500) : ResultData.success(true);
+    public ResultData<Integer> release() {
+        int release = reviewService.release();
+        return release < 0 ? ResultData.fail(ReturnCode.RC500) : ResultData.success(release);
     }
 
     /**
@@ -112,4 +113,30 @@ public class AdminController {
     public ResultData<Boolean> botStatus() {
         return ResultData.success(sysConfig.botStatus());
     }
+
+    @GetMapping("/release/strategy")
+    public ResultData<Object> getStrategy() {
+        Set<String> releaseStrategy = sysConfig.getReleaseStrategy();
+        String selectedReleaseStrategy = sysConfig.getSelectedReleaseStrategy();
+        Map<String, Object> map = Map.of("releaseStrategy", releaseStrategy, "selectedReleaseStrategy", selectedReleaseStrategy);
+        return ResultData.success(map);
+    }
+
+    @PostMapping("/release/strategy")
+    @AuthRequired
+    public ResultData<Boolean> setStrategy(@RequestParam("strategy") String strategy) {
+        return ResultData.success(sysConfig.setReleaseStrategy(strategy));
+    }
+
+    @GetMapping("/max/submission")
+    public ResultData<Integer> getMaxSubmissions() {
+        return ResultData.success(sysConfig.getMaxSubmissions());
+    }
+
+    @PostMapping("/max/submission")
+    @AuthRequired
+    public ResultData<Boolean> setMaxSubmissions(@RequestParam("max") int max) {
+        return ResultData.success(sysConfig.setMaxSubmissions(max));
+    }
+
 }
