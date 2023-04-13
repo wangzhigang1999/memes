@@ -5,9 +5,11 @@ import com.bupt.dailyhaha.service.Storage;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
+import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
+import com.qiniu.storage.model.BatchStatus;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 
@@ -82,6 +85,33 @@ public class QiNiuStorageImpl implements Storage, Condition {
         submission.setName(fileName);
         submission.setSubmissionType(mime);
         return submission;
+    }
+
+    @Override
+    public HashMap<String, Boolean> delete(String[] keyList) {
+        if (keyList == null || keyList.length == 0) {
+            return null;
+        }
+        Auth auth = Auth.create(accessKey, secretKey);
+        Configuration cfg = new Configuration(Region.autoRegion());
+        BucketManager bucketManager = new BucketManager(auth, cfg);
+
+        BucketManager.BatchOperations batchOperations = new BucketManager.BatchOperations();
+        batchOperations.addDeleteOp(bucket, keyList);
+        try {
+            Response response = bucketManager.batch(batchOperations);
+            BatchStatus[] batchStatusList = response.jsonToObject(BatchStatus[].class);
+            var nameStatusMap = new HashMap<String, Boolean>();
+            for (int i = 0; i < keyList.length; i++) {
+                BatchStatus status = batchStatusList[i];
+                String key = keyList[i];
+                nameStatusMap.put(key, status.code == 200);
+            }
+            return nameStatusMap;
+        } catch (QiniuException e) {
+            logger.error("delete image error", e);
+            return null;
+        }
     }
 
     @Override
