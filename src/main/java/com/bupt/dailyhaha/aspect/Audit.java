@@ -113,8 +113,9 @@ public class Audit implements CommandLineRunner {
     @PreDestroy
     public void exit() {
         pool.shutdown();
-        Document document = new Document("endTimestamp", System.currentTimeMillis());
-        var str = Instant.ofEpochMilli(instanceStartTime).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
+        var instanceEndTime = System.currentTimeMillis();
+        Document document = new Document("endTimestamp", instanceEndTime);
+        var str = Instant.ofEpochMilli(instanceEndTime).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
         document.append("endAt", str);
 
         var duration = System.currentTimeMillis() - instanceStartTime;

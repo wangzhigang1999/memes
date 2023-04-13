@@ -2,47 +2,61 @@ package com.bupt.dailyhaha.service;
 
 import com.bupt.dailyhaha.pojo.Submission;
 import com.bupt.dailyhaha.pojo.Sys;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Service
 public class SysConfig {
     final MongoTemplate mongoTemplate;
+    final ApplicationContext applicationContext;
 
-    Sys sys;
+    public Sys sys;
 
-    public SysConfig(MongoTemplate mongoTemplate) {
+    public SysConfig(MongoTemplate mongoTemplate, ApplicationContext applicationContext) {
         this.mongoTemplate = mongoTemplate;
-        this.sys = mongoTemplate.findById("sys", Sys.class);
-        if (this.sys == null) {
-            this.sys = new Sys();
-            mongoTemplate.save(this.sys);
+        this.applicationContext = applicationContext;
+        init();
+    }
+
+
+    private void init() {
+        sys = mongoTemplate.findById("sys", Sys.class);
+        if (sys == null) {
+            sys = new Sys();
         }
-        // check whether fields is null
-        if (this.sys.getTopSubmission() == null) {
-            this.sys.setTopSubmission(Set.of());
+
+        Map<String, ReleaseStrategy> impls = getImplsOfInterface(applicationContext);
+        Set<String> releaseStrategy = new HashSet<>(impls.keySet());
+        sys.setReleaseStrategy(releaseStrategy);
+
+        if (sys.getSelectedReleaseStrategy() == null) {
+            sys.setSelectedReleaseStrategy("default");
         }
-        mongoTemplate.save(this.sys);
+
+        mongoTemplate.save(sys);
     }
 
     public Boolean disableBot() {
-        this.sys.setBotUp(false);
-        mongoTemplate.save(this.sys);
+        sys.setBotUp(false);
+        mongoTemplate.save(sys);
         return true;
     }
 
     public Boolean enableBot() {
-        this.sys.setBotUp(true);
-        mongoTemplate.save(this.sys);
+        sys.setBotUp(true);
+        mongoTemplate.save(sys);
         return true;
     }
 
     public boolean botStatus() {
-        return this.sys.getBotUp();
+        return sys.getBotUp();
     }
 
     public boolean addTop(int hashcode) {
@@ -67,5 +81,40 @@ public class SysConfig {
 
     public Set<Submission> getTop() {
         return sys.getTopSubmission();
+    }
+
+    public Set<String> getReleaseStrategy() {
+        return sys.getReleaseStrategy();
+    }
+
+    public String getSelectedReleaseStrategy() {
+        return sys.getSelectedReleaseStrategy();
+    }
+
+    public boolean setReleaseStrategy(String strategy) {
+        if (sys.getReleaseStrategy().contains(strategy)) {
+            sys.setSelectedReleaseStrategy(strategy);
+            mongoTemplate.save(sys);
+            return true;
+        }
+        return false;
+    }
+
+    public int getMaxSubmissions() {
+        return sys.getMAX_SUBMISSIONS();
+    }
+
+    public boolean setMaxSubmissions(int maxSubmissions) {
+        if (maxSubmissions < 0) {
+            return false;
+        }
+        sys.setMAX_SUBMISSIONS(maxSubmissions);
+        mongoTemplate.save(sys);
+        return true;
+    }
+
+
+    private Map<String, ReleaseStrategy> getImplsOfInterface(ApplicationContext applicationContext) {
+        return applicationContext.getBeansOfType(ReleaseStrategy.class);
     }
 }
