@@ -3,6 +3,7 @@ package com.bupt.dailyhaha.service;
 import com.bupt.dailyhaha.pojo.Submission;
 
 import java.io.InputStream;
+import java.util.List;
 
 public interface SubmissionService {
 
@@ -36,4 +37,17 @@ public interface SubmissionService {
      * @return Submission
      */
     Submission storeStreamSubmission(InputStream stream, String mime, boolean personal);
+
+
+    /**
+     * 获取被标记为删除的投稿
+     */
+    List<Submission> getDeletedSubmission();
+
+
+    /**
+     * 硬删除
+     */
+    void hardDeleteSubmission(int hashcode);
+
 }
