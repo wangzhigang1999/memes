@@ -47,4 +47,11 @@ public interface ReviewService {
      */
     int release();
 
+    /**
+     * 获取当前已经review的submission数量
+     *
+     * @return 当前已经review的submission数量
+     */
+    long getReviewedNum();
+
 }

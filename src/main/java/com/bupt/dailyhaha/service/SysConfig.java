@@ -44,12 +44,19 @@ public class SysConfig {
     }
 
     public Boolean disableBot() {
+        if (!sys.getBotUp()) {
+            return true;
+        }
         sys.setBotUp(false);
         mongoTemplate.save(sys);
         return true;
     }
 
     public Boolean enableBot() {
+        if (sys.getBotUp()) {
+            return true;
+        }
+
         sys.setBotUp(true);
         mongoTemplate.save(sys);
         return true;

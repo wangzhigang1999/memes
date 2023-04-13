@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -102,6 +103,23 @@ public class SubmissionServiceImpl implements SubmissionService {
         cache.put(code, insertSubmission(submission));
         return submission;
     }
+
+    /**
+     * 获取被标记为删除的投稿
+     */
+    @Override
+    public List<Submission> getDeletedSubmission() {
+        return mongoTemplate.find(Query.query(Criteria.where("deleted").is(true)), Submission.class);
+    }
+
+    /**
+     * 硬删除
+     */
+    @Override
+    public void hardDeleteSubmission(int hashcode) {
+        mongoTemplate.remove(Query.query(Criteria.where("hash").is(hashcode)), Submission.class);
+    }
+
 
     private Submission insertSubmission(Submission submission) {
         try {
