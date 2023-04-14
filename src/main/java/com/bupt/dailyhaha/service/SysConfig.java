@@ -77,10 +77,7 @@ public class SysConfig {
     }
 
     public boolean removeTop(int hashcode) {
-        Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(hashcode)), Submission.class);
-        if (submission == null) {
-            return false;
-        }
+        var submission = new Submission(hashcode);
         sys.getTopSubmission().remove(submission);
         mongoTemplate.save(sys);
         return true;
