@@ -7,6 +7,7 @@ import com.bupt.dailyhaha.service.ReviewService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/review")
@@ -63,5 +64,14 @@ public class ReviewController {
     @AuthRequired
     public ResultData<Integer> batchAccept(@RequestBody List<Integer> hashcode) {
         return ResultData.success(service.batchAcceptSubmission(hashcode));
+    }
+
+    /**
+     * 今日详情
+     */
+    @GetMapping("/statistic")
+    @AuthRequired
+    public ResultData<Map<String, Integer>> today() {
+        return ResultData.success(service.getTodayInfo());
     }
 }

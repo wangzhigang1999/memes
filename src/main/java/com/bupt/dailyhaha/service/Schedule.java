@@ -40,10 +40,10 @@ public class Schedule {
         logger.info("release {} submissions", release);
 
         int toBeReviewed = reviewService.listSubmissions().size();
-        long reviewedNum = reviewService.getReviewedNum();
+        long reviewPassedNum = reviewService.getReviewPassedNum();
         int targetNum = sysConfig.getMaxSubmissions();
 
-        boolean botShouldEnabled = shouldBotEnabled(reviewedNum, toBeReviewed, targetNum);
+        boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
 
         // 十点之后开启机器人
         int currentHour = Utils.getCurrentHour();
@@ -72,6 +72,7 @@ public class Schedule {
     public static boolean shouldBotEnabled(long curSubmissionNum, int toBeReviewed, int targetNum) {
         // 如果当前已发布的数量大于目标数量，直接返回false
         if (curSubmissionNum >= targetNum) {
+            logger.info("current submission num {} is larger than target num {}.", curSubmissionNum, targetNum);
             return false;
         }
         int needed = (int) (targetNum - curSubmissionNum);
