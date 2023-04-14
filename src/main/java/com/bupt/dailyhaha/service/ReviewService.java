@@ -3,6 +3,7 @@ package com.bupt.dailyhaha.service;
 import com.bupt.dailyhaha.pojo.Submission;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ReviewService {
 
@@ -48,10 +49,17 @@ public interface ReviewService {
     int release();
 
     /**
-     * 获取当前已经review的submission数量
+     * 获取当前已经review通过的submission数量
+     * 这些都会被发布到今日的投稿中
      *
      * @return 当前已经review的submission数量
      */
-    long getReviewedNum();
+    long getReviewPassedNum();
 
+    /**
+     * 获取今日的统计信息
+     *
+     * @return 今日的统计信息
+     */
+    Map<String, Integer> getTodayInfo();
 }

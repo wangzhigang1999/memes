@@ -92,13 +92,21 @@ public class ReviewServiceImpl implements ReviewService {
      * @return 当前已经review的submission数量
      */
     @Override
-    public long getReviewedNum() {
+    public long getReviewPassedNum() {
         // 00:00:00 of today
         var start = Utils.getTodayStartUnixEpochMilli();
         // 向前推两个小时,从上一天的22点开始算起
         var from = start - 2 * 60 * 60 * 1000;
         Criteria criteria = Criteria.where("timestamp").gte(from).and("deleted").ne(true).and("reviewed").ne(false);
         return template.count(Query.query(criteria), Submission.class);
+    }
+
+    @Override
+    public Map<String, Integer> getTodayInfo() {
+        long reviewPassedNum = getReviewPassedNum();
+        int releasedNum = historyService.getHistory(Utils.getYMD()).size();
+        int toBeReviewedNum = listSubmissions().size();
+        return Map.of("reviewPassedNum", (int) reviewPassedNum, "releasedNum", releasedNum, "toBeReviewedNum", toBeReviewedNum);
     }
 
 
