@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service.impl.storageImpl;
 
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;

@@ -3,7 +3,7 @@ package com.bupt.dailyhaha.controller;
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.ResultData;
 import com.bupt.dailyhaha.pojo.ReturnCode;
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.ReviewService;
 import com.bupt.dailyhaha.service.StatisticService;
 import com.bupt.dailyhaha.service.SubmissionService;

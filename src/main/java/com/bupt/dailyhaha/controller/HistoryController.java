@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.controller;
 
 import com.bupt.dailyhaha.pojo.ResultData;
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.HistoryService;
 import org.springframework.web.bind.annotation.*;
 

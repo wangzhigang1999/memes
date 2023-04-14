@@ -1,9 +1,13 @@
 package com.bupt.dailyhaha.service.impl.storageImpl;
 
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectsArgs;
+import io.minio.Result;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,9 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -66,6 +73,38 @@ public class MinioStorageImpl implements Storage, Condition {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public HashMap<String, Boolean> delete(String[] keyList) {
+
+        List<DeleteObject> objects = new ArrayList<>();
+        for (String key : keyList) {
+            objects.add(new DeleteObject(key));
+        }
+
+        RemoveObjectsArgs removeObjectsArgs = RemoveObjectsArgs.builder().bucket(bucket).objects(objects).build();
+        Iterable<Result<DeleteError>> results = client.removeObjects(removeObjectsArgs);
+        HashMap<String, Boolean> map = new HashMap<>();
+
+        // 默认都是删除成功的
+        for (String key : keyList) {
+            map.put(key, true);
+        }
+
+        // 如果删除有错，就设置为false
+        results.forEach(result -> {
+            try {
+                DeleteError error = result.get();
+                map.put(error.objectName(), false);
+                logger.error(error.message());
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
+        });
+
+        return map;
+
     }
 
     @Override

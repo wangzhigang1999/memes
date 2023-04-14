@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.HistoryService;
 import com.bupt.dailyhaha.service.ReleaseStrategy;
 import com.bupt.dailyhaha.service.ReviewService;
