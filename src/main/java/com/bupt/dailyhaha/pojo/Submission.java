@@ -25,6 +25,10 @@ public class Submission {
         this.timestamp = System.currentTimeMillis();
     }
 
+    public Submission(int hashcode) {
+        this.hash = hashcode;
+    }
+
     public void setSubmissionType(String mime) {
         if (mime.startsWith("image")) {
             this.submissionType = SubmissionType.IMAGE;
