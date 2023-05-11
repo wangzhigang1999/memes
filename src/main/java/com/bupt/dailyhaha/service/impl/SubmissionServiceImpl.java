@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
 import com.mongodb.DuplicateKeyException;

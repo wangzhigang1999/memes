@@ -1,5 +1,6 @@
 package com.bupt.dailyhaha.pojo;
 
+import com.bupt.dailyhaha.pojo.media.Submission;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 

@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service;
 
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 
 import java.io.InputStream;
 import java.util.List;

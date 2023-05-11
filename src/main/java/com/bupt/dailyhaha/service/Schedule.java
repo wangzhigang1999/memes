@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.service;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
