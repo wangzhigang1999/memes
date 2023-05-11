@@ -30,6 +30,9 @@ public class DocServiceImpl implements DocService {
     @Override
     public Document create(Document doc) {
         doc.setCreateTime(System.currentTimeMillis());
+        if (doc.getId() != null) {
+            return update(doc);
+        }
         return mongoTemplate.save(doc);
     }
 
