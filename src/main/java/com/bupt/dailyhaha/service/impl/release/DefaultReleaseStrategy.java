@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service.impl.release;
 
-import com.bupt.dailyhaha.pojo.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.ReleaseStrategy;
 import org.springframework.stereotype.Component;
 
