@@ -4,6 +4,8 @@ import com.bupt.dailyhaha.pojo.PageResult;
 import com.bupt.dailyhaha.pojo.doc.Document;
 import com.bupt.dailyhaha.service.DocService;
 import com.bupt.dailyhaha.service.MongoPageHelper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -20,6 +22,9 @@ public class DocServiceImpl implements DocService {
 
     Logger logger = LoggerFactory.getLogger(DocServiceImpl.class);
 
+    static Cache<String, Document> documentCache = CacheBuilder.newBuilder().maximumSize(100).build();
+
+
     public DocServiceImpl(MongoTemplate mongoTemplate, MongoPageHelper mongoPageHelper) {
         this.mongoTemplate = mongoTemplate;
         this.mongoPageHelper = mongoPageHelper;
@@ -28,7 +33,15 @@ public class DocServiceImpl implements DocService {
 
     @Override
     public Document getDoc(String id) {
-        return mongoTemplate.findById(id, Document.class);
+        Document document = documentCache.getIfPresent(id);
+        if (document != null) {
+            return document;
+        }
+        document = mongoTemplate.findById(id, Document.class);
+        if (document != null) {
+            documentCache.put(id, document);
+        }
+        return document;
     }
 
 
@@ -38,7 +51,9 @@ public class DocServiceImpl implements DocService {
         if (doc.getId() != null) {
             return update(doc);
         }
-        return mongoTemplate.save(doc);
+        Document document = mongoTemplate.save(doc);
+        documentCache.put(document.getId(), document);
+        return document;
     }
 
     @Override
@@ -47,8 +62,9 @@ public class DocServiceImpl implements DocService {
             return null;
         }
         doc.setUpdateTime(System.currentTimeMillis());
-        return mongoTemplate.save(doc);
-
+        Document document = mongoTemplate.save(doc);
+        documentCache.put(doc.getId(), document);
+        return document;
     }
 
     @Override
@@ -63,6 +79,7 @@ public class DocServiceImpl implements DocService {
 
     @Override
     public boolean setPrivate(String docID, boolean isPrivate) {
+        documentCache.invalidate(docID);
         Document doc = mongoTemplate.findById(docID, Document.class);
         if (doc == null) {
             return false;
@@ -74,6 +91,7 @@ public class DocServiceImpl implements DocService {
 
     @Override
     public boolean delete(String docID) {
+        documentCache.invalidate(docID);
         Document doc = mongoTemplate.findById(docID, Document.class);
         if (doc == null) {
             return false;
