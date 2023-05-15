@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.pojo.BBSRecord;
+import com.bupt.dailyhaha.pojo.doc.BBSRecord;
 import com.bupt.dailyhaha.service.BBSTask;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

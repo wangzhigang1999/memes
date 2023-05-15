@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.aspect;
 
-import com.bupt.dailyhaha.pojo.LogDocument;
+import com.bupt.dailyhaha.pojo.common.LogDocument;
 import com.mongodb.client.MongoClient;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.http.HttpServletResponse;

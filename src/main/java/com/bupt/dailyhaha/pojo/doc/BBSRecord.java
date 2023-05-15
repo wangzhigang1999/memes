@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha.pojo;
+package com.bupt.dailyhaha.pojo.doc;
 
 
 import com.google.gson.Gson;
