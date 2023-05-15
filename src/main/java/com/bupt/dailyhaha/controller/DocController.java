@@ -1,12 +1,11 @@
 package com.bupt.dailyhaha.controller;
 
-import com.bupt.dailyhaha.anno.AuthRequired;
-import com.bupt.dailyhaha.pojo.ResultData;
+import com.bupt.dailyhaha.pojo.common.PageResult;
+import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.doc.Document;
 import com.bupt.dailyhaha.service.DocService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/doc")
@@ -20,9 +19,10 @@ public class DocController {
         this.docService = docService;
     }
 
-    @GetMapping("")
-    public ResultData<List<Document>> getDocs() {
-        return ResultData.success(docService.getDocs());
+
+    @GetMapping("/page")
+    public ResultData<PageResult<Document>> getDocs(@RequestParam String lastID, @RequestParam Integer pageSize, @RequestParam Integer pageNum) {
+        return ResultData.success(docService.getDocs(lastID, pageSize, pageNum,false));
     }
 
     @GetMapping("/{id}")
@@ -30,16 +30,7 @@ public class DocController {
         return ResultData.success(docService.getDoc(id));
     }
 
-    @AuthRequired
-    @PostMapping("/create")
-    public ResultData<Document> upsert(@RequestBody Document doc) {
-        return ResultData.success(docService.create(doc));
-    }
 
-    @PostMapping("/update")
-    @AuthRequired
-    public ResultData<Document> update(@RequestBody Document doc) {
-        return ResultData.success(docService.update(doc));
-    }
+
 
 }

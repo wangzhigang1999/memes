@@ -1,8 +1,8 @@
 package com.bupt.dailyhaha.service;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.LogDocument;
-import com.bupt.dailyhaha.pojo.Pair;
+import com.bupt.dailyhaha.pojo.common.LogDocument;
+import com.bupt.dailyhaha.pojo.common.Pair;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;

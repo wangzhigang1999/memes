@@ -1,13 +1,13 @@
 package com.bupt.dailyhaha.controller;
 
 import com.bupt.dailyhaha.anno.AuthRequired;
-import com.bupt.dailyhaha.pojo.ResultData;
-import com.bupt.dailyhaha.pojo.ReturnCode;
+import com.bupt.dailyhaha.pojo.doc.BBSRecord;
+import com.bupt.dailyhaha.pojo.common.PageResult;
+import com.bupt.dailyhaha.pojo.common.ResultData;
+import com.bupt.dailyhaha.pojo.common.ReturnCode;
+import com.bupt.dailyhaha.pojo.doc.Document;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.ReviewService;
-import com.bupt.dailyhaha.service.StatisticService;
-import com.bupt.dailyhaha.service.SubmissionService;
-import com.bupt.dailyhaha.service.SysConfig;
+import com.bupt.dailyhaha.service.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -23,13 +23,20 @@ public class AdminController {
 
     final ReviewService reviewService;
 
+    final DocService docService;
+
+    final BBSTask bbsTask;
+
+
     final SysConfig sysConfig;
 
 
-    public AdminController(SubmissionService service, StatisticService statistic, ReviewService reviewService, SysConfig sysConfig) {
+    public AdminController(SubmissionService service, StatisticService statistic, ReviewService reviewService, DocService docService, BBSTask bbsTask, SysConfig sysConfig) {
         this.service = service;
         this.statistic = statistic;
         this.reviewService = reviewService;
+        this.docService = docService;
+        this.bbsTask = bbsTask;
         this.sysConfig = sysConfig;
     }
 
@@ -137,6 +144,55 @@ public class AdminController {
     @AuthRequired
     public ResultData<Boolean> setMaxSubmissions(@RequestParam("max") int max) {
         return ResultData.success(sysConfig.setMaxSubmissions(max));
+    }
+
+    @AuthRequired
+    @PostMapping("/doc/create")
+    public ResultData<Document> upsert(@RequestBody Document doc) {
+        return ResultData.success(docService.create(doc));
+    }
+
+    @PostMapping("/doc/update")
+    @AuthRequired
+    public ResultData<Document> update(@RequestBody Document doc) {
+        return ResultData.success(docService.update(doc));
+    }
+
+    @PostMapping("/doc/delete")
+    @AuthRequired
+    public ResultData<Boolean> delete(String docID) {
+        return ResultData.success(docService.delete(docID));
+    }
+
+
+    @PostMapping("/doc/private")
+    @AuthRequired
+    public ResultData<Boolean> setPrivate(String docID, boolean isPrivate) {
+        return ResultData.success(docService.setPrivate(docID, isPrivate));
+    }
+
+    @GetMapping("/doc/page")
+    @AuthRequired
+    public ResultData<PageResult<Document>> getPrivateDocs(@RequestParam String lastID, @RequestParam Integer pageSize, @RequestParam Integer pageNum) {
+        return ResultData.success(docService.getDocs(lastID, pageSize, pageNum, true));
+    }
+
+    @AuthRequired
+    @GetMapping("/bbsTasks")
+    public ResultData<Object> getBBSTasks(BBSRecord.Status status) {
+        return ResultData.success(bbsTask.getTasks(status));
+    }
+
+    @AuthRequired
+    @PostMapping("/bbsTasks/create")
+    public ResultData<Boolean> createBBSTasks(@RequestBody BBSRecord.Post post) {
+        return ResultData.success(bbsTask.create(post));
+    }
+
+    @AuthRequired
+    @PostMapping("/bbsTasks/finish")
+    public ResultData<Boolean> markBBSTaskStatus(String id, BBSRecord.Status status) {
+        return ResultData.success(bbsTask.setStatus(id, status));
     }
 
 }

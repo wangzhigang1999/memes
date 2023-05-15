@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.aspect;
 
-import com.bupt.dailyhaha.pojo.ResultData;
-import com.bupt.dailyhaha.pojo.ReturnCode;
+import com.bupt.dailyhaha.pojo.common.ResultData;
+import com.bupt.dailyhaha.pojo.common.ReturnCode;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
