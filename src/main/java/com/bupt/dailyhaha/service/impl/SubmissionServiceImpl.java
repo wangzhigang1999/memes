@@ -1,7 +1,9 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
+import com.bupt.dailyhaha.pojo.PageResult;
 import com.bupt.dailyhaha.pojo.media.Submission;
+import com.bupt.dailyhaha.service.MongoPageHelper;
 import com.bupt.dailyhaha.service.Storage;
 import com.bupt.dailyhaha.service.SubmissionService;
 import com.mongodb.DuplicateKeyException;
@@ -22,14 +24,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SubmissionServiceImpl implements SubmissionService {
 
     final MongoTemplate mongoTemplate;
+    final MongoPageHelper mongoPageHelper;
 
     final Storage storage;
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(SubmissionServiceImpl.class);
     final static ConcurrentHashMap<Integer, Submission> cache = new ConcurrentHashMap<>();
 
-    public SubmissionServiceImpl(MongoTemplate mongoTemplate, Storage storage) {
+    public SubmissionServiceImpl(MongoTemplate mongoTemplate, MongoPageHelper mongoPageHelper, Storage storage) {
         this.mongoTemplate = mongoTemplate;
+        this.mongoPageHelper = mongoPageHelper;
         this.storage = storage;
     }
 
@@ -118,6 +122,13 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public void hardDeleteSubmission(int hashcode) {
         mongoTemplate.remove(Query.query(Criteria.where("hash").is(hashcode)), Submission.class);
+    }
+
+    @Override
+    public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("reviewed").is(true));
+        return mongoPageHelper.pageQuery(query, Submission.class, pageSize, pageNum, lastID);
     }
 
 

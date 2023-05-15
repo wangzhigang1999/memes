@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 public class Submission {
 
+    String id;
+
     SubmissionType submissionType;
     String url;
     Integer hash;

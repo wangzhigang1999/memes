@@ -1,5 +1,6 @@
 package com.bupt.dailyhaha.service;
 
+import com.bupt.dailyhaha.pojo.PageResult;
 import com.bupt.dailyhaha.pojo.media.Submission;
 
 import java.io.InputStream;
@@ -49,5 +50,8 @@ public interface SubmissionService {
      * 硬删除
      */
     void hardDeleteSubmission(int hashcode);
+
+
+    PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID);
 
 }
