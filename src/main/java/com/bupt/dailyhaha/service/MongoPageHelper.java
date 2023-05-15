@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.service;
 
 
-import com.bupt.dailyhaha.pojo.PageResult;
+import com.bupt.dailyhaha.pojo.common.PageResult;
 import io.micrometer.common.util.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service;
 
-import com.bupt.dailyhaha.pojo.BBSRecord;
+import com.bupt.dailyhaha.pojo.doc.BBSRecord;
 
 import java.util.List;
 

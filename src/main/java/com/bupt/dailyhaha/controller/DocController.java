@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.controller;
 
-import com.bupt.dailyhaha.pojo.PageResult;
-import com.bupt.dailyhaha.pojo.ResultData;
+import com.bupt.dailyhaha.pojo.common.PageResult;
+import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.doc.Document;
 import com.bupt.dailyhaha.service.DocService;
 import org.springframework.web.bind.annotation.*;

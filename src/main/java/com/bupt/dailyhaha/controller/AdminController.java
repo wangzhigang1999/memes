@@ -1,10 +1,10 @@
 package com.bupt.dailyhaha.controller;
 
 import com.bupt.dailyhaha.anno.AuthRequired;
-import com.bupt.dailyhaha.pojo.BBSRecord;
-import com.bupt.dailyhaha.pojo.PageResult;
-import com.bupt.dailyhaha.pojo.ResultData;
-import com.bupt.dailyhaha.pojo.ReturnCode;
+import com.bupt.dailyhaha.pojo.doc.BBSRecord;
+import com.bupt.dailyhaha.pojo.common.PageResult;
+import com.bupt.dailyhaha.pojo.common.ResultData;
+import com.bupt.dailyhaha.pojo.common.ReturnCode;
 import com.bupt.dailyhaha.pojo.doc.Document;
 import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.*;

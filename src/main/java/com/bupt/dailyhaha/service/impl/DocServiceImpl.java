@@ -1,6 +1,6 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.pojo.PageResult;
+import com.bupt.dailyhaha.pojo.common.PageResult;
 import com.bupt.dailyhaha.pojo.doc.Document;
 import com.bupt.dailyhaha.service.DocService;
 import com.bupt.dailyhaha.service.MongoPageHelper;

@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.PageResult;
+import com.bupt.dailyhaha.pojo.common.PageResult;
 import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.MongoPageHelper;
 import com.bupt.dailyhaha.service.Storage;
