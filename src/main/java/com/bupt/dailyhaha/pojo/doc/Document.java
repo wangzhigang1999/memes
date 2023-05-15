@@ -1,6 +1,5 @@
 package com.bupt.dailyhaha.pojo.doc;
 
-import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,9 +14,9 @@ import lombok.experimental.Accessors;
 public class Document {
     String id;
 
-    String cover_image;
+    String coverImage;
 
-    String brief_content;
+    String briefContent;
     String title;
     String content;
     String author;
@@ -26,15 +25,12 @@ public class Document {
     int like;
     int dislike;
 
-    String raw_content;
+    String rawContent;
 
     DocType type = DocType.Markdown;
 
-    public static void main(String[] args) {
-        Gson gson = new Gson();
-        Document document = new Document();
-        document.setType(DocType.ByrHtml);
-        System.out.print( gson.toJson(document));
-    }
+    boolean deleted = false;
+
+    boolean privateDoc = false;
 
 }
