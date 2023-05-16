@@ -2,7 +2,7 @@ package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.pojo.common.PageResult;
 import com.bupt.dailyhaha.pojo.doc.Document;
-import com.bupt.dailyhaha.service.DocService;
+import com.bupt.dailyhaha.service.Interface.Doc;
 import com.bupt.dailyhaha.service.MongoPageHelper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DocServiceImpl implements DocService {
+public class DocServiceImpl implements Doc {
 
     final MongoTemplate mongoTemplate;
 
@@ -74,7 +74,11 @@ public class DocServiceImpl implements DocService {
         if (!containPrivate) {
             query.addCriteria(Criteria.where("privateDoc").is(false));
         }
-        return mongoPageHelper.pageQuery(query, Document.class, pageSize, pageNum, lastID);
+
+        // hidden "content" field
+        query.fields().exclude("content").exclude("rawContent");
+
+        return mongoPageHelper.pageQuery(query, Document.class,pageSize, pageNum, lastID);
     }
 
     @Override
