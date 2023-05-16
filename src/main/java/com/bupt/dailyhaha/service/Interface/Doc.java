@@ -1,9 +1,9 @@
-package com.bupt.dailyhaha.service;
+package com.bupt.dailyhaha.service.Interface;
 
 import com.bupt.dailyhaha.pojo.common.PageResult;
 import com.bupt.dailyhaha.pojo.doc.Document;
 
-public interface DocService {
+public interface Doc {
     Document getDoc(String id);
 
     Document create(Document doc);

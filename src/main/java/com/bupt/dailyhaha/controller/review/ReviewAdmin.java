@@ -1,21 +1,21 @@
-package com.bupt.dailyhaha.controller;
+package com.bupt.dailyhaha.controller.review;
 
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.ReviewService;
+import com.bupt.dailyhaha.service.Interface.Review;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/review")
+@RequestMapping("/admin/review")
 @CrossOrigin(origins = "*")
-public class ReviewController {
-    final ReviewService service;
+public class ReviewAdmin {
+    final Review service;
 
-    public ReviewController(ReviewService service) {
+    public ReviewAdmin(Review service) {
         this.service = service;
     }
 
@@ -65,6 +65,7 @@ public class ReviewController {
     public ResultData<Integer> batchAccept(@RequestBody List<Integer> hashcode) {
         return ResultData.success(service.batchAcceptSubmission(hashcode));
     }
+
 
     /**
      * 今日详情

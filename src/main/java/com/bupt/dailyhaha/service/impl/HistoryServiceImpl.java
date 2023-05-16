@@ -1,9 +1,8 @@
 package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.media.History;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.HistoryService;
+import com.bupt.dailyhaha.service.Interface.History;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
@@ -20,12 +19,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
-public class HistoryServiceImpl implements HistoryService {
+public class HistoryServiceImpl implements History {
 
     final MongoTemplate mongoTemplate;
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(HistoryServiceImpl.class);
-    final static ConcurrentHashMap<String, History> dateHistoryCache = new ConcurrentHashMap<>();
+    final static ConcurrentHashMap<String, com.bupt.dailyhaha.pojo.media.History> dateHistoryCache = new ConcurrentHashMap<>();
 
     public HistoryServiceImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
@@ -43,7 +42,7 @@ public class HistoryServiceImpl implements HistoryService {
             logger.info("cache hit,date: {}", date);
             return dateHistoryCache.get(date).getSubmissions();
         }
-        History history = mongoTemplate.findOne(Query.query(Criteria.where("date").is(date)), History.class);
+        com.bupt.dailyhaha.pojo.media.History history = mongoTemplate.findOne(Query.query(Criteria.where("date").is(date)), com.bupt.dailyhaha.pojo.media.History.class);
         if (history != null) {
             logger.info("cache miss, date: {},will update it.", date);
             dateHistoryCache.put(date, history);
@@ -70,13 +69,13 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     public boolean updateHistory(String date, List<Submission> Submissions) {
-        History history = new History();
+        com.bupt.dailyhaha.pojo.media.History history = new com.bupt.dailyhaha.pojo.media.History();
         history.setDate(date);
         history.setSubmissions(Submissions);
         history.setTimestamp(System.currentTimeMillis());
 
         Update update = new Update().set("Submissions", Submissions).set("timestamp", System.currentTimeMillis()).set("count", Submissions.size());
-        UpdateResult result = mongoTemplate.upsert(Query.query(Criteria.where("date").is(date)), update, History.class);
+        UpdateResult result = mongoTemplate.upsert(Query.query(Criteria.where("date").is(date)), update, com.bupt.dailyhaha.pojo.media.History.class);
         var res = result.getUpsertedId() != null || result.getModifiedCount() > 0;
 
         if (res) {

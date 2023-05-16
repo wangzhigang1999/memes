@@ -1,7 +1,9 @@
 package com.bupt.dailyhaha.service;
 
 import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.pojo.media.Submission;
+import com.bupt.dailyhaha.service.Interface.Review;
+import com.bupt.dailyhaha.service.Interface.Storage;
+import com.bupt.dailyhaha.service.Interface.Submission;
 import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,16 +17,16 @@ public class Schedule {
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(Schedule.class);
 
-    final ReviewService reviewService;
+    final Review review;
 
     final Storage storage;
 
-    final SubmissionService submission;
+    final Submission submission;
 
     final SysConfig sysConfig;
 
-    public Schedule(ReviewService reviewService, Storage storage, SubmissionService submission, SysConfig sysConfig) {
-        this.reviewService = reviewService;
+    public Schedule(Review review, Storage storage, Submission submission, SysConfig sysConfig) {
+        this.review = review;
         this.storage = storage;
         this.submission = submission;
         this.sysConfig = sysConfig;
@@ -36,11 +38,11 @@ public class Schedule {
      */
     @Scheduled(fixedRate = 1000 * 1800)
     public void autoRelease() {
-        int release = reviewService.release();
+        int release = review.release();
         logger.info("release {} submissions", release);
 
-        int toBeReviewed = reviewService.listSubmissions().size();
-        long reviewPassedNum = reviewService.getReviewPassedNum();
+        int toBeReviewed = review.listSubmissions().size();
+        long reviewPassedNum = review.getReviewPassedNum();
         int targetNum = sysConfig.getMaxSubmissions();
 
         boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
@@ -87,7 +89,7 @@ public class Schedule {
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void cleanImg() {
-        List<Submission> deletedSubmission = submission.getDeletedSubmission();
+        List<com.bupt.dailyhaha.pojo.media.Submission> deletedSubmission = submission.getDeletedSubmission();
         logger.info("clean {} images", deletedSubmission.size());
 
         if (deletedSubmission.size() == 0) {
