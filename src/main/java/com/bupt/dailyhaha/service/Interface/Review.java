@@ -1,11 +1,11 @@
-package com.bupt.dailyhaha.service;
+package com.bupt.dailyhaha.service.Interface;
 
 import com.bupt.dailyhaha.pojo.media.Submission;
 
 import java.util.List;
 import java.util.Map;
 
-public interface ReviewService {
+public interface Review {
 
     /**
      * 列出从上一天的22：00到现在的所有未审核的submission

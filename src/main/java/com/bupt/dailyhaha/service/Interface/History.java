@@ -1,10 +1,10 @@
-package com.bupt.dailyhaha.service;
+package com.bupt.dailyhaha.service.Interface;
 
 import com.bupt.dailyhaha.pojo.media.Submission;
 
 import java.util.List;
 
-public interface HistoryService {
+public interface History {
 
     /**
      * 获取历史记录

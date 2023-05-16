@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha.service;
+package com.bupt.dailyhaha.service.Interface;
 
 import com.bupt.dailyhaha.pojo.doc.BBSRecord;
 

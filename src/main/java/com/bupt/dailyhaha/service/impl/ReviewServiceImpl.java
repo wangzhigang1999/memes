@@ -2,9 +2,9 @@ package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.HistoryService;
-import com.bupt.dailyhaha.service.ReleaseStrategy;
-import com.bupt.dailyhaha.service.ReviewService;
+import com.bupt.dailyhaha.service.Interface.History;
+import com.bupt.dailyhaha.service.Interface.ReleaseStrategy;
+import com.bupt.dailyhaha.service.Interface.Review;
 import com.bupt.dailyhaha.service.SysConfig;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,11 +19,11 @@ import java.util.Objects;
 
 @Service
 @AllArgsConstructor
-public class ReviewServiceImpl implements ReviewService {
+public class ReviewServiceImpl implements Review {
 
     final MongoTemplate template;
 
-    final HistoryService historyService;
+    final History history;
 
     final Map<String, ReleaseStrategy> releaseStrategyMap;
 
@@ -75,14 +75,14 @@ public class ReviewServiceImpl implements ReviewService {
         Criteria criteria = Criteria.where("timestamp").gte(from).lte(to).and("deleted").ne(true).and("reviewed").ne(false);
         List<Submission> submissions = template.find(Query.query(criteria), Submission.class);
 
-        List<Submission> history = historyService.getHistory(date);
+        List<Submission> history = this.history.getHistory(date);
         List<Submission> newSubmissions = findDiff(history, submissions);
 
         var strategy = releaseStrategyMap.get(config.sys.getSelectedReleaseStrategy());
         if (strategy != null) {
             submissions = strategy.release(history, newSubmissions);
         }
-        boolean updateHistory = historyService.updateHistory(date, submissions);
+        boolean updateHistory = this.history.updateHistory(date, submissions);
         return updateHistory ? submissions.size() : -1;
     }
 
@@ -104,7 +104,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Map<String, Integer> getTodayInfo() {
         long reviewPassedNum = getReviewPassedNum();
-        int releasedNum = historyService.getHistory(Utils.getYMD()).size();
+        int releasedNum = history.getHistory(Utils.getYMD()).size();
         int toBeReviewedNum = listSubmissions().size();
         return Map.of("reviewPassedNum", (int) reviewPassedNum, "releasedNum", releasedNum, "toBeReviewedNum", toBeReviewedNum);
     }

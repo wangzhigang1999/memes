@@ -31,6 +31,7 @@ public class Document {
 
     boolean deleted = false;
 
-    boolean privateDoc = false;
+    // 默认为私有文档
+    boolean privateDoc = true;
 
 }
