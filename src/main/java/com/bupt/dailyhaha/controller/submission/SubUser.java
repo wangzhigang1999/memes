@@ -5,7 +5,7 @@ import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.common.ReturnCode;
 import com.bupt.dailyhaha.service.Interface.History;
 import com.bupt.dailyhaha.service.Interface.Submission;
-import com.bupt.dailyhaha.service.SysConfig;
+import com.bupt.dailyhaha.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +25,7 @@ public class SubUser {
 
     final History history;
 
-    final SysConfig sysConfig;
+    final SysConfigService sysConfig;
 
 
     /**
@@ -91,7 +91,7 @@ public class SubUser {
      */
     @GetMapping("/history")
     public ResultData<List<String>> getHistory() {
-        return ResultData.success(history.getHistoryDates(7));
+        return ResultData.success(history.getHistoryDates(sysConfig.getMaxHistory()));
     }
 
     /**

@@ -23,9 +23,9 @@ public class Schedule {
 
     final Submission submission;
 
-    final SysConfig sysConfig;
+    final SysConfigService sysConfig;
 
-    public Schedule(Review review, Storage storage, Submission submission, SysConfig sysConfig) {
+    public Schedule(Review review, Storage storage, Submission submission, SysConfigService sysConfig) {
         this.review = review;
         this.storage = storage;
         this.submission = submission;

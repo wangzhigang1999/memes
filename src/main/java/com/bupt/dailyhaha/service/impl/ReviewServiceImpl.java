@@ -5,7 +5,7 @@ import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Interface.History;
 import com.bupt.dailyhaha.service.Interface.ReleaseStrategy;
 import com.bupt.dailyhaha.service.Interface.Review;
-import com.bupt.dailyhaha.service.SysConfig;
+import com.bupt.dailyhaha.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -27,7 +27,7 @@ public class ReviewServiceImpl implements Review {
 
     final Map<String, ReleaseStrategy> releaseStrategyMap;
 
-    final SysConfig config;
+    final SysConfigService config;
 
 
     @Override

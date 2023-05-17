@@ -3,11 +3,10 @@ package com.bupt.dailyhaha.controller.submission;
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.common.ReturnCode;
-import com.bupt.dailyhaha.service.*;
-import com.bupt.dailyhaha.service.Interface.BBSTask;
-import com.bupt.dailyhaha.service.Interface.Doc;
 import com.bupt.dailyhaha.service.Interface.Review;
 import com.bupt.dailyhaha.service.Interface.Submission;
+import com.bupt.dailyhaha.service.Statistic;
+import com.bupt.dailyhaha.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +23,8 @@ public class SubAdmin {
 
     final Review review;
 
-    final Doc doc;
 
-    final BBSTask bbsTask;
-
-    final SysConfig sysConfig;
+    final SysConfigService sysConfig;
 
 
     /**
@@ -69,6 +65,7 @@ public class SubAdmin {
 
 
     @GetMapping("/max")
+    @AuthRequired
     public ResultData<Integer> getMaxSubmissions() {
         return ResultData.success(sysConfig.getMaxSubmissions());
     }
