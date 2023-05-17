@@ -3,7 +3,7 @@ package com.bupt.dailyhaha.controller.common;
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.service.Statistic;
-import com.bupt.dailyhaha.service.SysConfig;
+import com.bupt.dailyhaha.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,7 @@ public class Common {
 
     final Statistic statistic;
 
-    final SysConfig sysConfig;
+    final SysConfigService sysConfig;
 
     /**
      * 验证token
@@ -69,5 +69,17 @@ public class Common {
     @AuthRequired
     public ResultData<Boolean> setStrategy(@RequestParam("strategy") String strategy) {
         return ResultData.success(sysConfig.setReleaseStrategy(strategy));
+    }
+
+    @GetMapping("/history/max")
+    @AuthRequired
+    public ResultData<Integer> getMaxHistory() {
+        return ResultData.success(sysConfig.getMaxHistory());
+    }
+
+    @PostMapping("/history/max")
+    @AuthRequired
+    public ResultData<Boolean> setMaxHistory(@RequestParam("max") int max) {
+        return ResultData.success(sysConfig.setMaxHistory(max));
     }
 }

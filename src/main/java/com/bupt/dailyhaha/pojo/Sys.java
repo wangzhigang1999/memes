@@ -14,6 +14,8 @@ public class Sys {
 
     int MAX_SUBMISSIONS = 50;
 
+    int MAX_HISTORY = 7;
+
     Set<String> releaseStrategy = Set.of();
     String selectedReleaseStrategy = "default";
 

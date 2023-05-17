@@ -14,13 +14,13 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class SysConfig {
+public class SysConfigService {
     final MongoTemplate mongoTemplate;
     final ApplicationContext applicationContext;
 
     public Sys sys;
 
-    public SysConfig(MongoTemplate mongoTemplate, ApplicationContext applicationContext) {
+    public SysConfigService(MongoTemplate mongoTemplate, ApplicationContext applicationContext) {
         this.mongoTemplate = mongoTemplate;
         this.applicationContext = applicationContext;
         init();
@@ -39,6 +39,10 @@ public class SysConfig {
 
         if (sys.getSelectedReleaseStrategy() == null) {
             sys.setSelectedReleaseStrategy("default");
+        }
+
+        if (sys.getMAX_HISTORY()==0){
+            sys.setMAX_HISTORY(7);
         }
 
         mongoTemplate.save(sys);
@@ -114,6 +118,19 @@ public class SysConfig {
             return false;
         }
         sys.setMAX_SUBMISSIONS(maxSubmissions);
+        mongoTemplate.save(sys);
+        return true;
+    }
+
+    public int getMaxHistory() {
+        return sys.getMAX_HISTORY();
+    }
+
+    public boolean setMaxHistory(int maxHistory) {
+        if (maxHistory < 0) {
+            return false;
+        }
+        sys.setMAX_HISTORY(maxHistory);
         mongoTemplate.save(sys);
         return true;
     }
