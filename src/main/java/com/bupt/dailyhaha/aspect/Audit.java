@@ -23,6 +23,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 记录请求日志
+ * 将网关的信息保存到mongodb中，一方面统计调用，另一方面也可以用于排查问题
+ */
 @Component
 @Aspect
 public class Audit implements CommandLineRunner {
@@ -76,11 +80,6 @@ public class Audit implements CommandLineRunner {
         Object proceed = joinPoint.proceed();
         long end = System.currentTimeMillis();
 
-        // do not audit if uuid is null
-        if (uuid == null || uuid.isEmpty()) {
-            return proceed;
-        }
-
         HttpServletResponse response = attributes.getResponse();
         assert response != null;
         int status = response.getStatus();
@@ -92,7 +91,7 @@ public class Audit implements CommandLineRunner {
                     .setClassMethod(classMethod)
                     .setDetail(proceed)
                     .setParameterMap(request.getParameterMap())
-                    .setUuid(uuid)
+                    .setUuid((uuid == null || uuid.isEmpty()) ? "unknown" : uuid)
                     .setStatus(status)
                     .setTimecost(end - start)
                     .setTimestamp(start)

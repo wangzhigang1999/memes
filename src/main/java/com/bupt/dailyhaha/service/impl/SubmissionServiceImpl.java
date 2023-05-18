@@ -2,9 +2,9 @@ package com.bupt.dailyhaha.service.impl;
 
 import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.common.PageResult;
-import com.bupt.dailyhaha.service.MongoPageHelper;
 import com.bupt.dailyhaha.service.Interface.Storage;
 import com.bupt.dailyhaha.service.Interface.Submission;
+import com.bupt.dailyhaha.service.MongoPageHelper;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
@@ -36,9 +36,13 @@ public class SubmissionServiceImpl implements Submission {
         this.storage = storage;
     }
 
-
-
-
+    /**
+     * 对投稿点赞/点踩
+     *
+     * @param hashcode 对应投稿的id
+     * @param up       true为点赞，false为点踩
+     * @return 是否成功
+     */
     @Override
     public boolean vote(int hashcode, boolean up) {
         // if up is true, then vote up, else vote down
@@ -54,6 +58,13 @@ public class SubmissionServiceImpl implements Submission {
     }
 
 
+    /**
+     * 存储文本类型的投稿
+     *
+     * @param uri  url  text
+     * @param mime mime
+     * @return 存储后的投稿
+     */
     @Override
     public com.bupt.dailyhaha.pojo.media.Submission storeTextFormatSubmission(String uri, String mime) {
 
@@ -72,6 +83,14 @@ public class SubmissionServiceImpl implements Submission {
         return insertSubmission(submission);
     }
 
+    /**
+     * 存储二进制类型的投稿
+     *
+     * @param stream   输入流
+     * @param mime     mime
+     * @param personal 是否私有
+     * @return 存储后的投稿
+     */
     @Override
     public com.bupt.dailyhaha.pojo.media.Submission storeStreamSubmission(InputStream stream, String mime, boolean personal) {
         byte[] bytes = Utils.readAllBytes(stream);
@@ -83,7 +102,6 @@ public class SubmissionServiceImpl implements Submission {
             return cache.get(code);
         }
 
-        // check if the submission already exists
         // 为什么需要这个？因为Pod会重启，重启之后会丢失缓存的信息，所以需要从数据库中查询
         // 也可以使用redis来做缓存，但是这个项目没有必要
         com.bupt.dailyhaha.pojo.media.Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(code)), com.bupt.dailyhaha.pojo.media.Submission.class);
@@ -123,6 +141,14 @@ public class SubmissionServiceImpl implements Submission {
         mongoTemplate.remove(Query.query(Criteria.where("hash").is(hashcode)), com.bupt.dailyhaha.pojo.media.Submission.class);
     }
 
+    /**
+     * 分页查询
+     *
+     * @param pageNum  页码
+     * @param pageSize 每页大小
+     * @param lastID   上一页最后一个元素的id
+     * @return 分页结果
+     */
     @Override
     public PageResult<com.bupt.dailyhaha.pojo.media.Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
         Query query = new Query();
@@ -131,6 +157,12 @@ public class SubmissionServiceImpl implements Submission {
     }
 
 
+    /**
+     * 插入投稿
+     *
+     * @param submission 投稿
+     * @return 插入后的投稿
+     */
     private com.bupt.dailyhaha.pojo.media.Submission insertSubmission(com.bupt.dailyhaha.pojo.media.Submission submission) {
         try {
             mongoTemplate.save(submission);

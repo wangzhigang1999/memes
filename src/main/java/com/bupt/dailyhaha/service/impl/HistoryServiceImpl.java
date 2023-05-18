@@ -18,6 +18,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * 历史记录服务
+ * <p>
+ * meme图的设计中有日期的概念，每一天的所有投稿会被归档至一个 history记录中
+ * 因此可以根据日期直接获取当天的投稿记录
+ */
 @Service
 public class HistoryServiceImpl implements History {
 
@@ -34,7 +40,7 @@ public class HistoryServiceImpl implements History {
      * 获取历史记录
      *
      * @param date 日期 YYYY-MM-DD
-     * @return 历史记录
+     * @return 当天的记录
      */
     @Override
     public List<Submission> getHistory(String date) {
@@ -67,6 +73,13 @@ public class HistoryServiceImpl implements History {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 更新历史记录
+     *
+     * @param date        日期  YYYY-MM-DD
+     * @param Submissions 投稿列表
+     * @return 是否更新成功
+     */
     @Override
     public boolean updateHistory(String date, List<Submission> Submissions) {
         com.bupt.dailyhaha.pojo.media.History history = new com.bupt.dailyhaha.pojo.media.History();

@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.service;
 
-import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.pojo.Sys;
+import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Interface.ReleaseStrategy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -27,6 +27,11 @@ public class SysConfigService {
     }
 
 
+    /**
+     * 初始化系统配置，如果有空配置，写一个默认值进去
+     * 最后保存回mongo
+     * 如果有多个实例启动，会导致多次初始化，但是不会有问题
+     */
     private void init() {
         sys = mongoTemplate.findById("sys", Sys.class);
         if (sys == null) {
@@ -41,8 +46,12 @@ public class SysConfigService {
             sys.setSelectedReleaseStrategy("default");
         }
 
-        if (sys.getMAX_HISTORY()==0){
+        if (sys.getMAX_HISTORY() == 0) {
             sys.setMAX_HISTORY(7);
+        }
+
+        if (sys.getMIN_SUBMISSIONS() == 0) {
+            sys.setMIN_SUBMISSIONS(50);
         }
 
         mongoTemplate.save(sys);
@@ -109,15 +118,15 @@ public class SysConfigService {
         return false;
     }
 
-    public int getMaxSubmissions() {
-        return sys.getMAX_SUBMISSIONS();
+    public int getMinSubmissions() {
+        return sys.getMIN_SUBMISSIONS();
     }
 
-    public boolean setMaxSubmissions(int maxSubmissions) {
-        if (maxSubmissions < 0) {
+    public boolean setMinSubmissions(int minSubmissions) {
+        if (minSubmissions < 0) {
             return false;
         }
-        sys.setMAX_SUBMISSIONS(maxSubmissions);
+        sys.setMIN_SUBMISSIONS(minSubmissions);
         mongoTemplate.save(sys);
         return true;
     }
@@ -136,6 +145,12 @@ public class SysConfigService {
     }
 
 
+    /**
+     * 获取所有实现了ReleaseStrategy接口的类
+     *
+     * @param applicationContext Spring上下文
+     * @return 所有实现了ReleaseStrategy接口的类
+     */
     private Map<String, ReleaseStrategy> getImplsOfInterface(ApplicationContext applicationContext) {
         return applicationContext.getBeansOfType(ReleaseStrategy.class);
     }

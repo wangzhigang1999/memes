@@ -9,6 +9,14 @@ import java.util.List;
 
 @Component("Custom")
 public class CustomReleaseStrategy implements ReleaseStrategy {
+
+    /**
+     * 一个自定义发布策略
+     *
+     * @param currentSubmissions 当前已发布的投稿
+     * @param newSubmissions     新的投稿
+     * @return 应该被发布的投稿
+     */
     @Override
     public List<Submission> release(List<Submission> currentSubmissions, List<Submission> newSubmissions) {
         int size = newSubmissions.size();
@@ -22,7 +30,7 @@ public class CustomReleaseStrategy implements ReleaseStrategy {
                 currentSubmissions.addAll(newSubmissions.subList(0, 5));
             }
         } else if (hour >= 20) {
-            // 22:00 - 00:00 晚上了，全部发布
+            // 20:00 - 00:00 晚上了，全部发布
             currentSubmissions.addAll(newSubmissions);
         } else {
             // 00:00 - 8:00 睡觉的时候，每次只发布一张

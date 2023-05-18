@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 定时任务
+ */
+
 @Service
 public class Schedule {
 
@@ -43,7 +47,7 @@ public class Schedule {
 
         int toBeReviewed = review.listSubmissions().size();
         long reviewPassedNum = review.getReviewPassedNum();
-        int targetNum = sysConfig.getMaxSubmissions();
+        int targetNum = sysConfig.getMinSubmissions();
 
         boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
 

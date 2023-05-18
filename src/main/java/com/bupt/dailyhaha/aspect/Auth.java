@@ -31,9 +31,16 @@ public class Auth {
     }
 
 
+    /**
+     * 校验token
+     */
     @Around("auth()")
     public Object auth(ProceedingJoinPoint joinPoint) throws Throwable {
 
+        /*
+         *  从请求头中获取token，如果token不正确，返回401
+         *  进程内部的token，只有在启动时才会生成，如果进程重启，token会改变；也可以通过环境变量传入
+         */
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
         var request = attributes.getRequest();
