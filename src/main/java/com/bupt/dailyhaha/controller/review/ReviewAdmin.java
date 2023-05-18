@@ -68,7 +68,7 @@ public class ReviewAdmin {
 
 
     /**
-     * 今日详情
+     * 今日投稿的统计信息
      */
     @GetMapping("/statistic")
     @AuthRequired

@@ -64,16 +64,27 @@ public class SubAdmin {
     }
 
 
-    @GetMapping("/max")
+    /**
+     * 获取每天的最少投稿数目
+     */
+    @GetMapping("/min")
     @AuthRequired
-    public ResultData<Integer> getMaxSubmissions() {
-        return ResultData.success(sysConfig.getMaxSubmissions());
+    public ResultData<Integer> getMinSubmissions() {
+        return ResultData.success(sysConfig.getMinSubmissions());
     }
 
-    @PostMapping("/max")
+    /**
+     * 设置每天的最少投稿数目,
+     * 当天的投稿数目小于这个数目时，会自动的开启bot；
+     * 大于这个数目时，会关闭bot
+     *
+     * @param min 最少投稿数目
+     * @return ResultData
+     */
+    @PostMapping("/min")
     @AuthRequired
-    public ResultData<Boolean> setMaxSubmissions(@RequestParam("max") int max) {
-        return ResultData.success(sysConfig.setMaxSubmissions(max));
+    public ResultData<Boolean> setMaxSubmissions(@RequestParam("min") int min) {
+        return ResultData.success(sysConfig.setMinSubmissions(min));
     }
 
 }

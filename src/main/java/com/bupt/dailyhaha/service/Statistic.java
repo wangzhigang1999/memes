@@ -28,7 +28,6 @@ public class Statistic {
      * @param end   end timestamp
      * @return List<Map < String, Object>>
      */
-
     public List<LogDocument> loadRecords(long start, long end) {
         Query query = new Query();
         query.addCriteria(Criteria.where("timestamp").gte(start).lte(end));
