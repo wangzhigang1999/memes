@@ -73,12 +73,19 @@ public class SubUser {
      * @param up   up or down
      * @return ResultData
      */
-
     @PostMapping("/vote/{hash}/{up}")
     public ResultData<Boolean> vote(@PathVariable("hash") int hash, @PathVariable("up") boolean up) {
         return ResultData.success(service.vote(hash, up));
     }
 
+    /**
+     * 分页获取投稿
+     *
+     * @param pageNum  页码
+     * @param pageSize 页大小
+     * @param lastID   上一页最后一个的id
+     * @return Page
+     */
     @GetMapping("/page")
     public ResultData<PageResult<com.bupt.dailyhaha.pojo.media.Submission>> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
         return ResultData.success(service.getSubmissionByPage(pageNum, pageSize, lastID));
