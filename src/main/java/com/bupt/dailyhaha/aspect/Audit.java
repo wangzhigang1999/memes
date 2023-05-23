@@ -83,26 +83,28 @@ public class Audit implements CommandLineRunner {
         HttpServletResponse response = attributes.getResponse();
         assert response != null;
         int status = response.getStatus();
-        pool.submit(() -> {
-            LogDocument document = new LogDocument();
-            document.setUrl(url)
-                    .setMethod(method)
-                    .setIp(ip)
-                    .setClassMethod(classMethod)
-                    .setDetail(proceed)
-                    .setParameterMap(request.getParameterMap())
-                    .setUuid((uuid == null || uuid.isEmpty()) ? "unknown" : uuid)
-                    .setStatus(status)
-                    .setTimecost(end - start)
-                    .setTimestamp(start)
-                    .setEnv(env)
-                    .setInstanceUUID(instanceUUID);
-            template.save(document);
-            if (!env.equals("prod")) {
-                logger.info(proceed.toString());
-            }
 
-        });
+        if (!env.equals("prod")) {
+            logger.info(proceed.toString());
+        } else {
+            pool.submit(() -> {
+                LogDocument document = new LogDocument();
+                document.setUrl(url)
+                        .setMethod(method)
+                        .setIp(ip)
+                        .setClassMethod(classMethod)
+                        .setDetail(proceed)
+                        .setParameterMap(request.getParameterMap())
+                        .setUuid((uuid == null || uuid.isEmpty()) ? "unknown" : uuid)
+                        .setStatus(status)
+                        .setTimecost(end - start)
+                        .setTimestamp(start)
+                        .setEnv(env)
+                        .setInstanceUUID(instanceUUID);
+                template.save(document);
+            });
+        }
+
         return proceed;
     }
 
