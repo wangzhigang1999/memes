@@ -1,16 +1,13 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
+import com.bupt.dailyhaha.mapper.MSubmission;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.Interface.History;
-import com.bupt.dailyhaha.service.Interface.ReleaseStrategy;
-import com.bupt.dailyhaha.service.Interface.Review;
+import com.bupt.dailyhaha.service.IHistory;
+import com.bupt.dailyhaha.service.IReleaseStrategy;
+import com.bupt.dailyhaha.service.IReview;
 import com.bupt.dailyhaha.service.SysConfigService;
+import com.bupt.dailyhaha.util.Utils;
 import lombok.AllArgsConstructor;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,13 +20,12 @@ import java.util.Objects;
  */
 @Service
 @AllArgsConstructor
-public class ReviewServiceImpl implements Review {
+public class IReviewServiceImpl implements IReview {
 
-    final MongoTemplate template;
+    final MSubmission submissionMapper;
+    final IHistory IHistory;
 
-    final History history;
-
-    final Map<String, ReleaseStrategy> releaseStrategyMap;
+    final Map<String, IReleaseStrategy> releaseStrategyMap;
 
     final SysConfigService config;
 
@@ -45,8 +41,8 @@ public class ReviewServiceImpl implements Review {
         var start = Utils.getTodayStartUnixEpochMilli();
         // 向前推两个小时,从上一天的22点开始算起
         var from = start - 2 * 60 * 60 * 1000;
-        Criteria criteria = Criteria.where("timestamp").gte(from).and("deleted").ne(true).and("reviewed").ne(true);
-        return template.find(Query.query(criteria), Submission.class);
+        var now = System.currentTimeMillis();
+        return submissionMapper.find(from, now, false, false);
     }
 
     /**
@@ -108,25 +104,24 @@ public class ReviewServiceImpl implements Review {
             从上一天的 22:00:00 到今天的 22:00:00
          */
 
-        Criteria criteria = Criteria.where("timestamp").gte(from).lte(to).and("deleted").ne(true).and("reviewed").ne(false);
 
         // 获取这个时间段内的所有投稿
-        List<Submission> submissions = template.find(Query.query(criteria), Submission.class);
+        List<Submission> submissions = submissionMapper.find(from, to, false, true);
 
         // 有一部分投稿是已经发布过的
-        List<Submission> history = this.history.getHistory(date);
+        List<Submission> history = this.IHistory.getHistory(date);
 
         // 找出这一批投稿中，哪些是新的投稿
         List<Submission> newSubmissions = findDiff(history, submissions);
 
         // 获取发布策略
-        var strategy = releaseStrategyMap.get(config.sys.getSelectedReleaseStrategy());
+        var strategy = releaseStrategyMap.get(config.sysConfig.getSelectedReleaseStrategy());
         if (strategy != null) {
             // 发布
             submissions = strategy.release(history, newSubmissions);
         }
         // 更新历史记录
-        boolean updateHistory = this.history.updateHistory(date, submissions);
+        boolean updateHistory = this.IHistory.updateHistory(date, submissions);
         return updateHistory ? submissions.size() : -1;
     }
 
@@ -141,14 +136,13 @@ public class ReviewServiceImpl implements Review {
         var start = Utils.getTodayStartUnixEpochMilli();
         // 向前推两个小时,从上一天的22点开始算起
         var from = start - 2 * 60 * 60 * 1000;
-        Criteria criteria = Criteria.where("timestamp").gte(from).and("deleted").ne(true).and("reviewed").ne(false);
-        return template.count(Query.query(criteria), Submission.class);
+        return submissionMapper.count(from, System.currentTimeMillis(), false, true);
     }
 
     @Override
     public Map<String, Integer> getTodayInfo() {
         long reviewPassedNum = getReviewPassedNum();
-        int releasedNum = history.getHistory(Utils.getYMD()).size();
+        int releasedNum = IHistory.getHistory(Utils.getYMD()).size();
         int toBeReviewedNum = listSubmissions().size();
         return Map.of("reviewPassedNum", (int) reviewPassedNum, "releasedNum", releasedNum, "toBeReviewedNum", toBeReviewedNum);
     }
@@ -162,13 +156,13 @@ public class ReviewServiceImpl implements Review {
      * @return 是否成功
      */
     private boolean updateSubmission(int hashcode, boolean deleted) {
-        var query = new Query(Criteria.where("hash").is(hashcode));
-        template.update(Submission.class).matching(query).apply(new Update().set("deleted", deleted).set("reviewed", true)).all();
-        Submission one = template.findOne(query, Submission.class);
-        return one != null && one.getDeleted();
+        return submissionMapper.updateStatus(hashcode, deleted) > 0;
     }
 
     private static List<Submission> findDiff(List<Submission> currentSubmissions, List<Submission> newSubmissions) {
+        if (currentSubmissions == null || newSubmissions == null) {
+            return List.of();
+        }
         return newSubmissions.stream().filter(newSubmission -> currentSubmissions.stream().noneMatch(currentSubmission -> Objects.equals(currentSubmission, newSubmission))).toList();
     }
 

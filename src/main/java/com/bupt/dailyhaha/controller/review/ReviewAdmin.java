@@ -3,7 +3,7 @@ package com.bupt.dailyhaha.controller.review;
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.Interface.Review;
+import com.bupt.dailyhaha.service.IReview;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,9 +13,9 @@ import java.util.Map;
 @RequestMapping("/admin/review")
 @CrossOrigin(origins = "*")
 public class ReviewAdmin {
-    final Review service;
+    final IReview service;
 
-    public ReviewAdmin(Review service) {
+    public ReviewAdmin(IReview service) {
         this.service = service;
     }
 

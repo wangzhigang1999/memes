@@ -1,22 +1,16 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
+import com.bupt.dailyhaha.mapper.MHistory;
+import com.bupt.dailyhaha.pojo.media.History;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.Interface.History;
-import com.mongodb.client.result.UpdateResult;
+import com.bupt.dailyhaha.service.IHistory;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * 历史记录服务
@@ -25,16 +19,13 @@ import java.util.stream.Collectors;
  * 因此可以根据日期直接获取当天的投稿记录
  */
 @Service
-public class HistoryServiceImpl implements History {
+@AllArgsConstructor
+public class HistoryServiceImpl implements IHistory {
 
-    final MongoTemplate mongoTemplate;
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(HistoryServiceImpl.class);
+    final MHistory historyMapper;
     final static ConcurrentHashMap<String, com.bupt.dailyhaha.pojo.media.History> dateHistoryCache = new ConcurrentHashMap<>();
-
-    public HistoryServiceImpl(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
 
     /**
      * 获取历史记录
@@ -48,7 +39,8 @@ public class HistoryServiceImpl implements History {
             logger.info("cache hit,date: {}", date);
             return dateHistoryCache.get(date).getSubmissions();
         }
-        com.bupt.dailyhaha.pojo.media.History history = mongoTemplate.findOne(Query.query(Criteria.where("date").is(date)), com.bupt.dailyhaha.pojo.media.History.class);
+
+        var history = historyMapper.findByDate(date);
         if (history != null) {
             logger.info("cache miss, date: {},will update it.", date);
             dateHistoryCache.put(date, history);
@@ -64,13 +56,7 @@ public class HistoryServiceImpl implements History {
      */
     @Override
     public List<String> getHistoryDates(int limit) {
-        Query query = Query.query(Criteria.where("date").exists(true));
-        query.limit(limit).with(Sort.by(Sort.Direction.DESC, "timestamp")).fields().include("date").exclude("_id");
-
-        return mongoTemplate.find(query, Map.class, "history").stream()
-                .map(map -> map.get("date").toString())
-                .filter(date -> !date.equals(Utils.getYMD()))
-                .collect(Collectors.toList());
+        return historyMapper.finAvailableDates(limit);
     }
 
     /**
@@ -82,14 +68,12 @@ public class HistoryServiceImpl implements History {
      */
     @Override
     public boolean updateHistory(String date, List<Submission> Submissions) {
-        com.bupt.dailyhaha.pojo.media.History history = new com.bupt.dailyhaha.pojo.media.History();
+        History history = new History();
         history.setDate(date);
         history.setSubmissions(Submissions);
         history.setTimestamp(System.currentTimeMillis());
 
-        Update update = new Update().set("Submissions", Submissions).set("timestamp", System.currentTimeMillis()).set("count", Submissions.size());
-        UpdateResult result = mongoTemplate.upsert(Query.query(Criteria.where("date").is(date)), update, com.bupt.dailyhaha.pojo.media.History.class);
-        var res = result.getUpsertedId() != null || result.getModifiedCount() > 0;
+        var res = historyMapper.updateHistory(date, history);
 
         if (res) {
             logger.info("update history success,update cache date: {}", date);

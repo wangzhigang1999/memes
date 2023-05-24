@@ -1,17 +1,12 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
+import com.bupt.dailyhaha.mapper.MSubmission;
 import com.bupt.dailyhaha.pojo.common.PageResult;
-import com.bupt.dailyhaha.service.Interface.Storage;
-import com.bupt.dailyhaha.service.Interface.Submission;
-import com.bupt.dailyhaha.service.MongoPageHelper;
-import com.mongodb.DuplicateKeyException;
-import com.mongodb.client.result.UpdateResult;
-import org.slf4j.Logger;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import com.bupt.dailyhaha.pojo.media.Submission;
+import com.bupt.dailyhaha.service.IStorage;
+import com.bupt.dailyhaha.service.ISubmission;
+import com.bupt.dailyhaha.util.Utils;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -20,21 +15,12 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class SubmissionServiceImpl implements Submission {
+@AllArgsConstructor
+public class SubmissionServiceImpl implements ISubmission {
 
-    final MongoTemplate mongoTemplate;
-    final MongoPageHelper mongoPageHelper;
-
-    final Storage storage;
-
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(SubmissionServiceImpl.class);
-    final static ConcurrentHashMap<Integer, com.bupt.dailyhaha.pojo.media.Submission> cache = new ConcurrentHashMap<>();
-
-    public SubmissionServiceImpl(MongoTemplate mongoTemplate, MongoPageHelper mongoPageHelper, Storage storage) {
-        this.mongoTemplate = mongoTemplate;
-        this.mongoPageHelper = mongoPageHelper;
-        this.storage = storage;
-    }
+    final static ConcurrentHashMap<Integer, Submission> cache = new ConcurrentHashMap<>();
+    final MSubmission mSubmission;
+    final IStorage IStorage;
 
     /**
      * 对投稿点赞/点踩
@@ -45,16 +31,7 @@ public class SubmissionServiceImpl implements Submission {
      */
     @Override
     public boolean vote(int hashcode, boolean up) {
-        // if up is true, then vote up, else vote down
-        var query = new Query(Criteria.where("hash").is(hashcode));
-        var update = new Update();
-        if (up) {
-            update.inc("up", 1);
-        } else {
-            update.inc("down", 1);
-        }
-        UpdateResult first = mongoTemplate.update(com.bupt.dailyhaha.pojo.media.Submission.class).matching(query).apply(update).first();
-        return first.getMatchedCount() > 0;
+        return mSubmission.vote(hashcode, up);
     }
 
 
@@ -66,19 +43,20 @@ public class SubmissionServiceImpl implements Submission {
      * @return 存储后的投稿
      */
     @Override
-    public com.bupt.dailyhaha.pojo.media.Submission storeTextFormatSubmission(String uri, String mime) {
+    public Submission storeTextFormatSubmission(String uri, String mime) {
 
         // check if the submission already exists
-        com.bupt.dailyhaha.pojo.media.Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(uri.hashCode())), com.bupt.dailyhaha.pojo.media.Submission.class);
+        var submission = mSubmission.findByHash(uri.hashCode());
         if (submission != null) {
             return submission;
         }
 
-        submission = new com.bupt.dailyhaha.pojo.media.Submission();
+        submission = new Submission();
         submission.setSubmissionType(mime);
         submission.setName(uri);
         submission.setUrl(uri);
         submission.setHash(uri.hashCode());
+        submission.setDate(Utils.getYMD());
 
         return insertSubmission(submission);
     }
@@ -92,7 +70,7 @@ public class SubmissionServiceImpl implements Submission {
      * @return 存储后的投稿
      */
     @Override
-    public com.bupt.dailyhaha.pojo.media.Submission storeStreamSubmission(InputStream stream, String mime, boolean personal) {
+    public Submission storeStreamSubmission(InputStream stream, String mime, boolean personal) {
         byte[] bytes = Utils.readAllBytes(stream);
         if (bytes == null) {
             return null;
@@ -104,17 +82,18 @@ public class SubmissionServiceImpl implements Submission {
 
         // 为什么需要这个？因为Pod会重启，重启之后会丢失缓存的信息，所以需要从数据库中查询
         // 也可以使用redis来做缓存，但是这个项目没有必要
-        com.bupt.dailyhaha.pojo.media.Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(code)), com.bupt.dailyhaha.pojo.media.Submission.class);
+        Submission submission = mSubmission.findByHash(code);
         if (submission != null) {
             cache.put(code, submission);
             return submission;
         }
 
-        submission = storage.store(bytes, mime);
+        submission = IStorage.store(bytes, mime);
         if (submission == null) {
             return null;
         }
         submission.setHash(code);
+        submission.setDate(Utils.getYMD());
 
         // 当做图床用的时候，不入库
         if (personal) {
@@ -129,8 +108,8 @@ public class SubmissionServiceImpl implements Submission {
      * 获取被标记为删除的投稿
      */
     @Override
-    public List<com.bupt.dailyhaha.pojo.media.Submission> getDeletedSubmission() {
-        return mongoTemplate.find(Query.query(Criteria.where("deleted").is(true)), com.bupt.dailyhaha.pojo.media.Submission.class);
+    public List<Submission> getDeletedSubmission() {
+        return mSubmission.find(true, null);
     }
 
     /**
@@ -138,7 +117,7 @@ public class SubmissionServiceImpl implements Submission {
      */
     @Override
     public void hardDeleteSubmission(int hashcode) {
-        mongoTemplate.remove(Query.query(Criteria.where("hash").is(hashcode)), com.bupt.dailyhaha.pojo.media.Submission.class);
+        assert mSubmission.hardDeleteByHash(hashcode);
     }
 
     /**
@@ -150,10 +129,8 @@ public class SubmissionServiceImpl implements Submission {
      * @return 分页结果
      */
     @Override
-    public PageResult<com.bupt.dailyhaha.pojo.media.Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("reviewed").is(true));
-        return mongoPageHelper.pageQuery(query, com.bupt.dailyhaha.pojo.media.Submission.class, pageSize, pageNum, lastID);
+    public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
+        return mSubmission.find(pageNum, pageSize, lastID);
     }
 
 
@@ -163,13 +140,7 @@ public class SubmissionServiceImpl implements Submission {
      * @param submission 投稿
      * @return 插入后的投稿
      */
-    private com.bupt.dailyhaha.pojo.media.Submission insertSubmission(com.bupt.dailyhaha.pojo.media.Submission submission) {
-        try {
-            mongoTemplate.save(submission);
-        } catch (DuplicateKeyException e) {
-            logger.info("duplicate submission, hash: {}", submission.getHash());
-            submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(submission.getHash())), com.bupt.dailyhaha.pojo.media.Submission.class);
-        }
-        return submission;
+    private Submission insertSubmission(Submission submission) {
+        return mSubmission.create(submission);
     }
 }

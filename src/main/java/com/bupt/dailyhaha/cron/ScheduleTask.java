@@ -1,9 +1,8 @@
-package com.bupt.dailyhaha.service;
+package com.bupt.dailyhaha.cron;
 
-import com.bupt.dailyhaha.Utils;
-import com.bupt.dailyhaha.service.Interface.Review;
-import com.bupt.dailyhaha.service.Interface.Storage;
-import com.bupt.dailyhaha.service.Interface.Submission;
+import com.bupt.dailyhaha.service.SysConfigService;
+import com.bupt.dailyhaha.util.Utils;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -17,24 +16,18 @@ import java.util.Map;
  */
 
 @Service
-public class Schedule {
+@AllArgsConstructor
+public class ScheduleTask {
 
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(Schedule.class);
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(ScheduleTask.class);
 
-    final Review review;
+    final com.bupt.dailyhaha.service.IReview IReview;
 
-    final Storage storage;
+    final com.bupt.dailyhaha.service.IStorage IStorage;
 
-    final Submission submission;
+    final com.bupt.dailyhaha.service.ISubmission ISubmission;
 
     final SysConfigService sysConfig;
-
-    public Schedule(Review review, Storage storage, Submission submission, SysConfigService sysConfig) {
-        this.review = review;
-        this.storage = storage;
-        this.submission = submission;
-        this.sysConfig = sysConfig;
-    }
 
 
     /**
@@ -42,11 +35,11 @@ public class Schedule {
      */
     @Scheduled(fixedRate = 1000 * 1800)
     public void autoRelease() {
-        int release = review.release();
+        int release = IReview.release();
         logger.info("release {} submissions", release);
 
-        int toBeReviewed = review.listSubmissions().size();
-        long reviewPassedNum = review.getReviewPassedNum();
+        int toBeReviewed = IReview.listSubmissions().size();
+        long reviewPassedNum = IReview.getReviewPassedNum();
         int targetNum = sysConfig.getMinSubmissions();
 
         boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
@@ -93,7 +86,7 @@ public class Schedule {
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void cleanImg() {
-        List<com.bupt.dailyhaha.pojo.media.Submission> deletedSubmission = submission.getDeletedSubmission();
+        List<com.bupt.dailyhaha.pojo.media.Submission> deletedSubmission = ISubmission.getDeletedSubmission();
         logger.info("clean {} images", deletedSubmission.size());
 
         if (deletedSubmission.size() == 0) {
@@ -107,7 +100,7 @@ public class Schedule {
             map.put(keys[i], deletedSubmission.get(i).getHash());
         }
 
-        HashMap<String, Boolean> booleanHashMap = storage.delete(keys);
+        HashMap<String, Boolean> booleanHashMap = IStorage.delete(keys);
         if (booleanHashMap == null) {
             logger.error("clean images failed");
             return;
@@ -115,12 +108,10 @@ public class Schedule {
 
         for (Map.Entry<String, Boolean> entry : booleanHashMap.entrySet()) {
             if (entry.getValue()) {
-                submission.hardDeleteSubmission(map.get(entry.getKey()));
+                ISubmission.hardDeleteSubmission(map.get(entry.getKey()));
             }
         }
-
         logger.info("clean images done");
     }
-
 
 }

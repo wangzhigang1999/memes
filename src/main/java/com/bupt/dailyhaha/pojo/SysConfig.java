@@ -2,13 +2,11 @@ package com.bupt.dailyhaha.pojo;
 
 import com.bupt.dailyhaha.pojo.media.Submission;
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
 
-@Document("sys")
 @Data
-public class Sys {
+public class SysConfig {
     private String id = "sys";
 
     // 机器人是否开启

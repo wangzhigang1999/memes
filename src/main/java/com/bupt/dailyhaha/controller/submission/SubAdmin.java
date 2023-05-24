@@ -3,9 +3,9 @@ package com.bupt.dailyhaha.controller.submission;
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.common.ReturnCode;
-import com.bupt.dailyhaha.service.Interface.Review;
-import com.bupt.dailyhaha.service.Interface.Submission;
-import com.bupt.dailyhaha.service.Statistic;
+import com.bupt.dailyhaha.service.IReview;
+import com.bupt.dailyhaha.service.ISubmission;
+import com.bupt.dailyhaha.service.StatisticService;
 import com.bupt.dailyhaha.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class SubAdmin {
 
-    final Submission service;
+    final ISubmission service;
 
-    final Statistic statistic;
+    final StatisticService statisticService;
 
-    final Review review;
+    final IReview IReview;
 
 
     final SysConfigService sysConfig;
@@ -35,7 +35,7 @@ public class SubAdmin {
     @RequestMapping("/release")
     @AuthRequired
     public ResultData<Integer> release() {
-        int release = review.release();
+        int release = IReview.release();
         return release < 0 ? ResultData.fail(ReturnCode.RC500) : ResultData.success(release);
     }
 

@@ -1,14 +1,14 @@
 package com.bupt.dailyhaha.service.impl.release;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.Interface.ReleaseStrategy;
+import com.bupt.dailyhaha.service.IReleaseStrategy;
+import com.bupt.dailyhaha.util.Utils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component("Custom")
-public class CustomReleaseStrategy implements ReleaseStrategy {
+public class CustomReleaseStrategy implements IReleaseStrategy {
 
     /**
      * 一个自定义发布策略

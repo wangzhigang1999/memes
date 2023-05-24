@@ -2,7 +2,7 @@ package com.bupt.dailyhaha.controller.common;
 
 import com.bupt.dailyhaha.anno.AuthRequired;
 import com.bupt.dailyhaha.pojo.common.ResultData;
-import com.bupt.dailyhaha.service.Statistic;
+import com.bupt.dailyhaha.service.StatisticService;
 import com.bupt.dailyhaha.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class Common {
 
-    final Statistic statistic;
+    final StatisticService statisticService;
 
     final SysConfigService sysConfig;
 
@@ -37,7 +37,7 @@ public class Common {
     @RequestMapping("/statistic")
     @AuthRequired
     public ResultData<Map<String, Object>> statistic() {
-        return ResultData.success(statistic.statistic());
+        return ResultData.success(statisticService.statistic());
     }
 
     /**

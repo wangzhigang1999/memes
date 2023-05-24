@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha;
+package com.bupt.dailyhaha.util;
 
 import org.apache.commons.io.FileUtils;
 
@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 public class Utils {
 
@@ -32,6 +34,16 @@ public class Utils {
         return today.toString();
     }
 
+    /**
+     * get start epoch milli of a date
+     *
+     * @param date date in the format of YYYY-MM-DD
+     * @return start epoch milli of a date
+     */
+    public static Long getStartEpochMilli(String date) {
+        return LocalDate.parse(date).atStartOfDay(ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli();
+    }
+
 
     /**
      * read all bytes from input stream
@@ -47,6 +59,13 @@ public class Utils {
         }
     }
 
+    /**
+     * save bytes to file
+     *
+     * @param bytes bytes
+     * @param path  path
+     * @return true if saved successfully
+     */
     public static boolean saveFile(byte[] bytes, String path) {
         try {
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), new File(path));
@@ -56,7 +75,12 @@ public class Utils {
         }
     }
 
-    public  static int getCurrentHour() {
+    /**
+     * get current hour in Asia/Shanghai
+     *
+     * @return current hour in Asia/Shanghai
+     */
+    public static int getCurrentHour() {
         var now = Instant.now();
         return now.atZone(java.time.ZoneId.of("Asia/Shanghai")).getHour();
     }
@@ -70,5 +94,9 @@ public class Utils {
         // convert l to  time format YYYY-MM-DD HH:mm:ss
         var str = Instant.ofEpochMilli(l).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
         System.out.println(str);
+
+
+        String date = "2023-05-24";
+        System.out.println(LocalDate.parse(date).atStartOfDay(ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli());
     }
 }

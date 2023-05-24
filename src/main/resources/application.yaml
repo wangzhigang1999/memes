@@ -1,16 +1,12 @@
 spring:
   application:
     name: memes
-  profiles:
-    active: ${env}
 
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-  web:
-    resources:
-      static-locations: [ "classpath:/static/","file:./memes/" ]
-  webflux:
-    static-path-pattern: /static/**
 
+urlPrefix: ${urlPrefix}
+
+token: ${token}

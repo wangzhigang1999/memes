@@ -3,8 +3,9 @@ package com.bupt.dailyhaha.controller.submission;
 import com.bupt.dailyhaha.pojo.common.PageResult;
 import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.common.ReturnCode;
-import com.bupt.dailyhaha.service.Interface.History;
-import com.bupt.dailyhaha.service.Interface.Submission;
+import com.bupt.dailyhaha.pojo.media.Submission;
+import com.bupt.dailyhaha.service.IHistory;
+import com.bupt.dailyhaha.service.ISubmission;
 import com.bupt.dailyhaha.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +22,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class SubUser {
 
-    final Submission service;
+    final ISubmission service;
 
-    final History history;
+    final IHistory IHistory;
 
     final SysConfigService sysConfig;
 
@@ -39,7 +40,7 @@ public class SubUser {
      * @throws IOException IOException
      */
     @PostMapping("")
-    public ResultData<com.bupt.dailyhaha.pojo.media.Submission> upload(MultipartFile file, String uri, String mime, boolean personal) throws IOException {
+    public ResultData<Submission> upload(MultipartFile file, String uri, String mime, boolean personal) throws IOException {
         if (mime == null || mime.isEmpty()) {
             return ResultData.fail(ReturnCode.RC400);
         }
@@ -97,8 +98,8 @@ public class SubUser {
      * @return ResultData
      */
     @GetMapping("/history")
-    public ResultData<List<String>> getHistory() {
-        return ResultData.success(history.getHistoryDates(sysConfig.getMaxHistory()));
+    public ResultData<List<String>> getIHistory() {
+        return ResultData.success(IHistory.getHistoryDates(sysConfig.getMaxHistory()));
     }
 
     /**
@@ -108,8 +109,8 @@ public class SubUser {
      * @return ResultData
      */
     @GetMapping("/{date}")
-    public ResultData<List<com.bupt.dailyhaha.pojo.media.Submission>> getSubmission(@PathVariable("date") String date) {
-        return ResultData.success(history.getHistory(date));
+    public ResultData<List<Submission>> getSubmission(@PathVariable("date") String date) {
+        return ResultData.success(IHistory.getHistory(date));
     }
 
 }

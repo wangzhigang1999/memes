@@ -2,10 +2,8 @@ package com.bupt.dailyhaha.pojo.media;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(collection = "Submission")
 @AllArgsConstructor
 public class Submission {
 
@@ -18,6 +16,7 @@ public class Submission {
     Boolean deleted = false;
     Boolean reviewed = false;
     long timestamp;
+    String date;
 
     long up;
 
@@ -32,11 +31,12 @@ public class Submission {
     }
 
     public void setSubmissionType(String mime) {
+        mime = mime.toLowerCase();
         if (mime.startsWith("image")) {
             this.submissionType = SubmissionType.IMAGE;
         } else if (mime.startsWith("video")) {
             this.submissionType = SubmissionType.VIDEO;
-        } else if (mime.startsWith("text/bilibili")) {
+        } else if (mime.startsWith("text/bilibili") || mime.startsWith("bilibili")) {
             this.submissionType = SubmissionType.BILIBILI;
         }
     }

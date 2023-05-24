@@ -1,25 +1,22 @@
 package com.bupt.dailyhaha.service;
 
-import com.bupt.dailyhaha.Utils;
+import com.bupt.dailyhaha.mapper.MLog;
 import com.bupt.dailyhaha.pojo.common.LogDocument;
 import com.bupt.dailyhaha.pojo.common.Pair;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+import com.bupt.dailyhaha.util.Utils;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.Function;
 
 @Service
-public class Statistic {
+@AllArgsConstructor
+public class StatisticService {
 
 
-    final MongoTemplate template;
+    MLog logMapper;
 
-    public Statistic(MongoTemplate template) {
-        this.template = template;
-    }
 
     /**
      * load records from start to end
@@ -29,13 +26,7 @@ public class Statistic {
      * @return List<Map < String, Object>>
      */
     public List<LogDocument> loadRecords(long start, long end) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("timestamp").gte(start).lte(end));
-        query.fields().include("timestamp").include("url").include("ip").include("timecost").include("uuid");
-        List<LogDocument> documents = template.find(query, LogDocument.class);
-        // filter the records which has :empty uuid or :empty url or :empty ip or :empty timecost
-        documents.removeIf(logDocument -> logDocument.getUuid().isEmpty());
-        return documents;
+        return logMapper.find(start, end);
     }
 
 

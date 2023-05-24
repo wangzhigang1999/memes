@@ -1,16 +1,9 @@
-package com.bupt.dailyhaha.service.impl.storageImpl;
+package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.media.Submission;
-import com.bupt.dailyhaha.service.Interface.Storage;
+import com.bupt.dailyhaha.service.IStorage;
+import com.bupt.dailyhaha.util.Utils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -18,9 +11,7 @@ import java.util.UUID;
 
 
 @Service("local")
-@Conditional(LocalStorageImpl.class)
-@Primary
-public class LocalStorageImpl implements Storage, Condition {
+public class LocalIStorageImpl implements IStorage {
 
 
     static String localDir = "memes";
@@ -33,7 +24,7 @@ public class LocalStorageImpl implements Storage, Condition {
         }
     }
 
-    @Value("${local.urlPrefix}")
+    @Value("${urlPrefix}")
     String urlPrefix;
 
 
@@ -54,11 +45,4 @@ public class LocalStorageImpl implements Storage, Condition {
         return submission;
     }
 
-
-    @Override
-    public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
-        Environment env = context.getEnvironment();
-        var property = env.getProperty("storage.type", String.class, "local");
-        return "local".equals(property);
-    }
 }

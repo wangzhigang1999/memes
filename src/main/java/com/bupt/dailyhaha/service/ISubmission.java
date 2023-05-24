@@ -1,11 +1,13 @@
-package com.bupt.dailyhaha.service.Interface;
+package com.bupt.dailyhaha.service;
+
 
 import com.bupt.dailyhaha.pojo.common.PageResult;
+import com.bupt.dailyhaha.pojo.media.Submission;
 
 import java.io.InputStream;
 import java.util.List;
 
-public interface Submission {
+public interface ISubmission {
 
 
     /**
@@ -25,7 +27,7 @@ public interface Submission {
      * @param mime mime
      * @return Submission
      */
-    com.bupt.dailyhaha.pojo.media.Submission storeTextFormatSubmission(String url, String mime);
+    Submission storeTextFormatSubmission(String url, String mime);
 
 
     /**
@@ -36,13 +38,13 @@ public interface Submission {
      * @param personal 是否是个人投稿
      * @return Submission
      */
-    com.bupt.dailyhaha.pojo.media.Submission storeStreamSubmission(InputStream stream, String mime, boolean personal);
+    Submission storeStreamSubmission(InputStream stream, String mime, boolean personal);
 
 
     /**
      * 获取被标记为删除的投稿
      */
-    List<com.bupt.dailyhaha.pojo.media.Submission> getDeletedSubmission();
+    List<Submission> getDeletedSubmission();
 
 
     /**
@@ -51,6 +53,6 @@ public interface Submission {
     void hardDeleteSubmission(int hashcode);
 
 
-    PageResult<com.bupt.dailyhaha.pojo.media.Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID);
+    PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID);
 
 }
