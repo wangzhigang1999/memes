@@ -28,9 +28,9 @@ public class SysConfigService {
 
 
     /**
-     * 初始化系统配置，如果有空配置，写一个默认值进去
+     * 初始化系统配置，如果有配置项不存在的，写一个默认值进去
      * 最后保存回mongo
-     * 如果有多个实例启动，会导致多次初始化，但是不会有问题
+     * 如果有多个实例启动，会导致多次初始化，但是不会有问题，因为只有不存在的时候才会写入默认值，而且多个实例写入的默认值是一样的
      */
     private void init() {
         sys = mongoTemplate.findById("sys", Sys.class);
@@ -38,6 +38,12 @@ public class SysConfigService {
             sys = new Sys();
         }
 
+        /*
+            设置发布策略
+            1. 扫描所有的实现了 ReleaseStrategy 接口的类
+            2. 将类名作为策略名
+            3. 设置一个策略名为 default 的策略，作为默认策略
+         */
         Map<String, ReleaseStrategy> impls = getImplsOfInterface(applicationContext);
         Set<String> releaseStrategy = new HashSet<>(impls.keySet());
         sys.setReleaseStrategy(releaseStrategy);

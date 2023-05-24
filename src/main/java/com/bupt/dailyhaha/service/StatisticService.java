@@ -12,12 +12,12 @@ import java.util.*;
 import java.util.function.Function;
 
 @Service
-public class Statistic {
+public class StatisticService {
 
 
     final MongoTemplate template;
 
-    public Statistic(MongoTemplate template) {
+    public StatisticService(MongoTemplate template) {
         this.template = template;
     }
 
