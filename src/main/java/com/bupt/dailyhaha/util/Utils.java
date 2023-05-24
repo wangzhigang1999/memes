@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha;
+package com.bupt.dailyhaha.util;
 
 import org.apache.commons.io.FileUtils;
 
