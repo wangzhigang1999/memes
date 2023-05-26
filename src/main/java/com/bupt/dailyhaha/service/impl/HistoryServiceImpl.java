@@ -56,7 +56,7 @@ public class HistoryServiceImpl implements IHistory {
      */
     @Override
     public List<String> getHistoryDates(int limit) {
-        return historyMapper.finAvailableDates(limit);
+        return historyMapper.findAvailableDates(limit);
     }
 
     /**
