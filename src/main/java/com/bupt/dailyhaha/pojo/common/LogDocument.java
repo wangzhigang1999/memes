@@ -1,6 +1,7 @@
 package com.bupt.dailyhaha.pojo.common;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
+@TableName(value = "log")
 public class LogDocument {
     private String url;
     private String method;
