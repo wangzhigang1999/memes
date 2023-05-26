@@ -1,5 +1,6 @@
 package com.bupt.dailyhaha.pojo.common;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class LogDocument {
     private String classMethod;
 
     private String detail;
+    @TableField(exist = false)
     private Map<String, String[]> parameterMap;
     private String uuid;
     private int status;
@@ -25,6 +27,7 @@ public class LogDocument {
     private long timestamp;
     private String env;
 
+    @TableField(value = "instance_uuid")
     private String instanceUUID;
 
     public static LogDocument random() {

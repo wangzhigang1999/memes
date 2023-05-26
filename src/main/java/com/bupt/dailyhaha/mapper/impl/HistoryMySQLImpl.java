@@ -1,7 +1,7 @@
 package com.bupt.dailyhaha.mapper.impl;
 
 import com.bupt.dailyhaha.mapper.MHistory;
-import com.bupt.dailyhaha.mapper.mysql.MSubmission;
+import com.bupt.dailyhaha.mapper.sqlite.MSubmission;
 import com.bupt.dailyhaha.pojo.media.History;
 import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.util.Utils;

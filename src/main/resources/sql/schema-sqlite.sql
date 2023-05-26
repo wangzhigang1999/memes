@@ -1,4 +1,4 @@
-create table if not exists log
+create table if not exists log_document
 (
     uuid          varchar(255)  null,
     url           varchar(255)  null,
@@ -28,13 +28,4 @@ create table if not exists submission
     date            varchar(255) null,
     submission_type varchar(255) null
 );
-
-create index date
-    on submission (date);
-
-create index date_del_rev
-    on submission (deleted, reviewed, timestamp);
-
-create index id
-    on submission (id);
 

@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha.mapper.mysql;
+package com.bupt.dailyhaha.mapper.sqlite;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.bupt.dailyhaha.pojo.common.LogDocument;

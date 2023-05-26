@@ -10,9 +10,9 @@ import java.util.List;
 @Service
 public class LogMySQLImpl implements MLog {
 
-    final com.bupt.dailyhaha.mapper.mysql.MLog mLog;
+    final com.bupt.dailyhaha.mapper.sqlite.MLog mLog;
 
-    public LogMySQLImpl(com.bupt.dailyhaha.mapper.mysql.MLog mLog) {
+    public LogMySQLImpl(com.bupt.dailyhaha.mapper.sqlite.MLog mLog) {
         this.mLog = mLog;
     }
 

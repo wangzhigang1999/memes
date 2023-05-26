@@ -15,10 +15,10 @@ import java.util.Map;
 public class SubmissionMySQLImpl implements MSubmission {
 
     public static final int FIRST_PAGE_NUM = 1;
-    final com.bupt.dailyhaha.mapper.mysql.MSubmission subMapper;
+    final com.bupt.dailyhaha.mapper.sqlite.MSubmission subMapper;
 
 
-    public SubmissionMySQLImpl(com.bupt.dailyhaha.mapper.mysql.MSubmission subMapper) {
+    public SubmissionMySQLImpl(com.bupt.dailyhaha.mapper.sqlite.MSubmission subMapper) {
         this.subMapper = subMapper;
     }
 
