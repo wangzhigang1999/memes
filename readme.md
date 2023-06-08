@@ -28,14 +28,7 @@
 
 ### mapper 包详解
 
-│ ├── MHistoryImpl.java				
-**│ ├── MHistory.java 		// 与历史投稿相关的接口**
-│ ├── MLogImpl.java
-**│ ├── MLog.java 			// 日志、审计、统计相关的接口**
-│ ├── MSubmissionImpl.java
-**│ ├── MSubmission.java 	 // 与投稿相关的接口**
-│ ├── MSysImpl.java
-**│ └── MSys.java 			// 与系统配置相关的接口**
+![image-20230608225412445](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/image-20230608225412445.png)
 
 可以看到，在Mapper包中定义了一些==接口==，每个接口对应了一个==默认的实现==。
 
@@ -83,6 +76,8 @@ public class MHistoryRedisImpl implements MHistory {
 
 可以根据自己的想法尝试一些稀奇古怪的存储方案。
 
+
+
 ==**所有的接口中的所有方法都需要自行实现！**==
 
 ==**所有的接口中的所有方法都需要自行实现！**==
@@ -91,24 +86,8 @@ public class MHistoryRedisImpl implements MHistory {
 
 ### service 包详解
 
-├── service										
-│ ├── impl									
-│ │ ├── HistoryServiceImpl.java 		// 默认的历史业务逻辑实现，**不需要改动**
-│ │ ├── IReviewServiceImpl.java 		// 默认的审核业务逻辑实现，**不需要改动**
-│ │ ├── LocalIStorageImpl.java 		// 一个默认的存储实现
-│ │ ├── SubmissionServiceImpl.java 	// 默认的投稿业务逻辑实现，**不需要改动**
-│ │ └── release								
-│ │ ├── CustomReleaseStrategy.java 	// 一个预先实现的发布策略
-│ │ └── DefaultReleaseStrategy.java 	// 一个预先实现的发布策略
-│ │
-│ ├── IHistory.java 				// 历史相关的业务接口		
-│ ├── IReleaseStrategy.java 		// 发布策略的接口
-│ ├── IReview.java 				// 审核相关业务的接口
-**│ ├── IStorage.java 				// 存储相关业务的接口**， **有可能需要改动**
-│ ├── ISubmission.java 			// 投稿相关的业务接口
-│ │
-│ ├── StatisticService.java 		// 逻辑过于简单，未抽象出接口 统计相关的业务逻辑
-│ └── SysConfigService.java 		// 逻辑过于简单，未抽象出接口 系统配置相关的业务逻辑
+![image-20230608225443784](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/image-20230608225443784.png)
+
 
 可以看到，service 包主要分为了一些==接口和对应的实现==，这些接口规定了业务需要做什么，而实现则定义了怎么做。
 
