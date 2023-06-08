@@ -53,7 +53,7 @@ public class MSubmissionImpl implements MSubmission {
      */
     @Override
     public List<Submission> find(long from, long to, Boolean deleted, Boolean reviewed) {
-        return null;
+        return List.of();
     }
 
     /**
@@ -67,7 +67,7 @@ public class MSubmissionImpl implements MSubmission {
      */
     @Override
     public Long count(long from, long to, Boolean deleted, Boolean reviewed) {
-        return null;
+        return 0L;
     }
 
     /**
