@@ -98,5 +98,15 @@ public class Utils {
 
         String date = "2023-05-24";
         System.out.println(LocalDate.parse(date).atStartOfDay(ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli());
+
+
+        String s = Instant.parse("2023-01-01T00:00:00.00Z").atZone(ZoneId.of("Asia/Shanghai")).toLocalDate().toString();
+        System.out.println(s);
+
+
+        var start = Instant.parse("2023-01-01T00:00:00.00Z").atZone(ZoneId.of("Asia/Shanghai")).toLocalDate();
+        var today = Instant.now().atZone(java.time.ZoneId.of("Asia/Shanghai")).toLocalDate();
+        int to = (int) (today.toEpochDay() - start.toEpochDay());
+        System.out.println(to);
     }
 }

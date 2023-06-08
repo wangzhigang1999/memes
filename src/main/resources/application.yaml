@@ -7,16 +7,16 @@ spring:
       max-request-size: 10MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${mysqlUrl}
-    username: ${mysqlUser}
-    password: ${mysqlPassword}
+    url: ${mysqlUrl:jdbc:mysql://localhost:3306/memes}
+    username: ${mysqlUser:root}
+    password: ${mysqlPassword:root}
   web:
     resources:
       static-locations: [ "classpath:/static/","file:./memes/" ]
   webflux:
     static-path-pattern: /static/**
 
-urlPrefix: ${urlPrefix}
+urlPrefix: ${urlPrefix:http://100.68.68.47:8080/}
 
 token: ${token}
 

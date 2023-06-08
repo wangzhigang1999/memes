@@ -15,10 +15,10 @@ import java.util.Map;
 public class SubmissionMySQLImpl implements MSubmission {
 
     public static final int FIRST_PAGE_NUM = 1;
-    final com.bupt.dailyhaha.mapper.sqlite.MSubmission subMapper;
+    final com.bupt.dailyhaha.mapper.mysql.MSubmission subMapper;
 
 
-    public SubmissionMySQLImpl(com.bupt.dailyhaha.mapper.sqlite.MSubmission subMapper) {
+    public SubmissionMySQLImpl(com.bupt.dailyhaha.mapper.mysql.MSubmission subMapper) {
         this.subMapper = subMapper;
     }
 
@@ -57,12 +57,9 @@ public class SubmissionMySQLImpl implements MSubmission {
 
     @Override
     public PageResult<Submission> find(int pageNum, int pageSize, String lastID) {
-        var total = count(0, System.currentTimeMillis(), false, true);
-        final int pages = (int) Math.ceil(total / (double) pageSize);
-        if (pageNum <= 0 || pageNum > pages) {
+        if (pageNum <= 0) {
             pageNum = FIRST_PAGE_NUM;
         }
-
         QueryWrapper<Submission> wrapper = new QueryWrapper<>();
         wrapper.eq("deleted", 0).eq("reviewed", 1);
 
@@ -75,8 +72,8 @@ public class SubmissionMySQLImpl implements MSubmission {
         List<Submission> submissions = subMapper.selectList(wrapper);
 
         final PageResult<Submission> pageResult = new PageResult<>();
-        pageResult.setTotal(total);
-        pageResult.setPages(pages);
+        // 对于mysql来讲，当表太大时，统计总数是很难的
+        pageResult.setTotal(Long.MAX_VALUE);
         pageResult.setPageSize(pageSize);
         pageResult.setPageNum(pageNum);
         pageResult.setList(submissions);

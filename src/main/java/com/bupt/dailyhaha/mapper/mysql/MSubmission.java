@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha.mapper.sqlite;
+package com.bupt.dailyhaha.mapper.mysql;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.bupt.dailyhaha.pojo.media.Submission;
