@@ -33,12 +33,9 @@ public class Audit {
 
     public final static String instanceUUID = UUID.randomUUID().toString();
 
-    public String env;
-
 
     public Audit(MLog mLog) {
         this.logMapper = mLog;
-        env = System.getenv("env");
     }
 
     @Pointcut("execution(* com.bupt.dailyhaha.controller.*.*.*(..))")
@@ -59,10 +56,7 @@ public class Audit {
         // get uuid from headers
         var uuid = request.getHeader("uuid");
 
-        // if not  prod
-        if (!env.equals("prod")) {
-            logger.info("url: {}, method: {}, ip: {}, classMethod: {}", url, method, ip, classMethod);
-        }
+        logger.info("url: {}, method: {}, ip: {}, classMethod: {}", url, method, ip, classMethod);
 
         long start = System.currentTimeMillis();
         Object proceed = joinPoint.proceed();
@@ -84,7 +78,6 @@ public class Audit {
                     .setStatus(status)
                     .setTimecost(end - start)
                     .setTimestamp(start)
-                    .setEnv(env)
                     .setInstanceUUID(instanceUUID);
             logMapper.insertLog(document);
         });
