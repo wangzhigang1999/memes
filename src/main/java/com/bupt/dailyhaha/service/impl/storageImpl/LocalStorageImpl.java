@@ -40,7 +40,7 @@ public class LocalStorageImpl implements Storage, Condition {
     @Override
     public Submission store(byte[] bytes, String mime) {
         String type = mime.split("/")[1];
-        String fileName = String.valueOf(System.currentTimeMillis()) + UUID.randomUUID() + "." + type;
+        String fileName = System.currentTimeMillis() + "-" + UUID.randomUUID() + "." + type;
         var path = localDir + "/" + fileName;
         boolean saved = Utils.saveFile(bytes, path);
         if (!saved) {

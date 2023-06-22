@@ -64,7 +64,7 @@ public class QiNiuStorageImpl implements Storage, Condition {
         String upToken = auth.uploadToken(bucket);
         String uuid = UUID.randomUUID().toString();
         long timeMillis = System.currentTimeMillis();
-        var fileName = String.valueOf(timeMillis).concat("shadiao/").concat(uuid).concat(".").concat(ext);
+        var fileName = "shadiao/".concat(String.valueOf(timeMillis)).concat("-").concat(uuid).concat(".").concat(ext);
         Response response = manager.put(bytes, fileName, upToken);
         DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
         return putRet.key;
