@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.bupt</groupId>
-    <artifactId>dailyHaha</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>dailyHaha</name>
-    <description>dailyHaha</description>
+    <artifactId>memes</artifactId>
+    <version>1.0</version>
+    <name>memes</name>
+    <description>memes for byr</description>
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>30.1.1-jre</version>
+            <version>31.1-jre</version>
         </dependency>
 
 

@@ -1,8 +1,8 @@
 package com.bupt.dailyhaha.service;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.common.LogDocument;
 import com.bupt.dailyhaha.pojo.common.Pair;
+import com.bupt.dailyhaha.util.Utils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,12 +12,12 @@ import java.util.*;
 import java.util.function.Function;
 
 @Service
-public class Statistic {
+public class StatisticService {
 
 
     final MongoTemplate template;
 
-    public Statistic(MongoTemplate template) {
+    public StatisticService(MongoTemplate template) {
         this.template = template;
     }
 

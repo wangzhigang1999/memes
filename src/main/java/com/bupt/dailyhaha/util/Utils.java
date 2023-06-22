@@ -1,4 +1,4 @@
-package com.bupt.dailyhaha;
+package com.bupt.dailyhaha.util;
 
 import org.apache.commons.io.FileUtils;
 
@@ -47,6 +47,13 @@ public class Utils {
         }
     }
 
+    /**
+     * save bytes to file
+     *
+     * @param bytes bytes
+     * @param path  path
+     * @return true if saved successfully
+     */
     public static boolean saveFile(byte[] bytes, String path) {
         try {
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), new File(path));
@@ -56,7 +63,12 @@ public class Utils {
         }
     }
 
-    public  static int getCurrentHour() {
+    /**
+     * get current hour in Asia/Shanghai
+     *
+     * @return current hour in Asia/Shanghai
+     */
+    public static int getCurrentHour() {
         var now = Instant.now();
         return now.atZone(java.time.ZoneId.of("Asia/Shanghai")).getHour();
     }

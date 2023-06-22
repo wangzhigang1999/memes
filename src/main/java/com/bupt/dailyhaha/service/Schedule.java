@@ -1,9 +1,9 @@
 package com.bupt.dailyhaha.service;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.service.Interface.Review;
 import com.bupt.dailyhaha.service.Interface.Storage;
 import com.bupt.dailyhaha.service.Interface.Submission;
+import com.bupt.dailyhaha.util.Utils;
 import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
