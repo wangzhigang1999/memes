@@ -1,8 +1,8 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Interface.History;
+import com.bupt.dailyhaha.util.Utils;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;

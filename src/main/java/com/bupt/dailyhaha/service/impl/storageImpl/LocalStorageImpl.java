@@ -1,8 +1,8 @@
 package com.bupt.dailyhaha.service.impl.storageImpl;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Interface.Storage;
+import com.bupt.dailyhaha.util.Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -40,7 +40,7 @@ public class LocalStorageImpl implements Storage, Condition {
     @Override
     public Submission store(byte[] bytes, String mime) {
         String type = mime.split("/")[1];
-        String fileName = UUID.randomUUID() + "." + type;
+        String fileName = String.valueOf(System.currentTimeMillis()) + UUID.randomUUID() + "." + type;
         var path = localDir + "/" + fileName;
         boolean saved = Utils.saveFile(bytes, path);
         if (!saved) {

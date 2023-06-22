@@ -5,7 +5,7 @@ import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.common.ReturnCode;
 import com.bupt.dailyhaha.service.Interface.Review;
 import com.bupt.dailyhaha.service.Interface.Submission;
-import com.bupt.dailyhaha.service.Statistic;
+import com.bupt.dailyhaha.service.StatisticService;
 import com.bupt.dailyhaha.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ public class SubAdmin {
 
     final Submission service;
 
-    final Statistic statistic;
+    final StatisticService statisticService;
 
     final Review review;
 

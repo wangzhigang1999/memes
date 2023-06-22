@@ -1,11 +1,11 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Interface.History;
 import com.bupt.dailyhaha.service.Interface.ReleaseStrategy;
 import com.bupt.dailyhaha.service.Interface.Review;
 import com.bupt.dailyhaha.service.SysConfigService;
+import com.bupt.dailyhaha.util.Utils;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

@@ -1,10 +1,10 @@
 package com.bupt.dailyhaha.service.impl;
 
-import com.bupt.dailyhaha.Utils;
 import com.bupt.dailyhaha.pojo.common.PageResult;
 import com.bupt.dailyhaha.service.Interface.Storage;
 import com.bupt.dailyhaha.service.Interface.Submission;
 import com.bupt.dailyhaha.service.MongoPageHelper;
+import com.bupt.dailyhaha.util.Utils;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
