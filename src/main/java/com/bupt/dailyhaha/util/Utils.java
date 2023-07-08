@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
+import java.util.Set;
 
 public class Utils {
 
@@ -71,6 +72,12 @@ public class Utils {
     public static int getCurrentHour() {
         var now = Instant.now();
         return now.atZone(java.time.ZoneId.of("Asia/Shanghai")).getHour();
+    }
+
+
+    public static Set<String> convertTag(String tag) {
+        String[] split = tag.split(",");
+        return Set.of(split);
     }
 
     public static void main(String[] args) {

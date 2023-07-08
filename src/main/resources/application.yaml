@@ -14,3 +14,5 @@ spring:
   webflux:
     static-path-pattern: /static/**
 
+  main:
+    lazy-initialization: true
