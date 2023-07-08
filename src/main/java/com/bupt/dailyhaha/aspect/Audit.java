@@ -93,7 +93,6 @@ public class Audit implements CommandLineRunner {
                         .setMethod(method)
                         .setIp(ip)
                         .setClassMethod(classMethod)
-                        .setDetail(proceed)
                         .setParameterMap(request.getParameterMap())
                         .setUuid((uuid == null || uuid.isEmpty()) ? "unknown" : uuid)
                         .setStatus(status)

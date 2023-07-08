@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -23,6 +24,9 @@ public class INewsImpl implements INews {
     final MongoPageHelper mongoPageHelper;
 
     final Storage storage;
+
+    String cacheKey = "";
+    List<News> cache = null;
 
     ThreadPoolExecutor pool = new ThreadPoolExecutor(10, 10, 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
 
@@ -38,31 +42,24 @@ public class INewsImpl implements INews {
         // use thread pool to upload image
         Future<String> future = pool.submit(new AsyncUpload(coverImage));
 
-
         // title content sourceURL must not null
         if (news.getTitle() == null || news.getContent() == null || news.getSourceURL() == null) {
             return null;
         }
-
-
         // if date is null, then set date to now
         if (news.getDate() == null) {
             // YYYY-MM-DD in Asia/Shanghai
             news.setDate(Utils.getYMD());
         }
-
         // set timestamp to now
         news.setTimestamp(System.currentTimeMillis());
-
-
-        String url;
+        String url = news.getCoverImage();
         try {
             url = future.get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            url = "https://bbs.bupt.site/shadiao/1688628801659-98ede151-98ba-44b2-b198-9e5bff028350.jpeg";
+        } catch (Exception ignored) {
+
         }
         news.setCoverImage(url);
-
         return mongoTemplate.insert(news);
     }
 
@@ -104,6 +101,40 @@ public class INewsImpl implements INews {
     }
 
     @Override
+    public List<News> findByDate(String date) {
+        // if empty then set to today
+        if (date == null || date.isEmpty()) {
+            date = Utils.getYMD();
+        }
+        Query query = new Query();
+        query.addCriteria(Criteria.where("date").is(date));
+        query.addCriteria(Criteria.where("deleted").is(false));
+        return mongoTemplate.find(query, News.class);
+    }
+
+    @Override
+    public List<News> findByMMDD(String MMDD) {
+        // if empty then set to today
+        if (MMDD == null || MMDD.isEmpty()) {
+            MMDD = Utils.getYMD().substring(5);
+        }
+
+        // if cache hit then return cache
+        if (cacheKey.equals(MMDD)) {
+            return cache;
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("date").regex(MMDD));
+        query.addCriteria(Criteria.where("deleted").is(false));
+        List<News> news = mongoTemplate.find(query, News.class);
+
+        cacheKey = MMDD;
+        cache = news;
+        return news;
+    }
+
+    @Override
     public boolean deleteNews(String id) {
         News news = findById(id);
         if (news == null) {
@@ -118,14 +149,15 @@ public class INewsImpl implements INews {
     @Override
     public PageResult<News> find(int pageNum, int pageSize, String lastID) {
         Query query = new Query();
-        return mongoPageHelper.pageQuery(query, News.class, pageSize,pageNum, lastID);
+        return mongoPageHelper.pageQuery(query, News.class, pageSize, pageNum, lastID);
     }
 
     @Override
     public PageResult<News> findByTag(Set<String> tags, int pageNum, int pageSize, String lastID) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("tag").in(tags));
-        return mongoPageHelper.pageQuery(query, News.class, pageNum, pageSize, lastID);
+        // tag query, the result must contain all tags
+        query.addCriteria(Criteria.where("tag").all(tags));
+        return mongoPageHelper.pageQuery(query, News.class, pageSize, pageNum, lastID);
     }
 
 
@@ -141,7 +173,7 @@ public class INewsImpl implements INews {
             try {
                 return storage.store(file.getBytes(), file.getContentType()).getUrl();
             } catch (IOException e) {
-                return "Default";
+                return "";
             }
         }
     }

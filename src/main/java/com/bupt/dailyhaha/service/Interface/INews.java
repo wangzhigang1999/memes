@@ -4,6 +4,7 @@ import com.bupt.dailyhaha.pojo.common.PageResult;
 import com.bupt.dailyhaha.pojo.media.News;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Set;
 
 public interface INews {
@@ -16,6 +17,10 @@ public interface INews {
     News removeTag(String newsId, Set<String> tag);
 
     News findById(String id);
+
+    List<News> findByDate(String date);
+
+    List<News> findByMMDD(String MMDD);
 
     boolean deleteNews(String id);
 

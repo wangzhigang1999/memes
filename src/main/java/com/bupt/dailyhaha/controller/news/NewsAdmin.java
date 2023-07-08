@@ -5,10 +5,7 @@ import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.media.News;
 import com.bupt.dailyhaha.service.Interface.INews;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.bupt.dailyhaha.util.Utils.convertTag;
@@ -24,7 +21,7 @@ public class NewsAdmin {
 
     @PostMapping("/add")
     @AuthRequired
-    public ResultData<News> addNews(String data, MultipartFile coverImage) {
+    public ResultData<News> addNews(String data, @RequestParam(required = false) MultipartFile coverImage) {
         News news = News.fromJson(data);
         return ResultData.success(iNews.addNews(news, coverImage));
     }

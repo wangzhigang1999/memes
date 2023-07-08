@@ -20,6 +20,8 @@ public class News {
 
     private String coverImage;
     private String title;
+
+    private String introduction;
     private String content;
     private String sourceURL;
     private String author;
