@@ -49,7 +49,7 @@ public class NewsUser {
 
 
     @GetMapping("/page")
-    public ResultData<PageResult<News>> page(Integer pageNum, Integer pageSize, String lastID, @RequestParam(required = false) String tag) {
+    public ResultData<PageResult<News>> page(Integer pageNum, Integer pageSize, String lastID, @RequestParam(required = false) Boolean hasContent, @RequestParam(required = false) String tag) {
         // set default value for pageNum and pageSize
         if (pageNum == null) {
             pageNum = 1;
@@ -57,9 +57,14 @@ public class NewsUser {
         if (pageSize == null) {
             pageSize = 10;
         }
-        if (tag != null) {
-            return ResultData.success(iNews.findByTag(convertTag(tag), pageNum, pageSize, lastID));
+
+        if (hasContent == null) {
+            hasContent = false;
         }
-        return ResultData.success(iNews.find(pageNum, pageSize, lastID));
+
+        if (tag != null) {
+            return ResultData.success(iNews.findByTag(convertTag(tag), hasContent, pageNum, pageSize, lastID));
+        }
+        return ResultData.success(iNews.find(pageNum, hasContent, pageSize, lastID));
     }
 }
