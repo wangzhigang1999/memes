@@ -24,7 +24,7 @@ public interface INews {
 
     boolean deleteNews(String id);
 
-    PageResult<News> find(int pageNum, int pageSize, String lastID);
+    PageResult<News> find(int pageNum,boolean hasContent, int pageSize, String lastID);
 
-    PageResult<News> findByTag(Set<String> tags, int pageNum, int pageSize, String lastID);
+    PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageNum, int pageSize, String lastID);
 }
