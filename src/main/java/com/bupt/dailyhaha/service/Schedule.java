@@ -53,7 +53,7 @@ public class Schedule {
 
         // 十点之后开启机器人
         int currentHour = Utils.getCurrentHour();
-        if (currentHour >= 22 || currentHour <= 8) {
+        if (currentHour >= 21 || currentHour <= 8) {
             botShouldEnabled = true;
             logger.info("bot enabled because of time");
         }
