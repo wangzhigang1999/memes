@@ -86,23 +86,23 @@ public class Audit implements CommandLineRunner {
 
         if (!env.equals("prod")) {
             logger.info(proceed.toString());
-        } else {
-            pool.submit(() -> {
-                LogDocument document = new LogDocument();
-                document.setUrl(url)
-                        .setMethod(method)
-                        .setIp(ip)
-                        .setClassMethod(classMethod)
-                        .setParameterMap(request.getParameterMap())
-                        .setUuid((uuid == null || uuid.isEmpty()) ? "unknown" : uuid)
-                        .setStatus(status)
-                        .setTimecost(end - start)
-                        .setTimestamp(start)
-                        .setEnv(env)
-                        .setInstanceUUID(instanceUUID);
-                template.save(document);
-            });
         }
+
+        pool.submit(() -> {
+            LogDocument document = new LogDocument();
+            document.setUrl(url)
+                    .setMethod(method)
+                    .setIp(ip)
+                    .setClassMethod(classMethod)
+                    .setParameterMap(request.getParameterMap())
+                    .setUuid((uuid == null || uuid.isEmpty()) ? "unknown" : uuid)
+                    .setStatus(status)
+                    .setTimecost(end - start)
+                    .setTimestamp(start)
+                    .setEnv(env)
+                    .setInstanceUUID(instanceUUID);
+            template.save(document);
+        });
 
         return proceed;
     }
