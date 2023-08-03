@@ -48,7 +48,7 @@ public class Schedule {
 
         int toBeReviewed = review.listSubmissions().size();
         long reviewPassedNum = review.getReviewPassedNum();
-        int targetNum = sysConfig.getSys().getMAX_HISTORY();
+        int targetNum = sysConfig.getSys().getMIN_SUBMISSIONS();
 
         boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
 
