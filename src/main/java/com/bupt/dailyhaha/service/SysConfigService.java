@@ -18,7 +18,7 @@ public class SysConfigService {
     final MongoTemplate mongoTemplate;
     final ApplicationContext applicationContext;
 
-    public Sys sys;
+    public static Sys sys;
 
     public SysConfigService(MongoTemplate mongoTemplate, ApplicationContext applicationContext) {
         this.mongoTemplate = mongoTemplate;
