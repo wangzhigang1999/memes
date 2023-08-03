@@ -2,11 +2,7 @@ spring:
   data:
     mongodb:
       database: memes-dev
-      host: ${mongoHost}
-      port: ${mongoPort}
-      username: ${mongoUser}
-      password: ${mongoPassword}
-      authentication-database: admin
+      uri: ${mongoUri}
 
 storage:
   type: ${storage}

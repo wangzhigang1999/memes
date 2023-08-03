@@ -18,7 +18,7 @@ public class SysConfigService {
     final MongoTemplate mongoTemplate;
     final ApplicationContext applicationContext;
 
-    public Sys sys;
+    public static Sys sys;
 
     public SysConfigService(MongoTemplate mongoTemplate, ApplicationContext applicationContext) {
         this.mongoTemplate = mongoTemplate;
@@ -107,13 +107,6 @@ public class SysConfigService {
         return sys.getTopSubmission();
     }
 
-    public Set<String> getReleaseStrategy() {
-        return sys.getReleaseStrategy();
-    }
-
-    public String getSelectedReleaseStrategy() {
-        return sys.getSelectedReleaseStrategy();
-    }
 
     public boolean setReleaseStrategy(String strategy) {
         if (sys.getReleaseStrategy().contains(strategy)) {
@@ -124,9 +117,6 @@ public class SysConfigService {
         return false;
     }
 
-    public int getMinSubmissions() {
-        return sys.getMIN_SUBMISSIONS();
-    }
 
     public boolean setMinSubmissions(int minSubmissions) {
         if (minSubmissions < 0) {
@@ -137,9 +127,6 @@ public class SysConfigService {
         return true;
     }
 
-    public int getMaxHistory() {
-        return sys.getMAX_HISTORY();
-    }
 
     public boolean setMaxHistory(int maxHistory) {
         if (maxHistory < 0) {
@@ -148,6 +135,12 @@ public class SysConfigService {
         sys.setMAX_HISTORY(maxHistory);
         mongoTemplate.save(sys);
         return true;
+    }
+
+
+    public Sys getSys() {
+        sys.getTopSubmission().clear();
+        return sys;
     }
 
 

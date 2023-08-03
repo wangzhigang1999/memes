@@ -98,7 +98,7 @@ public class SubUser {
      */
     @GetMapping("/history")
     public ResultData<List<String>> getHistory() {
-        return ResultData.success(history.getHistoryDates(sysConfig.getMaxHistory()));
+        return ResultData.success(history.getHistoryDates(sysConfig.getSys().getMAX_HISTORY()));
     }
 
     /**
