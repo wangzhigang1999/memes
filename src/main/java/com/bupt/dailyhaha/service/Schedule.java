@@ -43,11 +43,12 @@ public class Schedule {
     @Scheduled(fixedRate = 1000 * 1800)
     public void autoRelease() {
         int release = review.release();
-        logger.info("release {} submissions", release);
+        logger.info("auto release {} submissions", release);
+
 
         int toBeReviewed = review.listSubmissions().size();
         long reviewPassedNum = review.getReviewPassedNum();
-        int targetNum = sysConfig.getMinSubmissions();
+        int targetNum = sysConfig.getSys().getMAX_HISTORY();
 
         boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
 
@@ -55,15 +56,13 @@ public class Schedule {
         int currentHour = Utils.getCurrentHour();
         if (currentHour >= 21 || currentHour <= 8) {
             botShouldEnabled = true;
-            logger.info("bot enabled because of time");
+            logger.info("bot should enable because of time: {}", currentHour);
         }
 
         if (botShouldEnabled) {
             sysConfig.enableBot();
-            logger.info("bot enabled");
         } else {
             sysConfig.disableBot();
-            logger.info("bot disabled");
         }
     }
 
@@ -78,14 +77,15 @@ public class Schedule {
     public static boolean shouldBotEnabled(long curSubmissionNum, int toBeReviewed, int targetNum) {
         // 如果当前已发布的数量大于目标数量，直接返回false
         if (curSubmissionNum >= targetNum) {
-            logger.info("current submission num {} is larger than target num {}.", curSubmissionNum, targetNum);
+            logger.info("bot should disable because of curSubmissionNum: {} more than targetNum: {}", curSubmissionNum, targetNum);
             return false;
         }
         int needed = (int) (targetNum - curSubmissionNum);
-        logger.info("needed: {}, toBeReviewed: {},at least: {}", needed, toBeReviewed, needed * 1.5);
 
         // 审核的通过率大概是2/3,所以需要的数量是1.5倍
-        return toBeReviewed < (needed * 1.5);
+        boolean b = toBeReviewed < (needed * 1.5);
+        logger.info("bot should {} because of toBeReviewed: {} needed: {}", b ? "enable" : "disable", toBeReviewed, needed);
+        return b;
     }
 
     /**
@@ -94,7 +94,7 @@ public class Schedule {
     @Scheduled(cron = "0 0 0 * * ?")
     public void cleanImg() {
         List<com.bupt.dailyhaha.pojo.media.Submission> deletedSubmission = submission.getDeletedSubmission();
-        logger.info("clean {} images", deletedSubmission.size());
+        logger.info("clean images, {} images to be deleted", deletedSubmission.size());
 
         if (deletedSubmission.size() == 0) {
             return;
@@ -109,7 +109,7 @@ public class Schedule {
 
         HashMap<String, Boolean> booleanHashMap = storage.delete(keys);
         if (booleanHashMap == null) {
-            logger.error("clean images failed");
+            logger.error("clean images failed,because of storage error");
             return;
         }
 
@@ -119,7 +119,7 @@ public class Schedule {
             }
         }
 
-        logger.info("clean images done");
+        logger.info("clean images done, {} images deleted", booleanHashMap.size());
     }
 
 

@@ -64,14 +64,6 @@ public class SubAdmin {
     }
 
 
-    /**
-     * 获取每天的最少投稿数目
-     */
-    @GetMapping("/min")
-    @AuthRequired
-    public ResultData<Integer> getMinSubmissions() {
-        return ResultData.success(sysConfig.getMinSubmissions());
-    }
 
     /**
      * 设置每天的最少投稿数目,

@@ -1,6 +1,7 @@
 package com.bupt.dailyhaha.controller.common;
 
 import com.bupt.dailyhaha.anno.AuthRequired;
+import com.bupt.dailyhaha.pojo.Sys;
 import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.service.StatisticService;
 import com.bupt.dailyhaha.service.SysConfigService;
@@ -8,7 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Set;
 
 
 @RestController
@@ -70,16 +70,6 @@ public class Common {
         return ResultData.success(sysConfig.botStatus());
     }
 
-    /**
-     * 获取所有的投稿发布策略
-     */
-    @GetMapping("/release/strategy")
-    public ResultData<Object> getStrategy() {
-        Set<String> releaseStrategy = sysConfig.getReleaseStrategy();
-        String selectedReleaseStrategy = sysConfig.getSelectedReleaseStrategy();
-        Map<String, Object> map = Map.of("releaseStrategy", releaseStrategy, "selectedReleaseStrategy", selectedReleaseStrategy);
-        return ResultData.success(map);
-    }
 
     /**
      * 设置投稿发布策略
@@ -92,14 +82,6 @@ public class Common {
         return ResultData.success(sysConfig.setReleaseStrategy(strategy));
     }
 
-    /**
-     * 获取允许用户查看的最大历史记录数量
-     */
-    @GetMapping("/history/max")
-    @AuthRequired
-    public ResultData<Integer> getMaxHistory() {
-        return ResultData.success(sysConfig.getMaxHistory());
-    }
 
     /**
      * 设置允许用户查看的最大历史记录数量
@@ -110,5 +92,11 @@ public class Common {
     @AuthRequired
     public ResultData<Boolean> setMaxHistory(@RequestParam("max") int max) {
         return ResultData.success(sysConfig.setMaxHistory(max));
+    }
+
+    @GetMapping("/sys")
+    @AuthRequired
+    public ResultData<Sys> getSysConfig() {
+        return ResultData.success(sysConfig.getSys());
     }
 }
