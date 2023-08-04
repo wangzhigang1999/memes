@@ -82,9 +82,6 @@ public class SysConfigService {
         return true;
     }
 
-    public boolean botStatus() {
-        return sys.getBotUp();
-    }
 
     public boolean addTop(int hashcode) {
         Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(hashcode)), Submission.class);
@@ -101,10 +98,6 @@ public class SysConfigService {
         sys.getTopSubmission().remove(submission);
         mongoTemplate.save(sys);
         return true;
-    }
-
-    public Set<Submission> getTop() {
-        return sys.getTopSubmission();
     }
 
 

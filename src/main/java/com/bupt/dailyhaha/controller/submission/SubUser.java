@@ -63,7 +63,7 @@ public class SubUser {
      */
     @GetMapping("/top")
     public ResultData<Set<com.bupt.dailyhaha.pojo.media.Submission>> getTop() {
-        return ResultData.success(sysConfig.getTop());
+        return ResultData.success(SysConfigService.sys.getTopSubmission());
     }
 
     /**

@@ -67,7 +67,7 @@ public class Common {
      */
     @RequestMapping("/bot/status")
     public ResultData<Boolean> botStatus() {
-        return ResultData.success(sysConfig.botStatus());
+        return ResultData.success(SysConfigService.sys.getBotUp());
     }
 
 
