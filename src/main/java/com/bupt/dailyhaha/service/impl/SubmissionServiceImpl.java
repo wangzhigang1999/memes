@@ -1,5 +1,6 @@
 package com.bupt.dailyhaha.service.impl;
 
+import com.bupt.dailyhaha.aspect.Audit;
 import com.bupt.dailyhaha.pojo.common.PageResult;
 import com.bupt.dailyhaha.service.Interface.Storage;
 import com.bupt.dailyhaha.service.Interface.Submission;
@@ -164,6 +165,8 @@ public class SubmissionServiceImpl implements Submission {
      * @return 插入后的投稿
      */
     private com.bupt.dailyhaha.pojo.media.Submission insertSubmission(com.bupt.dailyhaha.pojo.media.Submission submission) {
+        String uuid = Audit.threadLocalUUID.get();
+        submission.setUploader(uuid);
         try {
             mongoTemplate.save(submission);
         } catch (DuplicateKeyException e) {

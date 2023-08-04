@@ -9,7 +9,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.bson.Document;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -33,10 +32,9 @@ public class Audit implements CommandLineRunner {
     final MongoClient client;
 
     final MongoTemplate template;
+    public static ThreadLocal<String> threadLocalUUID = ThreadLocal.withInitial(() -> "anonymous");
 
     ThreadPoolExecutor pool = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors(), 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
-
-    Logger logger = org.slf4j.LoggerFactory.getLogger(Audit.class);
 
     public final static long instanceStartTime = System.currentTimeMillis();
     public final static String instanceUUID = UUID.randomUUID().toString();
@@ -70,23 +68,14 @@ public class Audit implements CommandLineRunner {
 
         // get uuid from headers
         var uuid = request.getHeader("uuid");
+        HttpServletResponse response = attributes.getResponse();
+        assert response != null;
 
-        // if not  prod
-        if (!env.equals("prod")) {
-            logger.info("url: {}, method: {}, ip: {}, classMethod: {}", url, method, ip, classMethod);
-        }
+        threadLocalUUID.set(uuid);
 
         long start = System.currentTimeMillis();
         Object proceed = joinPoint.proceed();
         long end = System.currentTimeMillis();
-
-        HttpServletResponse response = attributes.getResponse();
-        assert response != null;
-        int status = response.getStatus();
-
-        if (!env.equals("prod")) {
-            logger.info(proceed.toString());
-        }
 
         pool.submit(() -> {
             LogDocument document = new LogDocument();
@@ -96,7 +85,6 @@ public class Audit implements CommandLineRunner {
                     .setClassMethod(classMethod)
                     .setParameterMap(request.getParameterMap())
                     .setUuid((uuid == null || uuid.isEmpty()) ? "unknown" : uuid)
-                    .setStatus(status)
                     .setTimecost(end - start)
                     .setTimestamp(start)
                     .setEnv(env)
@@ -104,6 +92,7 @@ public class Audit implements CommandLineRunner {
             template.save(document);
         });
 
+        threadLocalUUID.remove();
         return proceed;
     }
 

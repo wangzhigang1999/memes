@@ -13,6 +13,8 @@ public class Submission {
 
     SubmissionType submissionType;
     String url;
+
+    String uploader;
     Integer hash;
     String name;
     Boolean deleted = false;
