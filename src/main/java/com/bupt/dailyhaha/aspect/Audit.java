@@ -3,7 +3,6 @@ package com.bupt.dailyhaha.aspect;
 import com.bupt.dailyhaha.pojo.common.LogDocument;
 import com.mongodb.client.MongoClient;
 import jakarta.annotation.PreDestroy;
-import jakarta.servlet.http.HttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -32,6 +31,10 @@ public class Audit implements CommandLineRunner {
     final MongoClient client;
 
     final MongoTemplate template;
+
+    /**
+     * 用于在线程之内传递变量 UUID，是一个用户的标识
+     */
     public static ThreadLocal<String> threadLocalUUID = ThreadLocal.withInitial(() -> "anonymous");
 
     ThreadPoolExecutor pool = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors(), 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
@@ -66,16 +69,13 @@ public class Audit implements CommandLineRunner {
         String ip = request.getRemoteAddr();
         String classMethod = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
 
-        // get uuid from headers
         var uuid = request.getHeader("uuid");
-        HttpServletResponse response = attributes.getResponse();
-        assert response != null;
 
         threadLocalUUID.set(uuid);
-
         long start = System.currentTimeMillis();
         Object proceed = joinPoint.proceed();
         long end = System.currentTimeMillis();
+        threadLocalUUID.remove();
 
         pool.submit(() -> {
             LogDocument document = new LogDocument();
@@ -84,7 +84,7 @@ public class Audit implements CommandLineRunner {
                     .setIp(ip)
                     .setClassMethod(classMethod)
                     .setParameterMap(request.getParameterMap())
-                    .setUuid((uuid == null || uuid.isEmpty()) ? "unknown" : uuid)
+                    .setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid)
                     .setTimecost(end - start)
                     .setTimestamp(start)
                     .setEnv(env)
@@ -92,7 +92,6 @@ public class Audit implements CommandLineRunner {
             template.save(document);
         });
 
-        threadLocalUUID.remove();
         return proceed;
     }
 

@@ -132,7 +132,6 @@ public class SysConfigService {
 
 
     public Sys getSys() {
-        sys.getTopSubmission().clear();
         return sys;
     }
 

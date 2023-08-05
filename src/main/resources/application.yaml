@@ -16,3 +16,6 @@ spring:
 
   main:
     lazy-initialization: true
+
+server:
+  port: 8080
