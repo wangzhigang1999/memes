@@ -8,8 +8,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -40,8 +38,6 @@ public class Audit implements CommandLineRunner {
     public static ThreadLocal<String> threadLocalUUID = ThreadLocal.withInitial(() -> "anonymous");
 
     ThreadPoolExecutor pool = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors(), 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
-
-    Logger logger = LoggerFactory.getLogger(Audit.class);
 
     public final static long instanceStartTime = System.currentTimeMillis();
     public final static String instanceUUID = UUID.randomUUID().toString();
@@ -96,17 +92,6 @@ public class Audit implements CommandLineRunner {
             template.save(document);
         });
 
-        return proceed;
-    }
-
-
-    @Around(value = "execution(* com.bupt.dailyhaha.service.impl.storageImpl.*.*(..)) || execution(* com.bupt.dailyhaha.service.impl.*.*(..))")
-    public Object timeCost(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.currentTimeMillis();
-        Object proceed = joinPoint.proceed();
-        long end = System.currentTimeMillis();
-        var function = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
-        logger.info("{} cost {} ms", function, end - start);
         return proceed;
     }
 
