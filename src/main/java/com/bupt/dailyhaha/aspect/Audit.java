@@ -3,6 +3,7 @@ package com.bupt.dailyhaha.aspect;
 import com.bupt.dailyhaha.pojo.common.LogDocument;
 import com.mongodb.client.MongoClient;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -126,14 +127,9 @@ public class Audit implements CommandLineRunner {
         String method = request.getMethod();
         String ip = request.getRemoteAddr();
 
-        pool.submit(() -> registry.timer("request.timecost",
-                        "instance", instanceUUID,
-                        "url", url,
-                        "method", method,
-                        "ip", ip,
-                        "classMethod", classMethod,
-                        "env", env)
-                .record(end - start, TimeUnit.MILLISECONDS));
+        var tags = Tags.of("url", url, "method", method, "ip", ip, "classMethod", classMethod, "uuid", uuid, "env", env, "instanceUUID", instanceUUID);
+
+        pool.submit(() -> registry.gauge("request.timecost", tags, end - start));
 
         pool.submit(() -> {
             LogDocument document = new LogDocument();
