@@ -16,7 +16,7 @@ public class SyncConfig {
 
     final MongoTemplate template;
 
-    Logger logger = org.slf4j.LoggerFactory.getLogger(SyncConfig.class);
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(SyncConfig.class);
 
     public SyncConfig(MongoTemplate template) {
         this.template = template;

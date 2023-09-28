@@ -1,5 +1,8 @@
 package com.bupt.dailyhaha.pojo.common;
 
+import lombok.Getter;
+
+@Getter
 public enum ReturnCode {
     /**
      * 操作成功
@@ -66,11 +69,4 @@ public enum ReturnCode {
     }
 
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
 }

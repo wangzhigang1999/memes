@@ -3,7 +3,6 @@ package com.bupt.dailyhaha.service.impl.storageImpl;
 import com.bupt.dailyhaha.pojo.media.Submission;
 import com.bupt.dailyhaha.service.Interface.Storage;
 import com.google.gson.Gson;
-import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
@@ -12,7 +11,7 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.BatchStatus;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
-import org.slf4j.Logger;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -35,14 +34,11 @@ public class QiNiuStorageImpl implements Storage, Condition {
     String secretKey;
     @Value("${qiniu.bucket}")
     String bucket;
-
     @Value("${qiniu.urlPrefix}")
     String urlPrefix;
 
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(QiNiuStorageImpl.class);
 
-
-    static UploadManager manager;
+    static final UploadManager manager;
 
     static {
         Configuration cfg = new Configuration(Region.autoRegion());
@@ -57,9 +53,9 @@ public class QiNiuStorageImpl implements Storage, Condition {
      * @param bytes 图片字节数组
      * @param ext   图片后缀/扩展名
      * @return 七牛云上的图片名=文件路径+文件名
-     * @throws QiniuException 上传失败
      */
-    private String putImg(byte[] bytes, String ext) throws QiniuException {
+    @SneakyThrows
+    private String putImg(byte[] bytes, String ext) {
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucket);
         String uuid = UUID.randomUUID().toString();
@@ -72,15 +68,11 @@ public class QiNiuStorageImpl implements Storage, Condition {
 
 
     @Override
+    @SneakyThrows
     public Submission store(byte[] bytes, String mime) {
         String type = mime.split("/")[1];
-        String fileName;
-        try {
-            fileName = putImg(bytes, type.toLowerCase());
-        } catch (QiniuException e) {
-            logger.error("put image error", e);
-            return null;
-        }
+        String fileName = putImg(bytes, type.toLowerCase());
+
         var url = urlPrefix.concat(fileName);
         Submission submission = new Submission();
         submission.setUrl(url);
@@ -90,6 +82,7 @@ public class QiNiuStorageImpl implements Storage, Condition {
     }
 
     @Override
+    @SneakyThrows
     public HashMap<String, Boolean> delete(String[] keyList) {
         if (keyList == null || keyList.length == 0) {
             return null;
@@ -100,20 +93,17 @@ public class QiNiuStorageImpl implements Storage, Condition {
 
         BucketManager.BatchOperations batchOperations = new BucketManager.BatchOperations();
         batchOperations.addDeleteOp(bucket, keyList);
-        try {
-            Response response = bucketManager.batch(batchOperations);
-            BatchStatus[] batchStatusList = response.jsonToObject(BatchStatus[].class);
-            var nameStatusMap = new HashMap<String, Boolean>();
-            for (int i = 0; i < keyList.length; i++) {
-                BatchStatus status = batchStatusList[i];
-                String key = keyList[i];
-                nameStatusMap.put(key, status.code == 200);
-            }
-            return nameStatusMap;
-        } catch (QiniuException e) {
-            logger.error("delete image error", e);
-            return null;
+
+        Response response = bucketManager.batch(batchOperations);
+        BatchStatus[] batchStatusList = response.jsonToObject(BatchStatus[].class);
+        var nameStatusMap = new HashMap<String, Boolean>();
+        for (int i = 0; i < keyList.length; i++) {
+            BatchStatus status = batchStatusList[i];
+            String key = keyList[i];
+            nameStatusMap.put(key, status.code == 200);
         }
+        return nameStatusMap;
+
     }
 
     @Override

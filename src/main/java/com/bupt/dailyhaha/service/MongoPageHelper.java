@@ -33,8 +33,6 @@ public class MongoPageHelper {
     }
 
 
-
-
     /**
      * 分页查询，直接返回集合类型的结果.
      */
@@ -42,12 +40,6 @@ public class MongoPageHelper {
         return pageQuery(query, entityClass, Function.identity(), pageSize, pageNum, lastId);
     }
 
-    /**
-     * 分页查询，不考虑条件分页，直接使用skip-limit来分页.
-     */
-    public <T, R> PageResult<R> pageQuery(Query query, Class<T> entityClass, Function<T, R> mapper, Integer pageSize, Integer pageNum) {
-        return pageQuery(query, entityClass, mapper, pageSize, pageNum, null);
-    }
 
     /**
      * 分页查询.

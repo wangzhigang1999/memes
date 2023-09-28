@@ -26,12 +26,6 @@ public class ResultData<T> {
         return resultData;
     }
 
-    public static <T> ResultData<T> fail(int code, String message) {
-        ResultData<T> resultData = new ResultData<>();
-        resultData.setStatus(code);
-        resultData.setMessage(message);
-        return resultData;
-    }
 
     public static <T> ResultData<T> fail(ReturnCode returnCode) {
         ResultData<T> resultData = new ResultData<>();

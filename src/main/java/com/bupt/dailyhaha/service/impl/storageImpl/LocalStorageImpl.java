@@ -23,7 +23,7 @@ import java.util.UUID;
 public class LocalStorageImpl implements Storage, Condition {
 
 
-    static String localDir = "memes";
+    static final String localDir = "memes";
 
     static {
         File file = new File(localDir);

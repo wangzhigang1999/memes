@@ -47,7 +47,7 @@ public class Common {
      */
     @RequestMapping("/bot/enable")
     @AuthRequired
-    public ResultData<Boolean> stopBot() {
+    public ResultData<Boolean> enableBot() {
         return ResultData.success(sysConfig.enableBot());
     }
 
@@ -58,7 +58,7 @@ public class Common {
      */
     @RequestMapping("/bot/disable")
     @AuthRequired
-    public ResultData<Boolean> startBot() {
+    public ResultData<Boolean> disableBot() {
         return ResultData.success(sysConfig.disableBot());
     }
 

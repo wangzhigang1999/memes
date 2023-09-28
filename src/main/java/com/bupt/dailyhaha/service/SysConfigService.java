@@ -68,8 +68,8 @@ public class SysConfigService {
             return true;
         }
         sys.setBotUp(false);
-        mongoTemplate.save(sys);
-        return true;
+        Sys target = mongoTemplate.save(sys);
+        return !target.getBotUp();
     }
 
     public Boolean enableBot() {
@@ -78,8 +78,8 @@ public class SysConfigService {
         }
 
         sys.setBotUp(true);
-        mongoTemplate.save(sys);
-        return true;
+        Sys target = mongoTemplate.save(sys);
+        return target.getBotUp();
     }
 
 
@@ -96,8 +96,8 @@ public class SysConfigService {
     public boolean removeTop(int hashcode) {
         var submission = new Submission(hashcode);
         sys.getTopSubmission().remove(submission);
-        mongoTemplate.save(sys);
-        return true;
+        Sys save = mongoTemplate.save(sys);
+        return !save.getTopSubmission().contains(submission);
     }
 
 
