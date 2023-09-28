@@ -116,7 +116,7 @@ public class Audit implements CommandLineRunner {
 
         var duration = System.currentTimeMillis() - instanceStartTime;
         // convert to hours
-        duration /= 1000.0 * 60 * 60;
+        duration /= 1000 * 60 * 60;
         document.append("alive", duration);
 
         client.getDatabase(database).getCollection("up").updateOne(

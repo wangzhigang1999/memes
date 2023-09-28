@@ -59,22 +59,20 @@ public final class MongoAppender extends UnsynchronizedAppenderBase<ILoggingEven
         //YYYY-MM-DD HH:MM:SS in Asia/Shanghai
         String formattedTime = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(timeStamp));
 
-        try {
-            mongoClient.getDatabase(databaseName).getCollection(collectionName).insertOne(new Document(
-                    Map.of(
-                            "applicationName", "memes",
-                            "instance", Audit.instanceUUID,
-                            "hostname", hostname,
-                            "timestamp", timeStamp,
-                            "formattedTime", formattedTime,
-                            "logger", eventObject.getLoggerName(),
-                            "level", eventObject.getLevel().toString(),
-                            "thread", eventObject.getThreadName(),
-                            "message", formattedMessage
-                    )
-            ));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        mongoClient.getDatabase(databaseName).getCollection(collectionName).insertOne(new Document(
+                Map.of(
+                        "applicationName", "memes",
+                        "instance", Audit.instanceUUID,
+                        "hostname", hostname,
+                        "timestamp", timeStamp,
+                        "formattedTime", formattedTime,
+                        "logger", eventObject.getLoggerName(),
+                        "level", eventObject.getLevel().toString(),
+                        "thread", eventObject.getThreadName(),
+                        "message", formattedMessage
+                )
+        ));
+
     }
 }

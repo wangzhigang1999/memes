@@ -120,7 +120,7 @@ public class ReviewServiceImpl implements Review {
         List<Submission> newSubmissions = findDiff(history, submissions);
 
         // 获取发布策略
-        var strategy = releaseStrategyMap.get(config.sys.getSelectedReleaseStrategy());
+        var strategy = releaseStrategyMap.get(SysConfigService.sys.getSelectedReleaseStrategy());
         if (strategy != null) {
             // 发布
             submissions = strategy.release(history, newSubmissions);

@@ -96,7 +96,7 @@ public class Schedule {
         List<com.bupt.dailyhaha.pojo.media.Submission> deletedSubmission = submission.getDeletedSubmission();
         logger.info("clean images, {} images to be deleted", deletedSubmission.size());
 
-        if (deletedSubmission.size() == 0) {
+        if (deletedSubmission.isEmpty()) {
             return;
         }
 

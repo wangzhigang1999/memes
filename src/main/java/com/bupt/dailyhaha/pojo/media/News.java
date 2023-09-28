@@ -61,7 +61,4 @@ public class News {
         assert fakeNews.equals(news);
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
 }
