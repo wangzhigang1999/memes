@@ -6,6 +6,7 @@ import com.bupt.dailyhaha.service.Interface.INews;
 import com.bupt.dailyhaha.service.Interface.Storage;
 import com.bupt.dailyhaha.service.MongoPageHelper;
 import com.bupt.dailyhaha.util.Utils;
+import lombok.SneakyThrows;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -28,7 +29,7 @@ public class INewsImpl implements INews {
     String cacheKey = "";
     List<News> cache = null;
 
-    ThreadPoolExecutor pool = new ThreadPoolExecutor(10, 10, 0, TimeUnit.HOURS, new LinkedBlockingQueue<>());
+    final ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
 
     public INewsImpl(MongoTemplate mongoTemplate, MongoPageHelper mongoPageHelper, Storage storage) {
         this.mongoTemplate = mongoTemplate;
@@ -37,6 +38,7 @@ public class INewsImpl implements INews {
     }
 
     @Override
+    @SneakyThrows
     public News addNews(News news, MultipartFile coverImage) {
 
         // use thread pool to upload image
@@ -53,12 +55,8 @@ public class INewsImpl implements INews {
         }
         // set timestamp to now
         news.setTimestamp(System.currentTimeMillis());
-        String url = news.getCoverImage();
-        try {
-            url = future.get(10, TimeUnit.SECONDS);
-        } catch (Exception ignored) {
 
-        }
+        String url = future.get(10, TimeUnit.SECONDS);
         news.setCoverImage(url);
         return mongoTemplate.insert(news);
     }
