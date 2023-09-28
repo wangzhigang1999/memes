@@ -2,6 +2,7 @@ package com.bupt.dailyhaha.aspect;
 
 import com.bupt.dailyhaha.pojo.common.LogDocument;
 import com.mongodb.client.MongoClient;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -34,6 +35,8 @@ public class Audit implements CommandLineRunner {
 
     final MongoTemplate template;
 
+    final MeterRegistry registry;
+
     /**
      * 用于在线程之内传递变量 UUID，是一个用户的标识
      */
@@ -51,9 +54,10 @@ public class Audit implements CommandLineRunner {
     public final String env;
 
 
-    public Audit(MongoTemplate template, MongoClient client) {
+    public Audit(MongoTemplate template, MongoClient client, MeterRegistry registry) {
         this.client = client;
         this.template = template;
+        this.registry = registry;
         env = System.getenv("env");
     }
 
@@ -121,6 +125,15 @@ public class Audit implements CommandLineRunner {
         String url = request.getRequestURL().toString();
         String method = request.getMethod();
         String ip = request.getRemoteAddr();
+
+        pool.submit(() -> registry.timer("request.timecost",
+                        "instance", instanceUUID,
+                        "url", url,
+                        "method", method,
+                        "ip", ip,
+                        "classMethod", classMethod,
+                        "env", env)
+                .record(end - start, TimeUnit.MILLISECONDS));
 
         pool.submit(() -> {
             LogDocument document = new LogDocument();
