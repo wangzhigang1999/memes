@@ -1,9 +1,9 @@
-FROM maven:3.8.7-eclipse-temurin-19-alpine AS MAVEN_BUILD
+FROM maven:3.9.4-amazoncorretto-21 AS MAVEN_BUILD
 WORKDIR /app
 COPY . .
 RUN mvn clean package -Dmaven.test.skip=true
 
-FROM openjdk:19-jdk-alpine3.16
+FROM openjdk:21-rc-oraclelinux8
 COPY --from=MAVEN_BUILD /app/target/*.jar /app/application.jar
 EXPOSE 8080
 
