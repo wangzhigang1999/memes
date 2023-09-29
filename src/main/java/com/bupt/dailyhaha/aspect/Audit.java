@@ -129,15 +129,16 @@ public class Audit implements CommandLineRunner {
     private void doAudit(HttpServletRequest request, String classMethod, String uuid, long start, long end) {
 
         String url = request.getRequestURL().toString();
-        String method = request.getMethod();
         String ip = request.getRemoteAddr();
 
         pool.submit(() -> {
-            if (!timerMap.containsKey(method)) {
-                timerMap.put(method, Timer.builder("http_request_time").description("http request time").tags(Tags.of("class_method", method, "env", env, "instance", instanceUUID)).register(registry));
+            if (!timerMap.containsKey(classMethod)) {
+                timerMap.put(classMethod, Timer.builder("http_request_time").description("http request time").tags(Tags.of("class_method", classMethod, "env", env, "instance", instanceUUID)).register(registry));
             }
-            timerMap.get(method).record(end - start, TimeUnit.MILLISECONDS);
+            timerMap.get(classMethod).record(end - start, TimeUnit.MILLISECONDS);
         });
+
+        String method = request.getMethod();
 
         pool.submit(() -> {
             LogDocument document = new LogDocument();
