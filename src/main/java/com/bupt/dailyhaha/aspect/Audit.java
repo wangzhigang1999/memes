@@ -4,6 +4,7 @@ import com.bupt.dailyhaha.pojo.common.LogDocument;
 import com.mongodb.client.MongoClient;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.Timer;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -20,7 +21,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +56,8 @@ public class Audit implements CommandLineRunner {
     public String database;
 
     public final String env;
+
+    private final Map<String, Timer> timerMap = new ConcurrentHashMap<>();
 
 
     public Audit(MongoTemplate template, MongoClient client, MeterRegistry registry) {
@@ -127,9 +132,12 @@ public class Audit implements CommandLineRunner {
         String method = request.getMethod();
         String ip = request.getRemoteAddr();
 
-        var tags = Tags.of("url", url, "method", method, "ip", ip, "classMethod", classMethod, "uuid", uuid, "env", env, "instanceUUID", instanceUUID);
-
-        pool.submit(() -> registry.gauge("request.timecost", tags, end - start));
+        pool.submit(() -> {
+            if (!timerMap.containsKey(method)) {
+                timerMap.put(method, Timer.builder("http_request_time").description("http request time").tags(Tags.of("class_method", method, "env", env, "instance", instanceUUID)).register(registry));
+            }
+            timerMap.get(method).record(end - start, TimeUnit.MILLISECONDS);
+        });
 
         pool.submit(() -> {
             LogDocument document = new LogDocument();
