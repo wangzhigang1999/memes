@@ -2,6 +2,7 @@ package com.bupt.dailyhaha.aspect;
 
 import com.bupt.dailyhaha.pojo.common.ResultData;
 import com.bupt.dailyhaha.pojo.common.ReturnCode;
+import jakarta.servlet.http.HttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -47,6 +48,10 @@ public class Auth {
         var token = request.getHeader("token");
         if (token == null || !token.equals(localToken)) {
             logger.warn("token is not correct");
+            HttpServletResponse response = attributes.getResponse();
+            if (response != null) {
+                response.setStatus(401);
+            }
             return ResultData.fail(ReturnCode.RC401);
         }
         return joinPoint.proceed();
