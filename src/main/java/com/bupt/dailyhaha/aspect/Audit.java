@@ -126,10 +126,7 @@ public class Audit implements CommandLineRunner {
         client.getDatabase(database).getCollection("up").updateOne(new Document("instanceUUID", instanceUUID), new Document("$set", document));
     }
 
-    private void doAudit(HttpServletRequest request, String classMethod, String uuid, long start, long end) {
-
-        String url = request.getRequestURL().toString();
-        String ip = request.getRemoteAddr();
+    private void doAudit(final HttpServletRequest request, String classMethod, String uuid, long start, long end) {
 
         pool.submit(() -> {
             if (!timerMap.containsKey(classMethod)) {
@@ -138,11 +135,22 @@ public class Audit implements CommandLineRunner {
             timerMap.get(classMethod).record(end - start, TimeUnit.MILLISECONDS);
         });
 
-        String method = request.getMethod();
-
         pool.submit(() -> {
+            String method = request.getMethod();
+            String url = request.getRequestURL().toString();
+            String ip = request.getRemoteAddr();
             LogDocument document = new LogDocument();
-            document.setUrl(url).setMethod(method).setIp(ip).setClassMethod(classMethod).setParameterMap(request.getParameterMap()).setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid).setTimecost(end - start).setTimestamp(start).setEnv(env).setInstanceUUID(instanceUUID);
+            document.setUrl(url)
+                    .setMethod(method)
+                    .setIp(ip)
+                    .setClassMethod(classMethod)
+                    .setParameterMap(request.getParameterMap())
+                    .setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid)
+                    .setTimecost(end - start)
+                    .setTimestamp(start)
+                    .setEnv(env)
+                    .setInstanceUUID(instanceUUID)
+                    .setStatus(200);
             template.save(document);
         });
     }
