@@ -2,13 +2,13 @@
 
 专为北邮人设计的贴图秀投稿系统.
 
-![show](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/show.jpg)
+![show](assets/show.jpg)
 
-![show](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/image-20230807234030216.png)
+![show](assets/show-2.png)
 
 ## 架构
 
-![arch](https://wanz-bucket.oss-cn-beijing.aliyuncs.com/typora/arch.png)
+![arch](assets/arch.png)
 
 前端使用 **Angular + Tailwind CSS** 实现,部署在 **Netlify** 上.
 
