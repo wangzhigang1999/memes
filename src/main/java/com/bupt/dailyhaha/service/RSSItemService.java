@@ -42,6 +42,15 @@ public class RSSItemService {
         return template.find(query, RSSItem.class);
     }
 
+    public List<RSSItem> getLatest(Integer limit) {
+        Query query = new Query();
+        query.fields().exclude("description", "comments", "guid");
+        // sort by date
+        query.with(Sort.by(Sort.Direction.DESC, "pubDate"));
+        query.limit(limit);
+        return template.find(query, RSSItem.class);
+    }
+
     private List<RSSItem> getByMap(Map<String, String> map, Set<String> ignoreFields) {
         Query query = new Query();
         for (Map.Entry<String, String> entry : map.entrySet()) {
