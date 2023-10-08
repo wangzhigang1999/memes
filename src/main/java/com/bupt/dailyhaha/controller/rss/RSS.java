@@ -35,4 +35,9 @@ public class RSS {
     public List<RSSItem> getByKeyword(@PathVariable String keyword) {
         return service.getByKeyword(keyword);
     }
+
+    @GetMapping("/latest/{limit}")
+    public List<RSSItem> getLatest(@PathVariable Integer limit) {
+        return service.getLatest(limit);
+    }
 }
