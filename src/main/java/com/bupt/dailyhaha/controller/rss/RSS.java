@@ -30,4 +30,9 @@ public class RSS {
     public List<RSSItem> getByBoard(@PathVariable String board) {
         return service.getByBoard(board);
     }
+
+    @GetMapping("/keyword/{keyword}")
+    public List<RSSItem> getByKeyword(@PathVariable String keyword) {
+        return service.getByKeyword(keyword);
+    }
 }

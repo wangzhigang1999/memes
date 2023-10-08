@@ -31,6 +31,23 @@ public class RSSItemService {
         return getByMap(Map.of("board", board), Set.of("description", "comments", "guid"));
     }
 
+
+    public List<RSSItem> getByKeyword(String keyword) {
+        Query query = new Query();
+
+        // title or description contains keyword
+        query.addCriteria(Criteria.where("$or").is(List.of(
+                Criteria.where("title").regex(keyword),
+                Criteria.where("description").regex(keyword)
+        )));
+
+        query.fields().exclude("description", "comments", "guid");
+        // sort by date
+        query.with(Sort.by(Sort.Direction.DESC, "pubDate"));
+        query.limit(50);
+        return template.find(query, RSSItem.class);
+    }
+
     private List<RSSItem> getByMap(Map<String, String> map, Set<String> ignoreFields) {
         Query query = new Query();
         for (Map.Entry<String, String> entry : map.entrySet()) {
