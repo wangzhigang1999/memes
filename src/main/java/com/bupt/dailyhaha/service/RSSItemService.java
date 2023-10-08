@@ -34,13 +34,7 @@ public class RSSItemService {
 
     public List<RSSItem> getByKeyword(String keyword) {
         Query query = new Query();
-
-        // title or description contains keyword
-        query.addCriteria(Criteria.where("$or").is(List.of(
-                Criteria.where("title").regex(keyword),
-                Criteria.where("description").regex(keyword)
-        )));
-
+        query.addCriteria(Criteria.where("title").regex(keyword));
         query.fields().exclude("description", "comments", "guid");
         // sort by date
         query.with(Sort.by(Sort.Direction.DESC, "pubDate"));
