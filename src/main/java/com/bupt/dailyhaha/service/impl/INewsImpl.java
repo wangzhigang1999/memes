@@ -174,12 +174,11 @@ public class INewsImpl implements INews {
         }
 
         @Override
-        public String call() {
-            try {
-                return storage.store(file.getBytes(), file.getContentType()).getUrl();
-            } catch (IOException e) {
+        public String call() throws IOException {
+            if (file == null) {
                 return "";
             }
+            return storage.store(file.getBytes(), file.getContentType()).getUrl();
         }
     }
 }
