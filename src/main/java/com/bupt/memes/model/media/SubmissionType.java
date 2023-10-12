@@ -1,4 +1,4 @@
-package com.bupt.memes.pojo.media;
+package com.bupt.memes.model.media;
 
 public enum SubmissionType {
     IMAGE, VIDEO, BILIBILI

@@ -1,7 +1,7 @@
 package com.bupt.memes.service.impl;
 
-import com.bupt.memes.pojo.media.History;
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.media.History;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.IHistory;
 import com.bupt.memes.util.Utils;
 import com.mongodb.client.result.UpdateResult;

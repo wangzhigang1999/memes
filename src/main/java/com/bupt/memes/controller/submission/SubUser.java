@@ -1,9 +1,9 @@
 package com.bupt.memes.controller.submission;
 
-import com.bupt.memes.pojo.common.PageResult;
-import com.bupt.memes.pojo.common.ResultData;
-import com.bupt.memes.pojo.common.ReturnCode;
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.common.PageResult;
+import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.common.ReturnCode;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.IHistory;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.SysConfigService;

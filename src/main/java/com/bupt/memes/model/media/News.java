@@ -1,4 +1,4 @@
-package com.bupt.memes.pojo.media;
+package com.bupt.memes.model.media;
 
 import com.bupt.memes.util.Utils;
 import com.google.gson.Gson;

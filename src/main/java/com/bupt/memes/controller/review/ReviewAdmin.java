@@ -1,8 +1,8 @@
 package com.bupt.memes.controller.review;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.pojo.common.ResultData;
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Review;
 import org.springframework.web.bind.annotation.*;
 

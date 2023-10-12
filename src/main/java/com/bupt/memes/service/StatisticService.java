@@ -1,6 +1,6 @@
 package com.bupt.memes.service;
 
-import com.bupt.memes.pojo.common.LogDocument;
+import com.bupt.memes.model.common.LogDocument;
 import com.bupt.memes.util.Utils;
 import lombok.SneakyThrows;
 import org.springframework.data.domain.Sort;

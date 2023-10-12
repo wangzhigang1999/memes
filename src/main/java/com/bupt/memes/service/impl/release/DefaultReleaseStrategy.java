@@ -1,6 +1,6 @@
 package com.bupt.memes.service.impl.release;
 
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ReleaseStrategy;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package com.bupt.memes.service.Interface;
 
-import com.bupt.memes.pojo.common.PageResult;
-import com.bupt.memes.pojo.media.News;
+import com.bupt.memes.model.common.PageResult;
+import com.bupt.memes.model.media.News;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

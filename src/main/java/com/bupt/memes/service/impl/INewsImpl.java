@@ -1,7 +1,7 @@
 package com.bupt.memes.service.impl;
 
-import com.bupt.memes.pojo.common.PageResult;
-import com.bupt.memes.pojo.media.News;
+import com.bupt.memes.model.common.PageResult;
+import com.bupt.memes.model.media.News;
 import com.bupt.memes.service.Interface.INews;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;

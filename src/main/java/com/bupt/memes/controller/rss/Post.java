@@ -1,7 +1,7 @@
 package com.bupt.memes.controller.rss;
 
-import com.bupt.memes.pojo.RSSItem;
-import com.bupt.memes.service.RSSItemService;
+import com.bupt.memes.model.RSSItem;
+import com.bupt.memes.service.impl.rss.RSSItemService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/post")
 @CrossOrigin(origins = "*")
-public class RSS {
+public class Post {
     final RSSItemService service;
 
-    public RSS(RSSItemService service) {
+    public Post(RSSItemService service) {
         this.service = service;
     }
 

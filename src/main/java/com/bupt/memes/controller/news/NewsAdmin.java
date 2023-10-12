@@ -1,8 +1,8 @@
 package com.bupt.memes.controller.news;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.pojo.common.ResultData;
-import com.bupt.memes.pojo.media.News;
+import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.media.News;
 import com.bupt.memes.service.Interface.INews;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;

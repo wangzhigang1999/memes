@@ -1,8 +1,8 @@
 package com.bupt.memes.controller.submission;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.pojo.common.ResultData;
-import com.bupt.memes.pojo.common.ReturnCode;
+import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.common.ReturnCode;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.StatisticService;

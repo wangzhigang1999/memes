@@ -1,8 +1,8 @@
 package com.bupt.memes.controller.news;
 
-import com.bupt.memes.pojo.common.PageResult;
-import com.bupt.memes.pojo.common.ResultData;
-import com.bupt.memes.pojo.media.News;
+import com.bupt.memes.model.common.PageResult;
+import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.media.News;
 import com.bupt.memes.service.Interface.INews;
 import com.bupt.memes.util.Utils;
 import jakarta.servlet.http.HttpServletResponse;

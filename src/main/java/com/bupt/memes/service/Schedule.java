@@ -1,6 +1,6 @@
 package com.bupt.memes.service;
 
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.Interface.Storage;

@@ -1,6 +1,6 @@
 package com.bupt.memes.aspect;
 
-import com.bupt.memes.pojo.common.LogDocument;
+import com.bupt.memes.model.common.LogDocument;
 import com.mongodb.client.MongoClient;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;

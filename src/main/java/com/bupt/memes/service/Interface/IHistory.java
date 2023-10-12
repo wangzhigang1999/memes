@@ -1,6 +1,6 @@
 package com.bupt.memes.service.Interface;
 
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.media.Submission;
 
 import java.util.List;
 
