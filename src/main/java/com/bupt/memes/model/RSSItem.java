@@ -1,5 +1,6 @@
 package com.bupt.memes.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class RSSItem {
     private String title;
     private String link;
     private String author;
+    @JsonIgnore
     private String description;
     private String pubDate;
     private String comments;
