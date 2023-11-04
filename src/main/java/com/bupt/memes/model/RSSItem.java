@@ -1,4 +1,4 @@
-package com.bupt.memes.pojo;
+package com.bupt.memes.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

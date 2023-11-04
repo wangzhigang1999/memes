@@ -1,6 +1,6 @@
 package com.bupt.memes.aspect;
 
-import com.bupt.memes.pojo.Sys;
+import com.bupt.memes.model.Sys;
 import com.bupt.memes.service.SysConfigService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

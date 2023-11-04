@@ -1,5 +1,6 @@
-package com.bupt.memes.pojo.media;
+package com.bupt.memes.model.media;
 
+import com.bupt.memes.service.Interface.IndexMapKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -9,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "Submission")
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Submission {
+public class Submission implements IndexMapKey {
 
     String id;
 
@@ -56,5 +57,10 @@ public class Submission {
             return ((Submission) obj).getHash().equals(this.hash);
         }
         return false;
+    }
+
+    @Override
+    public String getIndexMapKey() {
+        return id;
     }
 }

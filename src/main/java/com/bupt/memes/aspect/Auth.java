@@ -1,7 +1,7 @@
 package com.bupt.memes.aspect;
 
-import com.bupt.memes.pojo.common.ResultData;
-import com.bupt.memes.pojo.common.ReturnCode;
+import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.common.ReturnCode;
 import jakarta.servlet.http.HttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

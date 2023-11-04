@@ -1,7 +1,7 @@
 package com.bupt.memes.service;
 
-import com.bupt.memes.pojo.Sys;
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.Sys;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ReleaseStrategy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;

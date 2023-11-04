@@ -1,7 +1,7 @@
 package com.bupt.memes.service;
 
 
-import com.bupt.memes.pojo.common.PageResult;
+import com.bupt.memes.model.common.PageResult;
 import io.micrometer.common.util.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

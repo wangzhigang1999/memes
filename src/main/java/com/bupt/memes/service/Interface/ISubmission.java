@@ -1,6 +1,6 @@
 package com.bupt.memes.service.Interface;
 
-import com.bupt.memes.pojo.common.PageResult;
+import com.bupt.memes.model.common.PageResult;
 
 import java.io.InputStream;
 import java.util.List;
@@ -25,7 +25,7 @@ public interface ISubmission {
      * @param mime mime
      * @return Submission
      */
-    com.bupt.memes.pojo.media.Submission storeTextFormatSubmission(String url, String mime);
+    com.bupt.memes.model.media.Submission storeTextFormatSubmission(String url, String mime);
 
 
     /**
@@ -36,13 +36,13 @@ public interface ISubmission {
      * @param personal 是否是个人投稿
      * @return Submission
      */
-    com.bupt.memes.pojo.media.Submission storeStreamSubmission(InputStream stream, String mime, boolean personal);
+    com.bupt.memes.model.media.Submission storeStreamSubmission(InputStream stream, String mime, boolean personal);
 
 
     /**
      * 获取被标记为删除的投稿
      */
-    List<com.bupt.memes.pojo.media.Submission> getDeletedSubmission();
+    List<com.bupt.memes.model.media.Submission> getDeletedSubmission();
 
 
     /**
@@ -51,6 +51,6 @@ public interface ISubmission {
     void hardDeleteSubmission(int hashcode);
 
 
-    PageResult<com.bupt.memes.pojo.media.Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID);
+    PageResult<com.bupt.memes.model.media.Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID);
 
 }

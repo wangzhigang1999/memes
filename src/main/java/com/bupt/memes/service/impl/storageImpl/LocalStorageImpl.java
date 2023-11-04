@@ -1,6 +1,6 @@
 package com.bupt.memes.service.impl.storageImpl;
 
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.util.Utils;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,8 +1,9 @@
 package com.bupt.memes.service.impl;
 
 import com.bupt.memes.aspect.Audit;
-import com.bupt.memes.pojo.common.PageResult;
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.IndexMap;
+import com.bupt.memes.model.common.PageResult;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
@@ -11,7 +12,7 @@ import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,9 +37,10 @@ public class SubmissionServiceImpl implements ISubmission {
     final MongoPageHelper mongoPageHelper;
 
     final Storage storage;
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(SubmissionServiceImpl.class);
-
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    final static Logger logger = org.apache.logging.log4j.LogManager.getLogger(SubmissionServiceImpl.class);
+
+    final IndexMap<Submission> submissionIndexMap = new IndexMap<>();
 
 
     /**
@@ -165,11 +168,23 @@ public class SubmissionServiceImpl implements ISubmission {
      * @return 分页结果
      */
     @Override
-    @Cacheable(value = "submission", key = "#lastID + #pageNum + #pageSize",condition = "#lastID != null && #lastID !=''")
+    @Cacheable(value = "submission", key = "#lastID + #pageNum + #pageSize", condition = "#lastID != null && #lastID !=''")
     public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
+        if (lastID != null && !lastID.isEmpty()) {
+            List<Submission> list = submissionIndexMap.getAfter(lastID, pageSize);
+            if (list != null && list.size() >= pageSize) {
+                PageResult<Submission> pageResult = new PageResult<>();
+                pageResult.setList(list);
+                logger.info("get submission from index map, size: {}", list.size());
+                return pageResult;
+            }
+        }
+        logger.info("get submission from db, lastID: {}", Objects.equals(lastID, "") ? "null" : lastID);
         Query query = new Query();
         query.addCriteria(Criteria.where("reviewed").is(true));
-        return mongoPageHelper.pageQuery(query, Submission.class, pageSize, pageNum, lastID);
+        PageResult<Submission> result = mongoPageHelper.pageQuery(query, Submission.class, pageSize, pageNum, lastID);
+        submissionIndexMap.putAll(result.getList());
+        return result;
     }
 
     /**
@@ -184,7 +199,6 @@ public class SubmissionServiceImpl implements ISubmission {
         try {
             mongoTemplate.save(submission);
         } catch (DuplicateKeyException e) {
-            logger.info("duplicate submission, hash: {}", submission.getHash());
             submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(submission.getHash())), Submission.class);
         }
         return submission;

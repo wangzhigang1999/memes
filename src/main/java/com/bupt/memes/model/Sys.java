@@ -1,6 +1,6 @@
-package com.bupt.memes.pojo;
+package com.bupt.memes.model;
 
-import com.bupt.memes.pojo.media.Submission;
+import com.bupt.memes.model.media.Submission;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
