@@ -1,11 +1,14 @@
 package com.bupt.memes.service.impl;
 
 import com.bupt.memes.model.media.Submission;
+import com.bupt.memes.model.ws.WSPacket;
+import com.bupt.memes.model.ws.WSPacketType;
 import com.bupt.memes.service.Interface.IHistory;
 import com.bupt.memes.service.Interface.ReleaseStrategy;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.SysConfigService;
 import com.bupt.memes.util.Utils;
+import com.bupt.memes.ws.WebSocketEndpoint;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -174,6 +177,7 @@ public class ReviewServiceImpl implements Review {
         var query = new Query(Criteria.where("hash").is(hashcode));
         template.update(Submission.class).matching(query).apply(new Update().set("deleted", deleted).set("reviewed", true)).all();
         Submission one = template.findOne(query, Submission.class);
+        WebSocketEndpoint.broadcast(new WSPacket<>(one, WSPacketType.REVIEW));
         return one != null && one.getDeleted();
     }
 

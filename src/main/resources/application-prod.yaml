@@ -31,3 +31,5 @@ management:
         retention-policy: autogen
         uri: ${influxUrl}
         auto-create-db: true
+server:
+  shutdown: graceful
