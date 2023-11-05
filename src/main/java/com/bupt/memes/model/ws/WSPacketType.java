@@ -5,6 +5,12 @@ public enum WSPacketType {
 
     SERVER_STATUS,
 
-    ONLINE_NUMBER
+    ONLINE_NUMBER,
+
+    WHISPER,
+
+    SESSION_RESPONSE,
+
+    SESSION_REQUEST,
 
 }

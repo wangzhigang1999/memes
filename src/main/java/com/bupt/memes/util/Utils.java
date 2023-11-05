@@ -88,6 +88,11 @@ public class Utils {
     public static String toJson(Object o) {
         return gson.toJson(o);
     }
+
+    public static <T> T fromJson(String json, Class<T> clazz) {
+        return gson.fromJson(json, clazz);
+    }
+
     public static void main(String[] args) {
         System.out.println(getTodayStartUnixEpochMilli());
         System.out.println(getYMD());
