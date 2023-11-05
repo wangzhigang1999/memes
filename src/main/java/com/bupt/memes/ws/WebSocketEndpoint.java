@@ -2,6 +2,8 @@ package com.bupt.memes.ws;
 
 
 import com.bupt.memes.model.ws.WSPacket;
+import com.bupt.memes.model.ws.WSPacketType;
+import com.bupt.memes.util.Utils;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.AllArgsConstructor;
@@ -35,12 +37,22 @@ public class WebSocketEndpoint {
         this.session = session;
         webSocketMap.put(session.getId(), this);
         count.incrementAndGet();
-        log.info("有新连接加入：{}，当前在线人数为：{}", session.getId(), count.get());
+        sendMessage(new WSPacket<>(session.getId(), WSPacketType.SESSION_RESPONSE));
+        log.info("新客户端{}连接，当前在线人数：{}", session.getId(), count.get());
     }
 
     @OnMessage
     public void onMessage(String message, Session session) {
-        log.info("收到客户端{}消息：{}", session.getId(), message);
+        WSPacket<String> wsPacket = Utils.fromJson(message, WSPacket.class);
+        switch (wsPacket.getType()) {
+            case WHISPER -> {
+                wsPacket.setSessionId(session.getId());
+                broadcast(wsPacket);
+            }
+            case SESSION_REQUEST -> sendMessage(new WSPacket<>(session.getId(), WSPacketType.SESSION_RESPONSE));
+
+            default -> log.warn("客户端{}发送了一个未知的消息：{}", session.getId(), message);
+        }
     }
 
     @OnError
