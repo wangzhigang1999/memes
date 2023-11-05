@@ -63,7 +63,11 @@ public class ReviewServiceImpl implements Review {
      */
     @Override
     public boolean acceptSubmission(int hashcode) {
-        return updateSubmission(hashcode, false);
+        if (updateSubmission(hashcode, false)) {
+            WebSocketEndpoint.broadcast(new WSPacket<>("", WSPacketType.REVIEW));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -91,6 +95,7 @@ public class ReviewServiceImpl implements Review {
                 count++;
             }
         }
+        WebSocketEndpoint.broadcast(new WSPacket<>("", WSPacketType.REVIEW));
         return count;
     }
 
@@ -177,7 +182,6 @@ public class ReviewServiceImpl implements Review {
         var query = new Query(Criteria.where("hash").is(hashcode));
         template.update(Submission.class).matching(query).apply(new Update().set("deleted", deleted).set("reviewed", true)).all();
         Submission one = template.findOne(query, Submission.class);
-        WebSocketEndpoint.broadcast(new WSPacket<>(one, WSPacketType.REVIEW));
         return one != null && one.getDeleted();
     }
 
