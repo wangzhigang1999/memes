@@ -1,5 +1,6 @@
 package com.bupt.memes.util;
 
+import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 
 import java.io.ByteArrayInputStream;
@@ -10,6 +11,8 @@ import java.time.Instant;
 import java.util.Set;
 
 public class Utils {
+
+    public static final Gson gson = new Gson();
 
     /**
      * get today start unix epoch milli
@@ -80,6 +83,11 @@ public class Utils {
         return Set.of(split);
     }
 
+
+    // to Json
+    public static String toJson(Object o) {
+        return gson.toJson(o);
+    }
     public static void main(String[] args) {
         System.out.println(getTodayStartUnixEpochMilli());
         System.out.println(getYMD());

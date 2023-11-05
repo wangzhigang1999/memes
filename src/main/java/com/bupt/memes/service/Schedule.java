@@ -1,10 +1,13 @@
 package com.bupt.memes.service;
 
 import com.bupt.memes.model.media.Submission;
+import com.bupt.memes.model.ws.WSPacket;
+import com.bupt.memes.model.ws.WSPacketType;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.util.Utils;
+import com.bupt.memes.ws.WebSocketEndpoint;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -118,5 +121,9 @@ public class Schedule {
         logger.info("clean images done, {} images deleted", booleanHashMap.size());
     }
 
+    @Scheduled(fixedRate = 5000)
+    public void push() {
+        WebSocketEndpoint.broadcast(new WSPacket<>(Map.of("online", WebSocketEndpoint.getCount()), WSPacketType.ONLINE_NUMBER));
+    }
 
 }
