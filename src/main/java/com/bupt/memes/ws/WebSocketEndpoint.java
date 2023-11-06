@@ -30,7 +30,7 @@ public class WebSocketEndpoint {
 
     private Session session;
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(WebSocketEndpoint.class.getName());
 
     @OnOpen
     public void onOpen(Session session) {
@@ -43,7 +43,8 @@ public class WebSocketEndpoint {
 
     @OnMessage
     public void onMessage(String message, Session session) {
-        WSPacket<String> wsPacket = Utils.fromJson(message, WSPacket.class);
+        WSPacket<?> wsPacket = Utils.fromJson(message, WSPacket.class);
+        log.info("客户端{}发送了一个消息：{}", session.getId(), message);
         switch (wsPacket.getType()) {
             case WHISPER -> {
                 wsPacket.setSessionId(session.getId());
@@ -73,10 +74,14 @@ public class WebSocketEndpoint {
     }
 
     @SneakyThrows
-    public static void broadcast(WSPacket<?> message) {
+    public static boolean broadcast(WSPacket<?> message) {
+        log.info("广播消息：{}", message);
         for (WebSocketEndpoint webSocketEndpoint : webSocketMap.values()) {
-            webSocketEndpoint.sendMessage(message);
+            if (webSocketEndpoint.session.isOpen()) {
+                webSocketEndpoint.sendMessage(message);
+            }
         }
+        return true;
     }
 
 }
