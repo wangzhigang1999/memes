@@ -95,7 +95,9 @@ public class ReviewServiceImpl implements Review {
                 count++;
             }
         }
-        WebSocketEndpoint.broadcast(new WSPacket<>("", WSPacketType.REVIEW));
+        if (count > 0) {
+            WebSocketEndpoint.broadcast(new WSPacket<>("", WSPacketType.REVIEW));
+        }
         return count;
     }
 
@@ -182,7 +184,7 @@ public class ReviewServiceImpl implements Review {
         var query = new Query(Criteria.where("hash").is(hashcode));
         template.update(Submission.class).matching(query).apply(new Update().set("deleted", deleted).set("reviewed", true)).all();
         Submission one = template.findOne(query, Submission.class);
-        return one != null && one.getDeleted();
+        return one != null && !one.getDeleted();
     }
 
     private static List<Submission> findDiff(List<Submission> currentSubmissions, List<Submission> newSubmissions) {

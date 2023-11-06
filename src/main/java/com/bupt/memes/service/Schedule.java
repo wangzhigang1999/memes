@@ -123,7 +123,7 @@ public class Schedule {
 
     @Scheduled(fixedRate = 5000)
     public void push() {
-        WebSocketEndpoint.broadcast(new WSPacket<>(Map.of("online", WebSocketEndpoint.getCount()), WSPacketType.ONLINE_NUMBER));
+        WebSocketEndpoint.broadcast(new WSPacket<>( WebSocketEndpoint.getCount(), WSPacketType.ONLINE_NUMBER));
     }
 
 }
