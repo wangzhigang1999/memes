@@ -32,30 +32,29 @@ public class SubUser {
     /**
      * upload file
      *
-     * @param file     file,非必须
-     * @param uri      uri,可能是一个url,将来会被嵌入到iframe中
-     * @param mime     mime,type
-     * @param personal personal or not
+     * @param file file,非必须
+     * @param text text,可能是一个url,将来会被嵌入到iframe中
+     * @param mime mime,type
      * @return ResultData
      * @throws IOException IOException
      */
     @PostMapping("")
-    public ResultData<Submission> upload(MultipartFile file, String uri, String mime, boolean personal) throws IOException {
+    public ResultData<Submission> upload(MultipartFile file, String text, String mime) throws IOException {
         if (mime == null || mime.isEmpty()) {
             return ResultData.fail(ReturnCode.RC400);
         }
         // file is null and uri is null,bad request
-        if (file == null && uri == null) {
+        if (file == null && text == null) {
             return ResultData.fail(ReturnCode.RC400);
         }
         if (mime.startsWith("text")) {
-            return ResultData.success(service.storeTextFormatSubmission(uri, mime));
+            return ResultData.success(service.storeTextFormatSubmission(text, mime));
         }
         if (file == null) {
             return ResultData.fail(ReturnCode.RC400);
         }
         InputStream inputStream = file.getInputStream();
-        var store = service.storeStreamSubmission(inputStream, mime, personal);
+        var store = service.storeStreamSubmission(inputStream, mime, false);
         return store == null ? ResultData.fail(ReturnCode.RC500) : ResultData.success(store);
     }
 

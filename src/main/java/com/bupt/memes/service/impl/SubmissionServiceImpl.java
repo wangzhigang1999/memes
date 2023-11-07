@@ -68,24 +68,47 @@ public class SubmissionServiceImpl implements ISubmission {
     /**
      * 存储文本类型的投稿
      *
-     * @param uri  url  text
+     * @param text url  text
      * @param mime mime
      * @return 存储后的投稿
      */
     @Override
-    public Submission storeTextFormatSubmission(String uri, String mime) {
+    public Submission storeTextFormatSubmission(String text, String mime) {
 
         // check if the submission already exists
-        var submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(uri.hashCode())), Submission.class);
+        var submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(text.hashCode())), Submission.class);
         if (submission != null) {
             return submission;
         }
 
         submission = new Submission();
         submission.setSubmissionType(mime);
-        submission.setName(uri);
-        submission.setUrl(uri);
-        submission.setHash(uri.hashCode());
+        submission.setHash(text.hashCode());
+
+
+        switch (submission.getSubmissionType()) {
+            case BILIBILI:
+                submission.setName(text);
+                submission.setUrl(text);
+                break;
+            case MARKDOWN:
+                // if the text is an url, then set the url
+                if (text.startsWith("http")) {
+                    submission.setUrl(text);
+                    submission.setName(text);
+                } else {
+                    submission.setContent(text);
+                    submission.setName("markdown");
+                }
+                break;
+            case VIDEO:
+                submission.setUrl(text);
+                submission.setName(text);
+                break;
+            default:
+                return null;
+        }
+
 
         return insertSubmission(submission);
     }

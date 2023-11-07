@@ -16,6 +16,7 @@ public class Submission implements IndexMapKey {
 
     SubmissionType submissionType;
     String url;
+    String content;
 
     String uploader;
     Integer hash;
@@ -43,6 +44,8 @@ public class Submission implements IndexMapKey {
             this.submissionType = SubmissionType.VIDEO;
         } else if (mime.startsWith("text/bilibili")) {
             this.submissionType = SubmissionType.BILIBILI;
+        } else if (mime.startsWith("text/markdown")) {
+            this.submissionType = SubmissionType.MARKDOWN;
         }
     }
 
