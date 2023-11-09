@@ -1,6 +1,6 @@
 package com.bupt.memes.service.impl.rss;
 
-import com.bupt.memes.model.RSSChannel;
+import com.bupt.memes.model.rss.RSSChannel;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 

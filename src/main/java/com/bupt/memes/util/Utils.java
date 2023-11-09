@@ -1,6 +1,5 @@
 package com.bupt.memes.util;
 
-import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 
 import java.io.ByteArrayInputStream;
@@ -11,8 +10,6 @@ import java.time.Instant;
 import java.util.Set;
 
 public class Utils {
-
-    public static final Gson gson = new Gson();
 
     /**
      * get today start unix epoch milli
@@ -81,16 +78,6 @@ public class Utils {
     public static Set<String> convertTag(String tag) {
         String[] split = tag.split(",");
         return Set.of(split);
-    }
-
-
-    // to Json
-    public static String toJson(Object o) {
-        return gson.toJson(o);
-    }
-
-    public static <T> T fromJson(String json, Class<T> clazz) {
-        return gson.fromJson(json, clazz);
     }
 
     public static void main(String[] args) {

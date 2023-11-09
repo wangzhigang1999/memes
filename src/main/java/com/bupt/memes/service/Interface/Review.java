@@ -17,28 +17,28 @@ public interface Review {
     /**
      * 接受一个submission
      *
-     * @param hashcode submission的hashcode
+     * @param id submission的id
      * @return 是否接受成功
      */
-    boolean acceptSubmission(int hashcode);
+    boolean acceptSubmission(String id);
 
     /**
      * 拒绝一个submission
      *
-     * @param hashcode submission的hashcode
+     * @param id submission的id
      * @return 是否拒绝成功
      */
-    boolean rejectSubmission(int hashcode);
+    boolean rejectSubmission(String id);
 
 
     /**
      * 批量审核通过submission，因为在所有的投稿中，绝大多数都是有效的，
      * 因此在剔除了无效的之后，剩下的批量通过，节省时间
      *
-     * @param hashcode submission的hashcode列表
+     * @param ids submission的id列表
      * @return 成功审核的数量
      */
-    int batchAcceptSubmission(List<Integer> hashcode);
+    int batchAcceptSubmission(List<String> ids);
 
 
     /**

@@ -3,11 +3,8 @@ package com.bupt.memes.controller.common;
 import com.bupt.memes.anno.AuthRequired;
 import com.bupt.memes.model.Sys;
 import com.bupt.memes.model.common.ResultData;
-import com.bupt.memes.model.ws.WSPacket;
-import com.bupt.memes.model.ws.WSPacketType;
 import com.bupt.memes.service.StatisticService;
 import com.bupt.memes.service.SysConfigService;
-import com.bupt.memes.ws.WebSocketEndpoint;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -103,9 +100,4 @@ public class Common {
         return ResultData.success(sysConfig.getSys());
     }
 
-    @PostMapping("/notification")
-    @AuthRequired
-    public Boolean setNotify(@RequestParam("notification") String notification) {
-        return WebSocketEndpoint.broadcast(new WSPacket<>(notification, WSPacketType.WHISPER));
-    }
 }

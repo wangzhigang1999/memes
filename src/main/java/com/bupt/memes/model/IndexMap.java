@@ -1,11 +1,13 @@
 package com.bupt.memes.model;
 
 import com.bupt.memes.service.Interface.IndexMapKey;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+@Component
 public class IndexMap<T extends IndexMapKey> {
     private final TreeMap<String, T> map = new TreeMap<>(Comparator.reverseOrder());
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
@@ -32,14 +34,10 @@ public class IndexMap<T extends IndexMapKey> {
         readWriteLock.writeLock().unlock();
     }
 
-
-    // 获取指定键的值
-    public T get(String key) {
-        readWriteLock.readLock().lock();
-        T t = map.get(key);
-        readWriteLock.readLock().unlock();
-        return t;
-
+    public void replace(T value) {
+        readWriteLock.writeLock().lock();
+        map.replace(value.getIndexMapKey(), value);
+        readWriteLock.writeLock().unlock();
     }
 
 

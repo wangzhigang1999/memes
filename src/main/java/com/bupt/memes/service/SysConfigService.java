@@ -5,12 +5,11 @@ import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ReleaseStrategy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -76,15 +75,14 @@ public class SysConfigService {
         if (sys.getBotUp()) {
             return true;
         }
-
         sys.setBotUp(true);
         Sys target = mongoTemplate.save(sys);
         return target.getBotUp();
     }
 
 
-    public boolean addTop(int hashcode) {
-        Submission submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(hashcode)), Submission.class);
+    public boolean addTop(String id) {
+        Submission submission = mongoTemplate.findById(id, Submission.class);
         if (submission == null) {
             return false;
         }
@@ -93,11 +91,10 @@ public class SysConfigService {
         return true;
     }
 
-    public boolean removeTop(int hashcode) {
-        var submission = new Submission(hashcode);
-        sys.getTopSubmission().remove(submission);
+    public boolean removeTop(String id) {
+        sys.getTopSubmission().removeIf(s -> Objects.equals(s.getId(), id));
         Sys save = mongoTemplate.save(sys);
-        return !save.getTopSubmission().contains(submission);
+        return save.getTopSubmission().stream().noneMatch(s -> Objects.equals(s.getId(), id));
     }
 
 

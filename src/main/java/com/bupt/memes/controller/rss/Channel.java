@@ -1,7 +1,7 @@
 package com.bupt.memes.controller.rss;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.model.RSSChannel;
+import com.bupt.memes.model.rss.RSSChannel;
 import com.bupt.memes.service.impl.rss.RSSChannelService;
 import org.springframework.web.bind.annotation.*;
 

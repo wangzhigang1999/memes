@@ -11,11 +11,11 @@ public interface ISubmission {
     /**
      * 点赞或者点踩
      *
-     * @param hashcode 对应投稿的名字
+     * @param id 对应投稿的名字
      * @param up       true为点赞，false为点踩
      * @return 是否成功
      */
-    boolean vote(int hashcode, boolean up);
+    boolean vote(String id, boolean up);
 
 
     /**

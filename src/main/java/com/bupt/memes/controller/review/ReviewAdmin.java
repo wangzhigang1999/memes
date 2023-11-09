@@ -33,37 +33,37 @@ public class ReviewAdmin {
     /**
      * 接受某个投稿
      *
-     * @param hashcode 投稿的hashcode
+     * @param id 投稿的id
      * @return ResultData
      */
-    @PostMapping("/accept/{hashcode}")
+    @PostMapping("/accept/{id}")
     @AuthRequired
-    public ResultData<Boolean> accept(@PathVariable("hashcode") int hashcode) {
-        return ResultData.success(service.acceptSubmission(hashcode));
+    public ResultData<Boolean> accept(@PathVariable("id") String id) {
+        return ResultData.success(service.acceptSubmission(id));
     }
 
     /**
      * 拒绝某个投稿
      *
-     * @param hashcode 投稿的hashcode
+     * @param id 投稿的 id
      * @return ResultData
      */
-    @PostMapping("/reject/{hashcode}")
+    @PostMapping("/reject/{id}")
     @AuthRequired
-    public ResultData<Boolean> reject(@PathVariable("hashcode") int hashcode) {
-        return ResultData.success(service.rejectSubmission(hashcode));
+    public ResultData<Boolean> reject(@PathVariable("id") String id) {
+        return ResultData.success(service.rejectSubmission(id));
     }
 
     /**
      * 批量接受投稿
      *
-     * @param hashcode 投稿的hashcode
+     * @param ids 投稿的 id
      * @return ResultData
      */
     @PostMapping("/accept/batch")
     @AuthRequired
-    public ResultData<Integer> batchAccept(@RequestBody List<Integer> hashcode) {
-        return ResultData.success(service.batchAcceptSubmission(hashcode));
+    public ResultData<Integer> batchAccept(@RequestBody List<String> ids) {
+        return ResultData.success(service.batchAcceptSubmission(ids));
     }
 
 

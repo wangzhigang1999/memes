@@ -1,6 +1,6 @@
 package com.bupt.memes.controller.rss;
 
-import com.bupt.memes.model.RSSItem;
+import com.bupt.memes.model.rss.RSSItem;
 import com.bupt.memes.service.impl.rss.RSSItemService;
 import org.springframework.web.bind.annotation.*;
 

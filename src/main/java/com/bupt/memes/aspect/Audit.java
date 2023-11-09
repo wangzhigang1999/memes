@@ -5,22 +5,19 @@ import com.mongodb.client.MongoClient;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
-import jakarta.annotation.PreDestroy;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.SneakyThrows;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Aspect
-public class Audit implements CommandLineRunner {
+public class Audit {
     final MongoClient client;
 
     final MongoTemplate template;
@@ -48,8 +45,9 @@ public class Audit implements CommandLineRunner {
 
     public final static ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
 
+    public final static Logger logger = LogManager.getLogger(Audit.class);
 
-    public final static long instanceStartTime = System.currentTimeMillis();
+
     public final static String instanceUUID = UUID.randomUUID().toString();
 
     @Value("${spring.data.mongodb.database}")
@@ -82,6 +80,7 @@ public class Audit implements CommandLineRunner {
 
         if (uuid == null || uuid.isEmpty()) {
             uuid = "anonymous";
+            logger.warn("uuid is null, use anonymous");
         }
 
         threadLocalUUID.set(uuid);
@@ -91,40 +90,9 @@ public class Audit implements CommandLineRunner {
         threadLocalUUID.remove();
 
         doAudit(request, classMethod, uuid, start, end);
-
         return proceed;
     }
 
-    @Override
-    public void run(String... args) {
-        /*
-            记录启动时间，因为render不保证24小时运行;需要统计宕机的时间
-         */
-        Document document = new Document("startTimestamp", instanceStartTime);
-        var str = Instant.ofEpochMilli(instanceStartTime).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
-        document.append("startAt", str).append("env", env).append("instanceUUID", instanceUUID);
-        client.getDatabase(database).getCollection("up").insertOne(document);
-    }
-
-    @PreDestroy
-    @SneakyThrows
-    public void exit() {
-        boolean termination = pool.awaitTermination(10, TimeUnit.SECONDS);
-        if (!termination) {
-            pool.shutdownNow();
-        }
-        var instanceEndTime = System.currentTimeMillis();
-        Document document = new Document("endTimestamp", instanceEndTime);
-        var str = Instant.ofEpochMilli(instanceEndTime).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
-        document.append("endAt", str);
-
-        var duration = System.currentTimeMillis() - instanceStartTime;
-        // convert to hours
-        duration /= 1000 * 60 * 60;
-        document.append("alive", duration);
-
-        client.getDatabase(database).getCollection("up").updateOne(new Document("instanceUUID", instanceUUID), new Document("$set", document));
-    }
 
     private void doAudit(final HttpServletRequest request, String classMethod, String uuid, long start, long end) {
 

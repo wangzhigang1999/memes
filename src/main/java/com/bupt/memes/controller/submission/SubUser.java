@@ -62,20 +62,20 @@ public class SubUser {
      * 获取置顶
      */
     @GetMapping("/top")
-    public ResultData<Set<Submission>> getTop() {
-        return ResultData.success(SysConfigService.sys.getTopSubmission());
+    public Set<Submission> getTop() {
+        return SysConfigService.sys.getTopSubmission();
     }
 
     /**
      * 点赞或者踩
      *
-     * @param hash hash
-     * @param up   up or down
+     * @param id id
+     * @param up up or down
      * @return ResultData
      */
-    @PostMapping("/vote/{hash}/{up}")
-    public ResultData<Boolean> vote(@PathVariable("hash") int hash, @PathVariable("up") boolean up) {
-        return ResultData.success(service.vote(hash, up));
+    @PostMapping("/vote/{id}/{up}")
+    public Boolean vote(@PathVariable("id") String id, @PathVariable("up") boolean up) {
+        return service.vote(id, up);
     }
 
     /**
@@ -87,8 +87,8 @@ public class SubUser {
      * @return Page
      */
     @GetMapping("/page")
-    public ResultData<PageResult<Submission>> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
-        return ResultData.success(service.getSubmissionByPage(pageNum, pageSize, lastID));
+    public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
+        return service.getSubmissionByPage(pageNum, pageSize, lastID);
     }
 
     /**
@@ -97,8 +97,8 @@ public class SubUser {
      * @return ResultData
      */
     @GetMapping("/history")
-    public ResultData<List<String>> getHistory() {
-        return ResultData.success(history.getHistoryDates(sysConfig.getSys().getMAX_HISTORY()));
+    public List<String> getHistory() {
+        return history.getHistoryDates(sysConfig.getSys().getMAX_HISTORY());
     }
 
     /**
@@ -108,8 +108,8 @@ public class SubUser {
      * @return ResultData
      */
     @GetMapping("/{date}")
-    public ResultData<List<Submission>> getSubmission(@PathVariable("date") String date) {
-        return ResultData.success(history.getHistory(date));
+    public List<Submission> getSubmission(@PathVariable("date") String date) {
+        return history.getHistory(date);
     }
 
 }

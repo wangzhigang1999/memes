@@ -1,6 +1,6 @@
 package com.bupt.memes.service.impl.rss;
 
-import com.bupt.memes.model.RSSItem;
+import com.bupt.memes.model.rss.RSSItem;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

@@ -12,8 +12,8 @@ import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -38,22 +38,21 @@ public class SubmissionServiceImpl implements ISubmission {
 
     final Storage storage;
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-    final static Logger logger = org.apache.logging.log4j.LogManager.getLogger(SubmissionServiceImpl.class);
+    final static Logger logger = LogManager.getLogger(SubmissionServiceImpl.class);
 
-    final IndexMap<Submission> submissionIndexMap = new IndexMap<>();
+    final IndexMap<Submission> submissionIndexMap;
 
 
     /**
      * 对投稿点赞/点踩
      *
-     * @param hashcode 对应投稿的id
-     * @param up       true为点赞，false为点踩
+     * @param id 对应投稿的id
+     * @param up true为点赞，false为点踩
      * @return 是否成功
      */
     @Override
-    public boolean vote(int hashcode, boolean up) {
-        // if up is true, then vote up, else vote down
-        var query = new Query(Criteria.where("hash").is(hashcode));
+    public boolean vote(String id, boolean up) {
+        var query = new Query(Criteria.where("id").is(id));
         var update = new Update();
         if (up) {
             update.inc("up", 1);
@@ -61,6 +60,12 @@ public class SubmissionServiceImpl implements ISubmission {
             update.inc("down", 1);
         }
         UpdateResult first = mongoTemplate.update(Submission.class).matching(query).apply(update).first();
+        // 异步更新缓存,确保缓存的一致性
+        executor.submit(() -> {
+            Submission submission = mongoTemplate.findById(id, Submission.class);
+            submissionIndexMap.replace(submission);
+            logger.info("update submission cache, id: {}", id);
+        });
         return first.getMatchedCount() > 0;
     }
 
@@ -191,14 +196,13 @@ public class SubmissionServiceImpl implements ISubmission {
      * @return 分页结果
      */
     @Override
-    @Cacheable(value = "submission", key = "#lastID + #pageNum + #pageSize", condition = "#lastID != null && #lastID !=''")
     public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
         if (lastID != null && !lastID.isEmpty()) {
             List<Submission> list = submissionIndexMap.getAfter(lastID, pageSize);
             if (list != null && list.size() >= pageSize) {
                 PageResult<Submission> pageResult = new PageResult<>();
                 pageResult.setList(list);
-                logger.info("get submission from index map, size: {}", list.size());
+                logger.info("cache hit,get submission from index map, size: {}", list.size());
                 return pageResult;
             }
         }

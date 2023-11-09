@@ -1,4 +1,4 @@
-package com.bupt.memes.model;
+package com.bupt.memes.model.rss;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

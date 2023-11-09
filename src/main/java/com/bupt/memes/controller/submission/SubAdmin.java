@@ -1,8 +1,6 @@
 package com.bupt.memes.controller.submission;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.model.common.ResultData;
-import com.bupt.memes.model.common.ReturnCode;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.StatisticService;
@@ -34,35 +32,33 @@ public class SubAdmin {
      */
     @RequestMapping("/release")
     @AuthRequired
-    public ResultData<Integer> release() {
-        int release = review.release();
-        return release < 0 ? ResultData.fail(ReturnCode.RC500) : ResultData.success(release);
+    public Integer release() {
+        return review.release();
     }
 
     /**
      * 置顶
      *
-     * @param hash hash
+     * @param id id
      * @return ResultData
      */
-    @PostMapping("/top/{hash}")
+    @PostMapping("/top/{id}")
     @AuthRequired
-    public ResultData<Boolean> top(@PathVariable("hash") int hash) {
-        return ResultData.success(sysConfig.addTop(hash));
+    public Boolean top(@PathVariable("id") String id) {
+        return sysConfig.addTop(id);
     }
 
     /**
      * 取消置顶
      *
-     * @param hash hash
+     * @param id id
      * @return ResultData
      */
-    @DeleteMapping("/top/{hash}")
+    @DeleteMapping("/top/{id}")
     @AuthRequired
-    public ResultData<Boolean> unTop(@PathVariable("hash") int hash) {
-        return ResultData.success(sysConfig.removeTop(hash));
+    public Boolean unTop(@PathVariable("id") String id) {
+        return sysConfig.removeTop(id);
     }
-
 
 
     /**
@@ -75,8 +71,8 @@ public class SubAdmin {
      */
     @PostMapping("/min")
     @AuthRequired
-    public ResultData<Boolean> setMaxSubmissions(@RequestParam("min") int min) {
-        return ResultData.success(sysConfig.setMinSubmissions(min));
+    public Boolean setMaxSubmissions(@RequestParam("min") int min) {
+        return sysConfig.setMinSubmissions(min);
     }
 
 }

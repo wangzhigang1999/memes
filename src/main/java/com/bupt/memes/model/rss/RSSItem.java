@@ -1,4 +1,4 @@
-package com.bupt.memes.model;
+package com.bupt.memes.model.rss;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

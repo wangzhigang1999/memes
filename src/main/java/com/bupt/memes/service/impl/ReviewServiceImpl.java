@@ -1,14 +1,11 @@
 package com.bupt.memes.service.impl;
 
 import com.bupt.memes.model.media.Submission;
-import com.bupt.memes.model.ws.WSPacket;
-import com.bupt.memes.model.ws.WSPacketType;
 import com.bupt.memes.service.Interface.IHistory;
 import com.bupt.memes.service.Interface.ReleaseStrategy;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.SysConfigService;
 import com.bupt.memes.util.Utils;
-import com.bupt.memes.ws.WebSocketEndpoint;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -58,47 +55,35 @@ public class ReviewServiceImpl implements Review {
     /**
      * 审核通过
      *
-     * @param hashcode submission的hashcode
+     * @param id submission的 id
      * @return 是否成功
      */
     @Override
-    public boolean acceptSubmission(int hashcode) {
-        if (updateSubmission(hashcode, false)) {
-            WebSocketEndpoint.broadcast(new WSPacket<>("", WSPacketType.REVIEW));
-            return true;
-        }
-        return false;
+    public boolean acceptSubmission(String id) {
+        return updateSubmission(id, false);
     }
 
     /**
      * 审核不通过
      *
-     * @param hashcode submission的hashcode
+     * @param id submission的id
      * @return 是否成功
      */
     @Override
-    public boolean rejectSubmission(int hashcode) {
-        return updateSubmission(hashcode, true);
+    public boolean rejectSubmission(String id) {
+        return updateSubmission(id, true);
     }
 
     /**
      * 批量通过
      *
-     * @param hashcode submission的hashcode列表
+     * @param ids submission的id列表
      * @return 成功通过的数量
      */
     @Override
-    public int batchAcceptSubmission(List<Integer> hashcode) {
-        int count = 0;
-        for (int i : hashcode) {
-            if (acceptSubmission(i)) {
-                count++;
-            }
-        }
-        if (count > 0) {
-            WebSocketEndpoint.broadcast(new WSPacket<>("", WSPacketType.REVIEW));
-        }
-        return count;
+    public int batchAcceptSubmission(List<String> ids) {
+        ids.forEach(this::acceptSubmission);
+        return ids.size();
     }
 
     /**
@@ -176,12 +161,12 @@ public class ReviewServiceImpl implements Review {
     /**
      * 更新投稿的审核状态
      *
-     * @param hashcode 投稿的hashcode
-     * @param deleted  是否删除
+     * @param id      投稿的id
+     * @param deleted 是否删除
      * @return 是否成功
      */
-    private boolean updateSubmission(int hashcode, boolean deleted) {
-        var query = new Query(Criteria.where("hash").is(hashcode));
+    private boolean updateSubmission(String id, boolean deleted) {
+        var query = new Query(Criteria.where("id").is(id));
         template.update(Submission.class).matching(query).apply(new Update().set("deleted", deleted).set("reviewed", true)).all();
         Submission one = template.findOne(query, Submission.class);
         return one != null && !one.getDeleted();

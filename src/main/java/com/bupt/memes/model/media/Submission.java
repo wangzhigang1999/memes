@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Objects;
+
 @Data
 @Document(collection = "Submission")
 @AllArgsConstructor
@@ -13,28 +15,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Submission implements IndexMapKey {
 
     String id;
-
     SubmissionType submissionType;
     String url;
     String content;
-
     String uploader;
     Integer hash;
     String name;
     Boolean deleted = false;
     Boolean reviewed = false;
+
     long timestamp;
-
     long up;
-
     long down;
 
     public Submission() {
         this.timestamp = System.currentTimeMillis();
     }
 
-    public Submission(int hashcode) {
-        this.hash = hashcode;
+    public Submission(String id) {
+        this.id = id;
     }
 
     public void setSubmissionType(String mime) {
@@ -51,15 +50,26 @@ public class Submission implements IndexMapKey {
 
     @Override
     public int hashCode() {
+        if (hash == null) {
+            hash = Objects.hash(id);
+        }
         return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Submission) {
-            return ((Submission) obj).getHash().equals(this.hash);
+
+        // if not instance of Submission, return false
+        if (!(obj instanceof Submission)) {
+            return false;
         }
-        return false;
+
+        // then check if is not null and equal
+        if (obj == this || Objects.equals(((Submission) obj).id, this.id)) {
+            return true;
+        }
+
+        return ((Submission) obj).getHash().equals(this.hash);
     }
 
     @Override

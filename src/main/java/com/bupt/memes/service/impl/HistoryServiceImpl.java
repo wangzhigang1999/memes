@@ -50,10 +50,6 @@ public class HistoryServiceImpl implements IHistory {
             return dateHistoryCache.get(date).getSubmissions();
         }
         History history = mongoTemplate.findOne(Query.query(Criteria.where("date").is(date)), History.class);
-        if (history != null) {
-            logger.info("cache miss, date: {},will update it.", date);
-            dateHistoryCache.put(date, history);
-        }
         return history == null ? new ArrayList<>() : history.getSubmissions();
     }
 
