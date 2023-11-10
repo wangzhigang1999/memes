@@ -91,6 +91,13 @@ public class IndexMap<T extends IndexMapKey> {
     public int size() {
         return this.map.size();
     }
+
+    public Boolean clear() {
+        readWriteLock.writeLock().lock();
+        this.map.clear();
+        readWriteLock.writeLock().unlock();
+        return this.map.isEmpty();
+    }
 }
 
 

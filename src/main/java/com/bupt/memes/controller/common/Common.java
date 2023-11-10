@@ -1,8 +1,10 @@
 package com.bupt.memes.controller.common;
 
 import com.bupt.memes.anno.AuthRequired;
+import com.bupt.memes.model.IndexMap;
 import com.bupt.memes.model.Sys;
 import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.StatisticService;
 import com.bupt.memes.service.SysConfigService;
 import lombok.AllArgsConstructor;
@@ -20,6 +22,8 @@ public class Common {
     final StatisticService statisticService;
 
     final SysConfigService sysConfig;
+
+    final IndexMap<Submission> indexMap;
 
     /**
      * 验证token
@@ -98,6 +102,13 @@ public class Common {
     @AuthRequired
     public ResultData<Sys> getSysConfig() {
         return ResultData.success(sysConfig.getSys());
+    }
+
+    // clean cache
+    @GetMapping("/cache/clean")
+    @AuthRequired
+    public ResultData<Boolean> cleanCache() {
+        return ResultData.success(indexMap.clear());
     }
 
 }
