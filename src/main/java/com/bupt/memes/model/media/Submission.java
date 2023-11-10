@@ -12,7 +12,7 @@ import java.util.Objects;
 @Document(collection = "Submission")
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Submission implements IndexMapKey {
+public class Submission implements IndexMapKey, Comparable<Submission> {
 
     String id;
     SubmissionType submissionType;
@@ -75,5 +75,11 @@ public class Submission implements IndexMapKey {
     @Override
     public String getIndexMapKey() {
         return id;
+    }
+
+
+    @Override
+    public int compareTo(Submission o) {
+        return this.id.compareTo(o.id);
     }
 }

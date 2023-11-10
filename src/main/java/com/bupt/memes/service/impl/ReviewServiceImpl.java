@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.util.comparator.Comparators;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,10 @@ public class ReviewServiceImpl implements Review {
                 .where("timestamp").gte(from)
                 .and("deleted").ne(true)
                 .and("reviewed").ne(true);
-        return template.find(Query.query(criteria), Submission.class);
+
+        List<Submission> submissions = template.find(Query.query(criteria), Submission.class);
+        submissions.sort(Comparators.comparable());
+        return submissions;
     }
 
     /**
@@ -82,6 +86,7 @@ public class ReviewServiceImpl implements Review {
      */
     @Override
     public int batchAcceptSubmission(List<String> ids) {
+        ids.sort(String::compareTo);
         ids.forEach(this::acceptSubmission);
         return ids.size();
     }
