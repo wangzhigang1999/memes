@@ -10,9 +10,7 @@ import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 定时任务
@@ -48,7 +46,7 @@ public class Schedule {
 
         boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
 
-        // 十点之后开启机器人
+        // 九点之后开启机器人，爬虫会在10点开始爬取
         int currentHour = Utils.getCurrentHour();
         if (currentHour >= 21 || currentHour <= 8) {
             botShouldEnabled = true;
@@ -88,34 +86,46 @@ public class Schedule {
      * 每天一次，清理一次存储
      */
     @Scheduled(cron = "0 0 0 * * ?")
-    public void cleanImg() {
+    public void cleanDeletedSub() {
+        logger.info("clean submissions start.");
         List<Submission> deletedSubmission = submission.getDeletedSubmission();
-        logger.info("clean images, {} images to be deleted", deletedSubmission.size());
-
-        if (deletedSubmission.isEmpty()) {
-            return;
-        }
-
-        String[] keys = new String[deletedSubmission.size()];
-        Map<String, Integer> map = new HashMap<>();
-        for (int i = 0; i < deletedSubmission.size(); i++) {
-            keys[i] = deletedSubmission.get(i).getName();
-            map.put(keys[i], deletedSubmission.get(i).getHash());
-        }
-
-        HashMap<String, Boolean> booleanHashMap = storage.delete(keys);
-        if (booleanHashMap == null) {
-            logger.error("clean images failed,because of storage error");
-            return;
-        }
-
-        for (Map.Entry<String, Boolean> entry : booleanHashMap.entrySet()) {
-            if (entry.getValue()) {
-                submission.hardDeleteSubmission(map.get(entry.getKey()));
+        Iterator<Submission> iterator = deletedSubmission.iterator();
+        while (iterator.hasNext()) {
+            Submission next = iterator.next();
+            if (next.textFormat()) {
+                submission.hardDeleteSubmission(next.getId());
+                iterator.remove();
             }
         }
 
-        logger.info("clean images done, {} images deleted", booleanHashMap.size());
+        if (deletedSubmission.isEmpty()) {
+            logger.info("clean submissions done, no images to be deleted from storage.");
+            return;
+        }
+
+        logger.info("clean images start, {} images to be deleted from storage.", deletedSubmission.size());
+
+        List<String> keyList = new ArrayList<>();
+        Map<String, String> nameIdMap = new HashMap<>();
+        for (Submission sub : deletedSubmission) {
+            keyList.add(sub.getName());
+            nameIdMap.put(sub.getName(), sub.getId());
+        }
+
+        String[] array = keyList.toArray(new String[0]);
+        var nameStatusMap = storage.delete(array);
+
+        if (nameStatusMap == null) {
+            logger.error("clean images failed,because of storage error.");
+            return;
+        }
+
+        nameStatusMap.forEach((objName, status) -> {
+            if (status) {
+                submission.hardDeleteSubmission(nameIdMap.get(objName));
+            }
+        });
+        logger.info("clean  done, {} images deleted from storage.", nameStatusMap.entrySet().stream().filter(Map.Entry::getValue).count());
     }
 
 }

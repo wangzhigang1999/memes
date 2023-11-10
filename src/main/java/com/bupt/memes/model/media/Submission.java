@@ -47,6 +47,9 @@ public class Submission implements IndexMapKey, Comparable<Submission> {
             this.submissionType = SubmissionType.MARKDOWN;
         }
     }
+    public boolean textFormat() {
+        return this.submissionType == SubmissionType.BILIBILI || this.submissionType == SubmissionType.MARKDOWN;
+    }
 
     @Override
     public int hashCode() {

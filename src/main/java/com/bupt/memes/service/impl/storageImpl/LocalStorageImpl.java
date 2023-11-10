@@ -14,6 +14,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -60,5 +62,17 @@ public class LocalStorageImpl implements Storage, Condition {
         Environment env = context.getEnvironment();
         var property = env.getProperty("storage.type", String.class, "local");
         return "local".equals(property);
+    }
+
+    @Override
+    public Map<String, Boolean> delete(String[] keyList) {
+        Map<String, Boolean> map = new HashMap<>();
+        for (String key : keyList) {
+            String path = localDir + "/" + key;
+            File file = new File(path);
+            boolean delete = file.delete();
+            map.put(key, delete);
+        }
+        return map;
     }
 }

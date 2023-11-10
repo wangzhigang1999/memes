@@ -183,8 +183,8 @@ public class SubmissionServiceImpl implements ISubmission {
      * 硬删除
      */
     @Override
-    public void hardDeleteSubmission(int hashcode) {
-        mongoTemplate.remove(Query.query(Criteria.where("hash").is(hashcode)), Submission.class);
+    public void hardDeleteSubmission(String id) {
+        mongoTemplate.remove(Query.query(Criteria.where("id").is(id)), Submission.class);
     }
 
     /**
