@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Objects;
 
 @Data
-@Document(collection = "Submission")
+@Document(collection = "submission")
 @AllArgsConstructor
 @Accessors(chain = true)
 public class Submission implements IndexMapKey, Comparable<Submission> {
