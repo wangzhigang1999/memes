@@ -21,7 +21,6 @@ public class LogDocument {
     private Object detail;
     private Map<String, String[]> parameterMap;
     private String uuid;
-    private int status;
     private long timecost; // ms
     private long timestamp;
     private String env;

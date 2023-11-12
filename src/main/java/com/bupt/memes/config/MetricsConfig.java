@@ -26,7 +26,7 @@ public class MetricsConfig {
     }
 
     @Bean
-    MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
+    MeterRegistryCustomizer<MeterRegistry> addCommonTags() {
         String hostname;
         try {
             hostname = InetAddress.getLocalHost().getHostName();

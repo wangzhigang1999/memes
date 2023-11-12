@@ -1,6 +1,7 @@
 package com.bupt.memes.model;
 
 import com.bupt.memes.service.Interface.IndexMapKey;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -41,7 +42,7 @@ public class IndexMap<T extends IndexMapKey> {
     }
 
 
-    // get after
+    @Timed(value = "cache_may_hit", description = "cache may hit")
     public List<T> getAfter(String key, Integer limit) {
         readWriteLock.readLock().lock();
         SortedMap<String, T> tailMap = map.tailMap(key, false);

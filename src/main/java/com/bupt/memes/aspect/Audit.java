@@ -98,7 +98,7 @@ public class Audit {
 
         pool.submit(() -> {
             if (!timerMap.containsKey(classMethod)) {
-                timerMap.put(classMethod, Timer.builder("http_request_time").description("http request time").tags(Tags.of("class_method", classMethod, "env", env, "instance", instanceUUID)).register(registry));
+                timerMap.put(classMethod, Timer.builder("http_request_time").description("http request time").tags(Tags.of("class_method", classMethod)).register(registry));
             }
             timerMap.get(classMethod).record(end - start, TimeUnit.MILLISECONDS);
         });
@@ -117,8 +117,7 @@ public class Audit {
                     .setTimecost(end - start)
                     .setTimestamp(start)
                     .setEnv(env)
-                    .setInstanceUUID(instanceUUID)
-                    .setStatus(200);
+                    .setInstanceUUID(instanceUUID);
             template.save(document);
         });
     }
