@@ -1,17 +1,21 @@
-package com.bupt.memes.model;
+package com.bupt.memes.service;
 
 import com.bupt.memes.service.Interface.IndexMapKey;
 import io.micrometer.core.annotation.Timed;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
-public class IndexMap<T extends IndexMapKey> {
+public class OrderedCache<T extends IndexMapKey> {
     private final TreeMap<String, T> map = new TreeMap<>(Comparator.reverseOrder());
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final Lock readLock = readWriteLock.readLock();
+
+    private final Lock writeLock = readWriteLock.writeLock();
 
     // max size
     private final Integer maxSize;
@@ -19,7 +23,7 @@ public class IndexMap<T extends IndexMapKey> {
     private final static Integer DEFAULT_EVICTION_SIZE = 2;
 
 
-    public IndexMap() {
+    public OrderedCache() {
         this.maxSize = Integer.MAX_VALUE;
     }
 
@@ -30,24 +34,24 @@ public class IndexMap<T extends IndexMapKey> {
         if (map.size() >= maxSize) {
             evict();
         }
-        readWriteLock.writeLock().lock();
+        writeLock.lock();
         map.put(value.getIndexMapKey(), value);
-        readWriteLock.writeLock().unlock();
+        writeLock.unlock();
     }
 
     public void replace(T value) {
-        readWriteLock.writeLock().lock();
+        writeLock.lock();
         map.replace(value.getIndexMapKey(), value);
-        readWriteLock.writeLock().unlock();
+        writeLock.unlock();
     }
 
 
     @Timed(value = "cache_may_hit", description = "cache may hit")
     public List<T> getAfter(String key, Integer limit) {
-        readWriteLock.readLock().lock();
+        readLock.lock();
         SortedMap<String, T> tailMap = map.tailMap(key, false);
         List<T> limitedValues = getLimitedValues(tailMap, limit);
-        readWriteLock.readLock().unlock();
+        readLock.unlock();
         return limitedValues;
     }
 
@@ -67,21 +71,21 @@ public class IndexMap<T extends IndexMapKey> {
         if (list.size() > maxSize) {
             throw new IllegalArgumentException("list size is larger than max size");
         }
-        readWriteLock.writeLock().lock();
+        writeLock.lock();
         for (T t : list) {
             add(t);
         }
-        readWriteLock.writeLock().unlock();
+        writeLock.unlock();
     }
 
     private void evict() {
-        readWriteLock.writeLock().lock();
+        writeLock.lock();
         for (int i = 0; i < DEFAULT_EVICTION_SIZE; i++) {
             if (!map.isEmpty()) {
                 map.remove(map.firstKey());
             }
         }
-        readWriteLock.writeLock().unlock();
+        writeLock.unlock();
     }
 
     @Override
@@ -94,10 +98,10 @@ public class IndexMap<T extends IndexMapKey> {
     }
 
     public Boolean clear() {
-        readWriteLock.writeLock().lock();
+        writeLock.lock();
         this.map.clear();
-        readWriteLock.writeLock().unlock();
-        return this.map.isEmpty();
+        writeLock.unlock();
+        return true;
     }
 }
 

@@ -1,12 +1,12 @@
 package com.bupt.memes.service.impl;
 
 import com.bupt.memes.aspect.Audit;
-import com.bupt.memes.model.IndexMap;
 import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
+import com.bupt.memes.service.OrderedCache;
 import com.bupt.memes.util.Utils;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
@@ -40,7 +40,7 @@ public class SubmissionServiceImpl implements ISubmission {
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     final static Logger logger = LogManager.getLogger(SubmissionServiceImpl.class);
 
-    final IndexMap<Submission> submissionIndexMap;
+    final OrderedCache<Submission> submissionOrderedCache;
 
 
     /**
@@ -63,7 +63,7 @@ public class SubmissionServiceImpl implements ISubmission {
         // 异步更新缓存,确保缓存的一致性
         executor.submit(() -> {
             Submission submission = mongoTemplate.findById(id, Submission.class);
-            submissionIndexMap.replace(submission);
+            submissionOrderedCache.replace(submission);
             logger.info("update submission cache, id: {}", id);
         });
         return first.getMatchedCount() > 0;
@@ -198,7 +198,7 @@ public class SubmissionServiceImpl implements ISubmission {
     @Override
     public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
         if (lastID != null && !lastID.isEmpty()) {
-            List<Submission> list = submissionIndexMap.getAfter(lastID, pageSize);
+            List<Submission> list = submissionOrderedCache.getAfter(lastID, pageSize);
             if (list != null && list.size() >= pageSize) {
                 PageResult<Submission> pageResult = new PageResult<>();
                 pageResult.setList(list);
@@ -210,7 +210,7 @@ public class SubmissionServiceImpl implements ISubmission {
         Query query = new Query();
         query.addCriteria(Criteria.where("reviewed").is(true));
         PageResult<Submission> result = mongoPageHelper.pageQuery(query, Submission.class, pageSize, pageNum, lastID);
-        submissionIndexMap.putAll(result.getList());
+        submissionOrderedCache.putAll(result.getList());
         return result;
     }
 
