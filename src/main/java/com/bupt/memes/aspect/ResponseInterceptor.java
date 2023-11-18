@@ -1,6 +1,7 @@
 package com.bupt.memes.aspect;
 
 import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.common.ReturnCode;
 import lombok.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -24,6 +25,9 @@ public class ResponseInterceptor implements ResponseBodyAdvice<Object> {
                                   @NonNull Class selectedConverterType,
                                   @NonNull ServerHttpRequest request,
                                   @NonNull ServerHttpResponse response) {
+        if (o == null) {
+            return ResultData.fail(ReturnCode.RC400);
+        }
         if (o instanceof ResultData<?>) {
             return o;
         }

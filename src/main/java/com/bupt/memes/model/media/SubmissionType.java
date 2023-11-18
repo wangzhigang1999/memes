@@ -1,5 +1,5 @@
 package com.bupt.memes.model.media;
 
 public enum SubmissionType {
-    IMAGE, VIDEO, BILIBILI,MARKDOWN
+    IMAGE, VIDEO, BILIBILI, MARKDOWN, BATCH_IMAGE
 }
