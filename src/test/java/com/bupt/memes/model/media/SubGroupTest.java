@@ -8,24 +8,24 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-class ImageGroupTest {
+class SubGroupTest {
 
 
-    ImageGroup imageGroup = null;
+    SubmissionGroup submissionGroup = null;
 
     @Test
     @Order(1)
     void fromSubmission() {
-        assert imageGroup == null;
-        Optional<ImageGroup> group = ImageGroup.fromSubmission(null);
+        assert submissionGroup == null;
+        Optional<SubmissionGroup> group = SubmissionGroup.fromSubmission(null);
         assert group.isEmpty();
 
         Submission submission = new Submission().setSubmissionType(SubmissionType.IMAGE);
-        group = ImageGroup.fromSubmission(List.of(submission));
+        group = SubmissionGroup.fromSubmission(List.of(submission));
         assert group.isPresent();
 
-        imageGroup = group.get();
-        assert imageGroup.images.size() == 1;
+        submissionGroup = group.get();
+        assert submissionGroup.children.size() == 1;
 
     }
 
@@ -34,15 +34,15 @@ class ImageGroupTest {
     void addSubmissions() {
         fromSubmission();
         Submission submission = new Submission().setSubmissionType(SubmissionType.IMAGE);
-        imageGroup.addSubmissions(List.of(submission));
-        assert imageGroup.images.size() == 2;
+        submissionGroup.addSubmissions(List.of(submission));
+        assert submissionGroup.children.size() == 2;
 
 
         Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
 				.create();
 
-        System.out.println(gson.toJson(imageGroup));
+        System.out.println(gson.toJson(submissionGroup));
 
     }
 

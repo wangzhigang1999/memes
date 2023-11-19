@@ -1,8 +1,8 @@
 package com.bupt.memes.service.impl;
 
-import com.bupt.memes.model.media.ImageGroup;
 import com.bupt.memes.model.media.Submission;
-import com.bupt.memes.service.Interface.IImageGroup;
+import com.bupt.memes.model.media.SubmissionGroup;
+import com.bupt.memes.service.Interface.ISubGroup;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,50 +16,50 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class ImageGroupImpl implements IImageGroup {
+public class SubGroupImpl implements ISubGroup {
 
     final MongoTemplate template;
 
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(ImageGroupImpl.class);
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(SubGroupImpl.class);
 
     @Override
     @Transactional
-    public ImageGroup createImageGroup(List<String> submissionIds) {
+    public SubmissionGroup createGroup(List<String> submissionIds) {
         List<Submission> submissions = ensureSubmissionsExist(submissionIds);
         if (submissions.size() != submissionIds.size()) {
             logger.warn("create image group failed, submissions not exist");
             return null;
         }
-        Optional<ImageGroup> group = ImageGroup.fromSubmission(submissions);
+        Optional<SubmissionGroup> group = SubmissionGroup.fromSubmission(submissions);
         assert group.isPresent();
-        ImageGroup imageGroup = group.get();
-        List<Submission> images = imageGroup.getImages();
+        SubmissionGroup submissionGroup = group.get();
+        List<Submission> images = submissionGroup.getChildren();
         images.forEach(template::remove);
-        template.insert(imageGroup);
-        return imageGroup;
+        template.insert(submissionGroup);
+        return submissionGroup;
     }
 
     @Override
     @Transactional
-    public ImageGroup addToImageGroup(String imageGroupId, List<String> submissionIds) {
-        ImageGroup imageGroup = getById(imageGroupId);
-        if (imageGroup == null) {
+    public SubmissionGroup addToGroup(String groupId, List<String> submissionIds) {
+        SubmissionGroup submissionGroup = getById(groupId);
+        if (submissionGroup == null) {
             return null;
         }
         List<Submission> submissions = ensureSubmissionsExist(submissionIds);
         if (submissions.size() != submissionIds.size()) {
             return null;
         }
-        imageGroup.addSubmissions(submissions);
-        template.save(imageGroup);
+        submissionGroup.addSubmissions(submissions);
+        template.save(submissionGroup);
         submissions.forEach(template::remove);
-        return imageGroup;
+        return submissionGroup;
     }
 
 
     @Override
-    public ImageGroup getById(String id) {
-        return template.findById(id, ImageGroup.class);
+    public SubmissionGroup getById(String id) {
+        return template.findById(id, SubmissionGroup.class);
     }
 
 

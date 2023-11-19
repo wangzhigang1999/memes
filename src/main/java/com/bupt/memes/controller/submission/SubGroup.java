@@ -1,31 +1,31 @@
 package com.bupt.memes.controller.submission;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.service.Interface.IImageGroup;
+import com.bupt.memes.service.Interface.ISubGroup;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/submission/imageGroup")
+@RequestMapping("/admin/submission/group")
 @CrossOrigin(origins = "*")
 @AllArgsConstructor
-public class ImageGroup {
+public class SubGroup {
 
-    final IImageGroup imageGroup;
+    final ISubGroup subGroup;
 
     // create
     @PutMapping("")
     @AuthRequired
     public Object create(@RequestBody List<String> submissionIds) {
-        return imageGroup.createImageGroup(submissionIds);
+        return subGroup.createGroup(submissionIds);
     }
 
     // post
     @PostMapping("/{id}")
     @AuthRequired
     public Object update(@PathVariable("id") String id, @RequestBody List<String> submissionIds) {
-        return imageGroup.addToImageGroup(id, submissionIds);
+        return subGroup.addToGroup(id, submissionIds);
     }
 }
