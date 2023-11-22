@@ -6,7 +6,6 @@ import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
-import com.bupt.memes.service.OrderedCache;
 import com.bupt.memes.util.Utils;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
@@ -40,8 +39,6 @@ public class SubmissionServiceImpl implements ISubmission {
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     final static Logger logger = LogManager.getLogger(SubmissionServiceImpl.class);
 
-    final OrderedCache<Submission> submissionOrderedCache;
-
 
     /**
      * 对投稿点赞/点踩
@@ -60,12 +57,7 @@ public class SubmissionServiceImpl implements ISubmission {
             update.inc("down", 1);
         }
         UpdateResult first = mongoTemplate.update(Submission.class).matching(query).apply(update).first();
-        // 异步更新缓存,确保缓存的一致性
-        executor.submit(() -> {
-            Submission submission = mongoTemplate.findById(id, Submission.class);
-            submissionOrderedCache.replace(submission);
-            logger.info("update submission cache, id: {}", id);
-        });
+
         return first.getMatchedCount() > 0;
     }
 
@@ -121,14 +113,13 @@ public class SubmissionServiceImpl implements ISubmission {
     /**
      * 存储二进制类型的投稿
      *
-     * @param stream   输入流
-     * @param mime     mime
-     * @param personal 是否私有
+     * @param stream 输入流
+     * @param mime   mime
      * @return 存储后的投稿
      */
     @Override
     @SneakyThrows
-    public Submission storeStreamSubmission(InputStream stream, String mime, boolean personal) {
+    public Submission storeStreamSubmission(InputStream stream, String mime) {
         byte[] bytes = Utils.readAllBytes(stream);
 
         int code = Arrays.hashCode(bytes);
@@ -197,21 +188,10 @@ public class SubmissionServiceImpl implements ISubmission {
      */
     @Override
     public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
-        if (lastID != null && !lastID.isEmpty()) {
-            List<Submission> list = submissionOrderedCache.getAfter(lastID, pageSize);
-            if (list != null && list.size() >= pageSize) {
-                PageResult<Submission> pageResult = new PageResult<>();
-                pageResult.setList(list);
-                logger.info("cache hit,get submission from index map, size: {}", list.size());
-                return pageResult;
-            }
-        }
         logger.info("get submission from db, lastID: {}", Objects.equals(lastID, "") ? "null" : lastID);
         Query query = new Query();
         query.addCriteria(Criteria.where("reviewed").is(true));
-        PageResult<Submission> result = mongoPageHelper.pageQuery(query, Submission.class, pageSize, pageNum, lastID);
-        submissionOrderedCache.putAll(result.getList());
-        return result;
+        return mongoPageHelper.pageQuery(query, Submission.class, pageSize, pageNum, lastID);
     }
 
     /**

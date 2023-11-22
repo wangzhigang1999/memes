@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Accessors
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "rss_channel")

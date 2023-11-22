@@ -32,12 +32,11 @@ public interface ISubmission {
     /**
      * 存储图片、视频类型的投稿
      *
-     * @param stream   输入流
-     * @param mime     mime
-     * @param personal 是否是个人投稿
+     * @param stream 输入流
+     * @param mime   mime
      * @return Submission
      */
-    Submission storeStreamSubmission(InputStream stream, String mime, boolean personal);
+    Submission storeStreamSubmission(InputStream stream, String mime);
 
 
     /**

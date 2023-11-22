@@ -54,7 +54,7 @@ public class SubUser {
             return ResultData.fail(ReturnCode.RC400);
         }
         InputStream inputStream = file.getInputStream();
-        var store = service.storeStreamSubmission(inputStream, mime, false);
+        var store = service.storeStreamSubmission(inputStream, mime);
         return store == null ? ResultData.fail(ReturnCode.RC500) : ResultData.success(store);
     }
 

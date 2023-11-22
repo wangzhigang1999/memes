@@ -28,4 +28,11 @@ public class SubGroup {
     public Object update(@PathVariable("id") String id, @RequestBody List<String> submissionIds) {
         return subGroup.addToGroup(id, submissionIds);
     }
+
+    // get
+    @GetMapping("/{id}")
+    @AuthRequired
+    public Object get(@PathVariable("id") String id) {
+        return subGroup.getById(id);
+    }
 }
