@@ -128,4 +128,11 @@ public class Schedule {
         logger.info("clean  done, {} images deleted from storage.", nameStatusMap.entrySet().stream().filter(Map.Entry::getValue).count());
     }
 
+    @Scheduled(fixedRate = 1000 * 60)
+    public void SyncTopStatus() {
+        logger.info("SyncTopStatus start.");
+        sysConfig.updateTopSubmission();
+        logger.info("SyncTopStatus done.");
+    }
+
 }

@@ -6,6 +6,7 @@ import com.bupt.memes.service.Interface.ReleaseStrategy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -125,6 +126,20 @@ public class SysConfigService {
         sys.setMAX_HISTORY(maxHistory);
         mongoTemplate.save(sys);
         return true;
+    }
+
+    @Transactional
+    public void updateTopSubmission() {
+        Set<Submission> submission = sys.getTopSubmission();
+        // find and replace
+        submission.forEach(s -> {
+            Submission byId = mongoTemplate.findById(s.getId(), Submission.class);
+            assert byId != null;
+            submission.remove(s);
+            submission.add(byId);
+        });
+        sys.setTopSubmission(submission);
+        mongoTemplate.save(sys);
     }
 
 
