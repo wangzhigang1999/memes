@@ -194,6 +194,11 @@ public class SubmissionServiceImpl implements ISubmission {
         return mongoPageHelper.pageQuery(query, Submission.class, pageSize, pageNum, lastID);
     }
 
+    @Override
+    public Submission getSubmissionById(String id) {
+        return mongoTemplate.findById(id, Submission.class);
+    }
+
     /**
      * 插入投稿
      *

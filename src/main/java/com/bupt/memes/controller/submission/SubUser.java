@@ -112,4 +112,10 @@ public class SubUser {
         return history.getHistory(date);
     }
 
+
+    @GetMapping("/{id}")
+    public Submission getSubmissionById(@PathVariable("id") String id) {
+        return service.getSubmissionById(id);
+    }
+
 }

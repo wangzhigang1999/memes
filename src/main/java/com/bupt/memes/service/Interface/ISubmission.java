@@ -53,4 +53,6 @@ public interface ISubmission {
 
     PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID);
 
+    Submission getSubmissionById(String id);
+
 }
