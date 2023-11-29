@@ -104,18 +104,18 @@ public class SubUser {
     /**
      * 获取某一天的提交
      *
-     * @param date 日期 YYYY-MM-DD
-     * @return ResultData
+     * @param idOrDate 日期 YYYY-MM-DD
+     * @return List
      */
-    @GetMapping("/{date}")
-    public List<Submission> getSubmission(@PathVariable("date") String date) {
-        return history.getHistory(date);
-    }
-
-
-    @GetMapping("/{id}")
-    public Submission getSubmissionById(@PathVariable("id") String id) {
-        return service.getSubmissionById(id);
+    @GetMapping("/{idOrDate}")
+    public List<Submission> getSubmission(@PathVariable("idOrDate") String idOrDate) {
+        if (idOrDate == null || idOrDate.isEmpty()) {
+            return null;
+        }
+        if (idOrDate.length() > 10) {
+            return List.of(service.getSubmissionById(idOrDate));
+        }
+        return history.getHistory(idOrDate);
     }
 
 }
