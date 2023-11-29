@@ -113,7 +113,8 @@ public class SubUser {
             return null;
         }
         if (idOrDate.length() > 10) {
-            return List.of(service.getSubmissionById(idOrDate));
+            Submission byId = service.getSubmissionById(idOrDate);
+            return byId == null ? null : List.of(byId);
         }
         return history.getHistory(idOrDate);
     }
