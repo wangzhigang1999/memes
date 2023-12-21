@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "storage.type",
+      "type": "java.lang.String",
+      "description": "The type of storage used by the application."
+    }
+  ]
+}

@@ -38,6 +38,12 @@ public class TimeUtil {
     }
 
 
+    // convert YYYY-MM-DD to unix epoch milli
+    public static long convertYMDToUnixEpochMilli(String ymd) {
+        var localDate = java.time.LocalDate.parse(ymd);
+        return localDate.atStartOfDay(java.time.ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli();
+    }
+
 
 
     public static void main(String[] args) {

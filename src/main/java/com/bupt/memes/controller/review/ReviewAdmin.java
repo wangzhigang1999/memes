@@ -27,7 +27,7 @@ public class ReviewAdmin {
     @GetMapping("")
     @AuthRequired
     public ResultData<List<Submission>> all() {
-        return ResultData.success(service.listSubmissions());
+        return ResultData.success(service.getWaitingSubmissions());
     }
 
     /**
@@ -64,6 +64,18 @@ public class ReviewAdmin {
     @AuthRequired
     public ResultData<Integer> batchAccept(@RequestBody List<String> ids) {
         return ResultData.success(service.batchAcceptSubmission(ids));
+    }
+
+    /**
+     * 批量拒绝投稿
+     *
+     * @param ids 投稿的 id
+     * @return Integer
+     */
+    @PostMapping("/reject/batch")
+    @AuthRequired
+    public Integer batchReject(@RequestBody List<String> ids) {
+        return service.batchRejectSubmission(ids);
     }
 
 

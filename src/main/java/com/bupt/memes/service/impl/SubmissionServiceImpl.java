@@ -6,6 +6,7 @@ import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
+import com.bupt.memes.util.TimeUtil;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import lombok.AllArgsConstructor;
@@ -196,6 +197,23 @@ public class SubmissionServiceImpl implements ISubmission {
     @Override
     public Submission getSubmissionById(String id) {
         return mongoTemplate.findById(id, Submission.class);
+    }
+
+    @Override
+    public List<Submission> getSubmissionByDate(String date) {
+        long start = TimeUtil.convertYMDToUnixEpochMilli(date);
+        // subtract 2 hours
+        start -= 2 * 60 * 60 * 1000;
+        long end = start + 24 * 60 * 60 * 1000;
+        var time = "timestamp";
+        Query query = new Query();
+        query.addCriteria(new Criteria().andOperator(
+                Criteria.where(time).gte(start),
+                Criteria.where(time).lt(end),
+                Criteria.where("reviewed").is(true),
+                Criteria.where("deleted").is(false)
+        ));
+        return mongoTemplate.find(query, Submission.class);
     }
 
     /**

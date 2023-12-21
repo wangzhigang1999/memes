@@ -1,9 +1,6 @@
 package com.bupt.memes.controller.submission;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.service.Interface.ISubmission;
-import com.bupt.memes.service.Interface.Review;
-import com.bupt.memes.service.StatisticService;
 import com.bupt.memes.service.SysConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,26 +12,9 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class SubAdmin {
 
-    final ISubmission service;
-
-    final StatisticService statisticService;
-
-    final Review review;
-
 
     final SysConfigService sysConfig;
 
-
-    /**
-     * 发布今天的提交
-     *
-     * @return ResultData
-     */
-    @RequestMapping("/release")
-    @AuthRequired
-    public Integer release() {
-        return review.release();
-    }
 
     /**
      * 置顶
@@ -67,11 +47,11 @@ public class SubAdmin {
      * 大于这个数目时，会关闭bot
      *
      * @param min 最少投稿数目
-     * @return ResultData
+     * @return Boolean
      */
-    @PostMapping("/min")
+    @PostMapping("/minimum/{min}")
     @AuthRequired
-    public Boolean setMaxSubmissions(@RequestParam("min") int min) {
+    public Boolean setMinSubmissions(@PathVariable("min") int min) {
         return sysConfig.setMinSubmissions(min);
     }
 

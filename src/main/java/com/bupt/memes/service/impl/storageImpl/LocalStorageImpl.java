@@ -5,13 +5,8 @@ import com.bupt.memes.service.Interface.Storage;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -22,10 +17,9 @@ import java.util.UUID;
 
 
 @Service("local")
-@Conditional(LocalStorageImpl.class)
 @Primary
-public class LocalStorageImpl implements Storage, Condition {
-
+@ConditionalOnProperty(prefix = "storage", name = "type", havingValue = "local")
+public class LocalStorageImpl implements Storage {
 
     static final String localDir = "memes-img";
 
@@ -60,13 +54,6 @@ public class LocalStorageImpl implements Storage, Condition {
         return submission;
     }
 
-
-    @Override
-    public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
-        Environment env = context.getEnvironment();
-        var property = env.getProperty("storage.type", String.class, "local");
-        return "local".equals(property);
-    }
 
     @Override
     public Map<String, Boolean> delete(String[] keyList) {

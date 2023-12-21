@@ -2,7 +2,7 @@ spring:
   application:
     name: memes
   profiles:
-    active: ${env}
+    active: ${env:dev}
 
   servlet:
     multipart:

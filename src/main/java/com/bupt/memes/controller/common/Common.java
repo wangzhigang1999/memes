@@ -2,7 +2,6 @@ package com.bupt.memes.controller.common;
 
 import com.bupt.memes.anno.AuthRequired;
 import com.bupt.memes.model.Sys;
-import com.bupt.memes.model.common.ResultData;
 import com.bupt.memes.service.StatisticService;
 import com.bupt.memes.service.SysConfigService;
 import lombok.AllArgsConstructor;
@@ -19,15 +18,16 @@ public class Common {
 
     final StatisticService statisticService;
 
-    final SysConfigService sysConfig;
+    final SysConfigService configService;
 
     /**
      * 验证token
+     * 通过 aop 实现，不需要传参
      */
     @RequestMapping("/verify")
     @AuthRequired
-    public ResultData<Boolean> verify() {
-        return ResultData.success(true);
+    public Boolean verify() {
+        return true;
     }
 
 
@@ -36,68 +36,35 @@ public class Common {
      */
     @RequestMapping("/statistic")
     @AuthRequired
-    public ResultData<Map<String, Object>> statistic() {
-        return ResultData.success(statisticService.statistic());
+    public Map<String, Object> statistic() {
+        return statisticService.statistic();
     }
 
     /**
-     * 开启爬虫
+     * 设置爬虫的状态
      *
      * @return 是否成功
      */
-    @RequestMapping("/bot/enable")
+    @PostMapping("/bot/status/{status}")
     @AuthRequired
-    public ResultData<Boolean> enableBot() {
-        return ResultData.success(sysConfig.enableBot());
+    public Boolean enableBot(@PathVariable String status) {
+        return "enable".equals(status) ? configService.enableBot() : configService.disableBot();
     }
 
-    /**
-     * 关闭爬虫
-     *
-     * @return 是否成功
-     */
-    @RequestMapping("/bot/disable")
-    @AuthRequired
-    public ResultData<Boolean> disableBot() {
-        return ResultData.success(sysConfig.disableBot());
-    }
 
     /**
      * 获取爬虫的状态
      */
-    @RequestMapping("/bot/status")
-    public ResultData<Boolean> botStatus() {
-        return ResultData.success(SysConfigService.sys.getBotUp());
+    @GetMapping("/bot/status")
+    public Boolean botStatus() {
+        return SysConfigService.getBotStatus();
     }
 
-
-    /**
-     * 设置投稿发布策略
-     *
-     * @param strategy 策略名称
-     */
-    @PostMapping("/release/strategy")
-    @AuthRequired
-    public ResultData<Boolean> setStrategy(@RequestParam("strategy") String strategy) {
-        return ResultData.success(sysConfig.setReleaseStrategy(strategy));
-    }
-
-
-    /**
-     * 设置允许用户查看的最大历史记录数量
-     *
-     * @param max 最大历史记录数量 7 < max < 30
-     */
-    @PostMapping("/history/max")
-    @AuthRequired
-    public ResultData<Boolean> setMaxHistory(@RequestParam("max") int max) {
-        return ResultData.success(sysConfig.setMaxHistory(max));
-    }
 
     @GetMapping("/sys")
     @AuthRequired
-    public ResultData<Sys> getSysConfig() {
-        return ResultData.success(sysConfig.getSys());
+    public Sys getConfigService() {
+        return configService.getSys();
     }
 
 }

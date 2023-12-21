@@ -12,7 +12,7 @@ public interface Review {
      *
      * @return submission列表
      */
-    List<Submission> listSubmissions();
+    List<Submission> getWaitingSubmissions();
 
     /**
      * 接受一个submission
@@ -41,12 +41,8 @@ public interface Review {
     int batchAcceptSubmission(List<String> ids);
 
 
-    /**
-     * 发布当日，指从昨天的22：00到今日的22：00的所有已经过审核的submission
-     *
-     * @return 是否发布成功
-     */
-    int release();
+    int batchRejectSubmission(List<String> ids);
+
 
     /**
      * 获取当前已经review通过的submission数量
@@ -54,7 +50,9 @@ public interface Review {
      *
      * @return 当前已经review的submission数量
      */
-    long getReviewPassedNum();
+    long getPassedNum();
+
+    long getWaitingNum();
 
     /**
      * 获取今日的统计信息

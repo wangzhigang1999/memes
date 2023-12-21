@@ -30,6 +30,6 @@ public class SyncConfig {
     @Before("pubMethods()")
     public void beforePubMethods(JoinPoint joinPoint) {
         logger.info("Syncing sys config before {}", joinPoint.getSignature().getName());
-        SysConfigService.sys = template.findById("sys", Sys.class);
+        SysConfigService.setSys(template.findById("sys", Sys.class));
     }
 }

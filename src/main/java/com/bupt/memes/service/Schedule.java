@@ -33,53 +33,52 @@ public class Schedule {
 
 
     /**
-     * 每隔 30min 自动发布一次
+     * 每隔 30min 自动开启或关闭机器人
      */
     @Scheduled(fixedRate = 1000 * 1800)
-    public void autoRelease() {
-        int release = review.release();
-        logger.info("auto release {} submissions", release);
+    public void autobots() {
 
-
-        int toBeReviewed = review.listSubmissions().size();
-        long reviewPassedNum = review.getReviewPassedNum();
+        long waitingNum = review.getWaitingNum();
+        long passedNum = review.getPassedNum();
         int targetNum = sysConfig.getSys().getMIN_SUBMISSIONS();
 
-        boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
+        boolean meets = meetsMinReq(passedNum, waitingNum, targetNum);
+        if (meets) {
+            sysConfig.enableBot();
+            logger.info("bot should enable because of waitingNum: {} passedNum: {} targetNum: {}", waitingNum, passedNum, targetNum);
+            return;
+        }
 
         // 九点之后开启机器人，爬虫会在10点开始爬取
         int currentHour = getCurrentHour();
         if (currentHour >= 21 || currentHour <= 8) {
-            botShouldEnabled = true;
-            logger.info("bot should enable because of time: {}", currentHour);
-        }
-
-        if (botShouldEnabled) {
             sysConfig.enableBot();
-        } else {
-            sysConfig.disableBot();
+            logger.info("bot should enable because of time: {}", currentHour);
+            return;
         }
+        // 机器人关闭
+        sysConfig.disableBot();
     }
 
     /**
-     * 判断机器人是否应该开启
+     * 通过meme的数量判断机器人是否应该开启
      *
-     * @param curSubmissionNum 当前已审核通过的数量
-     * @param toBeReviewed     待审核的数量
-     * @param targetNum        目标数量
+     * @param passedNum  当前已审核通过的数量
+     * @param waitingNum 待审核的数量
+     * @param targetNum  目标数量
      * @return 是否应该开启
      */
-    public static boolean shouldBotEnabled(long curSubmissionNum, int toBeReviewed, int targetNum) {
+    public static boolean meetsMinReq(long passedNum, long waitingNum, int targetNum) {
         // 如果当前已发布的数量大于目标数量，直接返回false
-        if (curSubmissionNum >= targetNum) {
-            logger.info("bot should disable because of curSubmissionNum: {} more than targetNum: {}", curSubmissionNum, targetNum);
+        if (passedNum >= targetNum) {
+            logger.info("bot should disable because of passedNum: {} more than targetNum: {}", passedNum, targetNum);
             return false;
         }
-        int needed = (int) (targetNum - curSubmissionNum);
+        int needed = (int) (targetNum - passedNum);
 
         // 审核的通过率大概是2/3,所以需要的数量是1.5倍
-        boolean b = toBeReviewed < (needed * 1.5);
-        logger.info("bot should {} because of toBeReviewed: {} needed: {}", b ? "enable" : "disable", toBeReviewed, needed);
+        boolean b = waitingNum < (needed * 1.5);
+        logger.info("bot should {} because of waitingNum: {} needed: {}", b ? "enable" : "disable", waitingNum, needed);
         return b;
     }
 

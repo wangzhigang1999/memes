@@ -13,12 +13,7 @@ import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.core.env.Environment;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.lang.NonNull;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -26,8 +21,8 @@ import java.util.UUID;
 
 
 @Service("qiniu")
-@Conditional(QiNiuStorageImpl.class)
-public class QiNiuStorageImpl implements Storage, Condition {
+@ConditionalOnProperty(prefix = "storage", name = "type", havingValue = "qiniu")
+public class QiNiuStorageImpl implements Storage {
     @Value("${qiniu.accessKey}")
     String accessKey;
     @Value("${qiniu.secretKey}")
@@ -104,12 +99,5 @@ public class QiNiuStorageImpl implements Storage, Condition {
         }
         return nameStatusMap;
 
-    }
-
-    @Override
-    public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
-        Environment env = context.getEnvironment();
-        var property = env.getProperty("storage.type", String.class, "local");
-        return "qiniu".equals(property);
     }
 }

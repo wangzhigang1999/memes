@@ -26,10 +26,6 @@ public class INewsImpl implements INews {
     final MongoPageHelper mongoPageHelper;
 
     final Storage storage;
-
-    String cacheKey = "";
-    List<News> cache = null;
-
     final ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
 
     public INewsImpl(MongoTemplate mongoTemplate, MongoPageHelper mongoPageHelper, Storage storage) {
@@ -112,25 +108,23 @@ public class INewsImpl implements INews {
     }
 
     @Override
-    public List<News> findByMMDD(String MMDD) {
-        // if empty then set to today
-        if (MMDD == null || MMDD.isEmpty()) {
-            MMDD = getYMD().substring(5);
+    public List<News> findByMMDD(String month, String day) {
+
+        // ensure month and day is two digit
+        if (month.length() == 1) {
+            month = "0" + month;
+        }
+        if (day.length() == 1) {
+            day = "0" + day;
         }
 
-        // if cache hit then return cache
-        if (cacheKey.equals(MMDD)) {
-            return cache;
-        }
+        String monthAndDay = month + "-" + day;
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("date").regex(MMDD));
+        query.addCriteria(Criteria.where("date").regex(monthAndDay));
         query.addCriteria(Criteria.where("deleted").is(false));
-        List<News> news = mongoTemplate.find(query, News.class);
 
-        cacheKey = MMDD;
-        cache = news;
-        return news;
+        return mongoTemplate.find(query, News.class);
     }
 
     @Override

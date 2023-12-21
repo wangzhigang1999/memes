@@ -2,28 +2,33 @@ package com.bupt.memes.service;
 
 import com.bupt.memes.model.Sys;
 import com.bupt.memes.model.media.Submission;
-import com.bupt.memes.service.Interface.ReleaseStrategy;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 @Service
 public class SysConfigService {
     final MongoTemplate mongoTemplate;
-    final ApplicationContext applicationContext;
+    private static Sys sys;
 
-    public static Sys sys;
-
-    public SysConfigService(MongoTemplate mongoTemplate, ApplicationContext applicationContext) {
+    public SysConfigService(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
-        this.applicationContext = applicationContext;
         init();
+    }
+
+    public static Boolean getBotStatus() {
+        return sys.getBotUp();
+    }
+
+    public static void setSys(Sys sys) {
+        SysConfigService.sys = sys;
+    }
+
+    public static Set<Submission> getTop() {
+        return sys.getTopSubmission();
     }
 
 
@@ -38,23 +43,6 @@ public class SysConfigService {
             sys = new Sys();
         }
 
-        /*
-            设置发布策略
-            1. 扫描所有的实现了 ReleaseStrategy 接口的类
-            2. 将类名作为策略名
-            3. 设置一个策略名为 default 的策略，作为默认策略
-         */
-        Map<String, ReleaseStrategy> impls = getImplsOfInterface(applicationContext);
-        Set<String> releaseStrategy = new HashSet<>(impls.keySet());
-        sys.setReleaseStrategy(releaseStrategy);
-
-        if (sys.getSelectedReleaseStrategy() == null) {
-            sys.setSelectedReleaseStrategy("default");
-        }
-
-        if (sys.getMAX_HISTORY() == 0) {
-            sys.setMAX_HISTORY(7);
-        }
 
         if (sys.getMIN_SUBMISSIONS() == 0) {
             sys.setMIN_SUBMISSIONS(50);
@@ -98,17 +86,6 @@ public class SysConfigService {
         return save.getTopSubmission().stream().noneMatch(s -> Objects.equals(s.getId(), id));
     }
 
-
-    public boolean setReleaseStrategy(String strategy) {
-        if (sys.getReleaseStrategy().contains(strategy)) {
-            sys.setSelectedReleaseStrategy(strategy);
-            mongoTemplate.save(sys);
-            return true;
-        }
-        return false;
-    }
-
-
     public boolean setMinSubmissions(int minSubmissions) {
         if (minSubmissions < 0) {
             return false;
@@ -119,20 +96,13 @@ public class SysConfigService {
     }
 
 
-    public boolean setMaxHistory(int maxHistory) {
-        if (maxHistory < 0) {
-            return false;
-        }
-        sys.setMAX_HISTORY(maxHistory);
-        mongoTemplate.save(sys);
-        return true;
-    }
-
     @Transactional
     public void updateTopSubmission() {
         Set<Submission> submission = sys.getTopSubmission();
         // find and replace
         submission.forEach(s -> {
+            if (s == null) return;
+
             Submission byId = mongoTemplate.findById(s.getId(), Submission.class);
             assert byId != null;
             submission.remove(s);
@@ -142,19 +112,7 @@ public class SysConfigService {
         mongoTemplate.save(sys);
     }
 
-
     public Sys getSys() {
         return sys;
-    }
-
-
-    /**
-     * 获取所有实现了ReleaseStrategy接口的类
-     *
-     * @param applicationContext Spring上下文
-     * @return 所有实现了ReleaseStrategy接口的类
-     */
-    private Map<String, ReleaseStrategy> getImplsOfInterface(ApplicationContext applicationContext) {
-        return applicationContext.getBeansOfType(ReleaseStrategy.class);
     }
 }

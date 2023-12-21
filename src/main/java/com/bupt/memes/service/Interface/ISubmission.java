@@ -13,7 +13,7 @@ public interface ISubmission {
      * 点赞或者点踩
      *
      * @param id 对应投稿的名字
-     * @param up       true为点赞，false为点踩
+     * @param up true为点赞，false为点踩
      * @return 是否成功
      */
     boolean vote(String id, boolean up);
@@ -54,5 +54,7 @@ public interface ISubmission {
     PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID);
 
     Submission getSubmissionById(String id);
+
+    List<Submission> getSubmissionByDate(String date);
 
 }

@@ -4,7 +4,6 @@ import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.common.ResultData;
 import com.bupt.memes.model.common.ReturnCode;
 import com.bupt.memes.model.media.Submission;
-import com.bupt.memes.service.Interface.IHistory;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.SysConfigService;
 import lombok.AllArgsConstructor;
@@ -23,8 +22,6 @@ import java.util.Set;
 public class SubUser {
 
     final ISubmission service;
-
-    final IHistory history;
 
     final SysConfigService sysConfig;
 
@@ -63,19 +60,20 @@ public class SubUser {
      */
     @GetMapping("/top")
     public Set<Submission> getTop() {
-        return SysConfigService.sys.getTopSubmission();
+        return SysConfigService.getTop();
     }
 
-    /**
-     * 点赞或者踩
-     *
-     * @param id id
-     * @param up up or down
-     * @return ResultData
-     */
-    @PostMapping("/vote/{id}/{up}")
-    public Boolean vote(@PathVariable("id") String id, @PathVariable("up") boolean up) {
-        return service.vote(id, up);
+
+    // 点赞
+    @PostMapping("{id}/like")
+    public Boolean like(@PathVariable("id") String id) {
+        return service.vote(id, true);
+    }
+
+    // 点踩
+    @PostMapping("{id}/dislike")
+    public Boolean dislike(@PathVariable("id") String id) {
+        return service.vote(id, false);
     }
 
     /**
@@ -91,32 +89,27 @@ public class SubUser {
         return service.getSubmissionByPage(pageNum, pageSize, lastID);
     }
 
+
     /**
-     * 获取所有的历史日期
+     * 获取某个id的投稿
      *
-     * @return ResultData
+     * @param id id
+     * @return Submission
      */
-    @GetMapping("/history")
-    public List<String> getHistory() {
-        return history.getHistoryDates(sysConfig.getSys().getMAX_HISTORY());
+    @GetMapping("/id/{id}")
+    public Submission getSubmissionById(@PathVariable("id") String id) {
+        return service.getSubmissionById(id);
     }
 
     /**
      * 获取某一天的提交
      *
-     * @param idOrDate 日期 YYYY-MM-DD
+     * @param date 日期 YYYY-MM-DD
      * @return List
      */
-    @GetMapping("/{idOrDate}")
-    public List<Submission> getSubmission(@PathVariable("idOrDate") String idOrDate) {
-        if (idOrDate == null || idOrDate.isEmpty()) {
-            return null;
-        }
-        if (idOrDate.length() > 10) {
-            Submission byId = service.getSubmissionById(idOrDate);
-            return byId == null ? null : List.of(byId);
-        }
-        return history.getHistory(idOrDate);
+    @GetMapping("/date/{date}")
+    public List<Submission> getSubmissionByDate(@PathVariable("date") String date) {
+        return service.getSubmissionByDate(date);
     }
 
 }

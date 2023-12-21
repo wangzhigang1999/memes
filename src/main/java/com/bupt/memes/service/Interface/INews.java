@@ -20,7 +20,7 @@ public interface INews {
 
     List<News> findByDate(String date);
 
-    List<News> findByMMDD(String MMDD);
+    List<News> findByMMDD(String month, String day);
 
     boolean deleteNews(String id);
 
