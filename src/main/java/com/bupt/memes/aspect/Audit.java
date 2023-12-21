@@ -1,7 +1,6 @@
 package com.bupt.memes.aspect;
 
 import com.bupt.memes.model.common.LogDocument;
-import com.bupt.memes.util.Utils;
 import com.mongodb.client.MongoClient;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
@@ -99,7 +98,10 @@ public class Audit {
 
         pool.submit(() -> {
             if (!timerMap.containsKey(classMethod)) {
-                timerMap.put(classMethod, Timer.builder("http_request_time").description("http request time").tags(Tags.of("class_method", classMethod)).register(registry));
+                timerMap.put(classMethod, Timer.builder("http_request_time")
+                        .description("http request time")
+                        .tags(Tags.of("class_method", classMethod))
+                        .register(registry));
             }
             timerMap.get(classMethod).record(end - start, TimeUnit.MILLISECONDS);
         });
@@ -107,9 +109,14 @@ public class Audit {
         pool.submit(() -> {
             String method = request.getMethod();
             String url = request.getRequestURL().toString();
-            String ip = Utils.getIpAddress(request);
             LogDocument document = new LogDocument();
-            document.setUrl(url).setMethod(method).setIp(ip).setParameterMap(request.getParameterMap()).setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid).setTimecost(end - start).setTimestamp(start).setInstanceUUID(instanceUUID);
+            document.setUrl(url)
+                    .setMethod(method)
+                    .setParameterMap(request.getParameterMap())
+                    .setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid)
+                    .setTimecost(end - start)
+                    .setTimestamp(start)
+                    .setInstanceUUID(instanceUUID);
             template.save(document);
         });
     }

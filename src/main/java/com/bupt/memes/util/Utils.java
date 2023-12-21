@@ -1,7 +1,5 @@
 package com.bupt.memes.util;
 
-import io.micrometer.common.util.StringUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 
 import java.io.ByteArrayInputStream;
@@ -81,48 +79,6 @@ public class Utils {
         String[] split = tag.split(",");
         return Set.of(split);
     }
-
-    /***
-     * 获取客户端IP地址;这里通过了Nginx获取;X-Real-IP
-     */
-    public static String getIpAddress(HttpServletRequest request) {
-        if (request == null) {
-            return "unknown";
-        }
-        String ip = request.getHeader("x-forwarded-for");
-
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Forwarded-For");
-            if (!StringUtils.isBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
-                // 多次反向代理后会有多个IP值，第一个为真实IP。
-                int index = ip.indexOf(',');
-                if (index != -1) {
-                    ip = ip.substring(0, index);
-                }
-            }
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Real-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        if ("0:0:0:0:0:0:0:1".equals(ip)) {
-            return "127.0.0.1";
-        } else {
-            if (ip.equals("127.0.0.1") || ip.equalsIgnoreCase("localhost") && StringUtils.isBlank(request.getRemoteAddr())) {
-                ip = request.getRemoteAddr();
-            }
-        }
-        return ip;
-    }
-
 
     public static void main(String[] args) {
         System.out.println(getTodayStartUnixEpochMilli());
