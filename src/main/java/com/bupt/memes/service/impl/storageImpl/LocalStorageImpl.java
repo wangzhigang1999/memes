@@ -2,7 +2,8 @@ package com.bupt.memes.service.impl.storageImpl;
 
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Storage;
-import com.bupt.memes.util.Utils;
+import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -13,6 +14,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,12 +42,14 @@ public class LocalStorageImpl implements Storage, Condition {
 
 
     @Override
+    @SneakyThrows
     public Submission store(byte[] bytes, String mime) {
         String type = mime.split("/")[1];
         String fileName = System.currentTimeMillis() + "-" + UUID.randomUUID() + "." + type;
         var path = localDir + "/" + fileName;
-        boolean saved = Utils.saveFile(bytes, path);
-        if (!saved) {
+        try {
+            FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), new File(path));
+        } catch (Exception e) {
             return null;
         }
         var url = urlPrefix + fileName;

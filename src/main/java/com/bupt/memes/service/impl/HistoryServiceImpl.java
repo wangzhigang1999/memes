@@ -3,7 +3,6 @@ package com.bupt.memes.service.impl;
 import com.bupt.memes.model.media.History;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.IHistory;
-import com.bupt.memes.util.Utils;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
@@ -18,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static com.bupt.memes.util.TimeUtil.getYMD;
 
 /**
  * 历史记录服务
@@ -68,7 +69,7 @@ public class HistoryServiceImpl implements IHistory {
 
         return mongoTemplate.find(query, Map.class, "history").stream()
                 .map(map -> map.get("date").toString())
-                .filter(date -> !date.equals(Utils.getYMD()))
+                .filter(date -> !date.equals(getYMD()))
                 .collect(Collectors.toList());
     }
 

@@ -1,7 +1,6 @@
 package com.bupt.memes.service;
 
 import com.bupt.memes.model.common.LogDocument;
-import com.bupt.memes.util.Utils;
 import lombok.SneakyThrows;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,6 +13,8 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.bupt.memes.util.TimeUtil.getTodayStartUnixEpochMilli;
 
 @Service
 public class StatisticService {
@@ -28,7 +29,7 @@ public class StatisticService {
     @SneakyThrows
     public Map<String, Object> statistic() {
         // start is the timestamp of 00:00:00 of today asia/shanghai
-        final long start = Utils.getTodayStartUnixEpochMilli();
+        final long start = getTodayStartUnixEpochMilli();
         final long end = System.currentTimeMillis();
 
         AtomicLong total = new AtomicLong(0);

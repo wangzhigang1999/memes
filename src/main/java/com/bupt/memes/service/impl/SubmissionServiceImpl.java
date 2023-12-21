@@ -6,7 +6,6 @@ import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
-import com.bupt.memes.util.Utils;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
 import lombok.AllArgsConstructor;
@@ -120,7 +119,7 @@ public class SubmissionServiceImpl implements ISubmission {
     @Override
     @SneakyThrows
     public Submission storeStreamSubmission(InputStream stream, String mime) {
-        byte[] bytes = Utils.readAllBytes(stream);
+        byte[] bytes = stream.readAllBytes();
 
         int code = Arrays.hashCode(bytes);
 

@@ -5,7 +5,6 @@ import com.bupt.memes.service.Interface.IHistory;
 import com.bupt.memes.service.Interface.ReleaseStrategy;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.SysConfigService;
-import com.bupt.memes.util.Utils;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -17,6 +16,9 @@ import org.springframework.util.comparator.Comparators;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.bupt.memes.util.TimeUtil.getTodayStartUnixEpochMilli;
+import static com.bupt.memes.util.TimeUtil.getYMD;
 
 /**
  * 审核相关的服务
@@ -43,7 +45,7 @@ public class ReviewServiceImpl implements Review {
     @Override
     public List<Submission> listSubmissions() {
         // 00:00:00 of today
-        var start = Utils.getTodayStartUnixEpochMilli();
+        var start = getTodayStartUnixEpochMilli();
         // 向前推两个小时,从上一天的22点开始算起
         var from = start - 2 * 60 * 60 * 1000;
         Criteria criteria = Criteria
@@ -99,9 +101,9 @@ public class ReviewServiceImpl implements Review {
     @Override
     public int release() {
 
-        String date = Utils.getYMD();
+        String date = getYMD();
         // 00:00:00 of today
-        var start = Utils.getTodayStartUnixEpochMilli();
+        var start = getTodayStartUnixEpochMilli();
         // 向前推两个小时
         var from = start - 2 * 60 * 60 * 1000;
         // 向后推22个小时
@@ -144,7 +146,7 @@ public class ReviewServiceImpl implements Review {
     @Override
     public long getReviewPassedNum() {
         // 00:00:00 of today
-        var start = Utils.getTodayStartUnixEpochMilli();
+        var start = getTodayStartUnixEpochMilli();
         // 向前推两个小时,从上一天的22点开始算起
         var from = start - 2 * 60 * 60 * 1000;
         Criteria criteria = Criteria
@@ -157,7 +159,7 @@ public class ReviewServiceImpl implements Review {
     @Override
     public Map<String, Integer> getTodayInfo() {
         long reviewPassedNum = getReviewPassedNum();
-        int releasedNum = history.getHistory(Utils.getYMD()).size();
+        int releasedNum = history.getHistory(getYMD()).size();
         int toBeReviewedNum = listSubmissions().size();
         return Map.of("reviewPassedNum", (int) reviewPassedNum, "releasedNum", releasedNum, "toBeReviewedNum", toBeReviewedNum);
     }

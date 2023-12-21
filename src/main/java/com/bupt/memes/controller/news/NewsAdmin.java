@@ -8,7 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.bupt.memes.util.Utils.convertTag;
+import static com.bupt.memes.util.NewsUtil.convertTag;
+
 
 @RestController
 @RequestMapping("/admin/news")

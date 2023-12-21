@@ -4,13 +4,14 @@ import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.Interface.Storage;
-import com.bupt.memes.util.Utils;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static com.bupt.memes.util.TimeUtil.getCurrentHour;
 
 /**
  * 定时任务
@@ -47,7 +48,7 @@ public class Schedule {
         boolean botShouldEnabled = shouldBotEnabled(reviewPassedNum, toBeReviewed, targetNum);
 
         // 九点之后开启机器人，爬虫会在10点开始爬取
-        int currentHour = Utils.getCurrentHour();
+        int currentHour = getCurrentHour();
         if (currentHour >= 21 || currentHour <= 8) {
             botShouldEnabled = true;
             logger.info("bot should enable because of time: {}", currentHour);

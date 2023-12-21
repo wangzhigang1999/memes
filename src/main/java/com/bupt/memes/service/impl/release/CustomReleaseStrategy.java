@@ -2,10 +2,11 @@ package com.bupt.memes.service.impl.release;
 
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ReleaseStrategy;
-import com.bupt.memes.util.Utils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static com.bupt.memes.util.TimeUtil.getCurrentHour;
 
 @Component("Custom")
 public class CustomReleaseStrategy implements ReleaseStrategy {
@@ -21,7 +22,7 @@ public class CustomReleaseStrategy implements ReleaseStrategy {
     public List<Submission> release(List<Submission> currentSubmissions, List<Submission> newSubmissions) {
         int size = newSubmissions.size();
 
-        int hour = Utils.getCurrentHour();
+        int hour = getCurrentHour();
         if (hour >= 8 && hour <= 20) {
             // 8:00 - 22:00 白天，每次发布5张
             if (size <= 5) {

@@ -5,7 +5,6 @@ import com.bupt.memes.model.media.News;
 import com.bupt.memes.service.Interface.INews;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
-import com.bupt.memes.util.Utils;
 import lombok.SneakyThrows;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,6 +17,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
+
+import static com.bupt.memes.util.TimeUtil.getYMD;
 
 @Service
 public class INewsImpl implements INews {
@@ -51,7 +52,7 @@ public class INewsImpl implements INews {
         // if date is null, then set date to now
         if (news.getDate() == null) {
             // YYYY-MM-DD in Asia/Shanghai
-            news.setDate(Utils.getYMD());
+            news.setDate(getYMD());
         }
         // set timestamp to now
         news.setTimestamp(System.currentTimeMillis());
@@ -102,7 +103,7 @@ public class INewsImpl implements INews {
     public List<News> findByDate(String date) {
         // if empty then set to today
         if (date == null || date.isEmpty()) {
-            date = Utils.getYMD();
+            date = getYMD();
         }
         Query query = new Query();
         query.addCriteria(Criteria.where("date").is(date));
@@ -114,7 +115,7 @@ public class INewsImpl implements INews {
     public List<News> findByMMDD(String MMDD) {
         // if empty then set to today
         if (MMDD == null || MMDD.isEmpty()) {
-            MMDD = Utils.getYMD().substring(5);
+            MMDD = getYMD().substring(5);
         }
 
         // if cache hit then return cache

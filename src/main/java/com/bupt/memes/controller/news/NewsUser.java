@@ -4,14 +4,15 @@ import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.common.ResultData;
 import com.bupt.memes.model.media.News;
 import com.bupt.memes.service.Interface.INews;
-import com.bupt.memes.util.Utils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.bupt.memes.util.Utils.convertTag;
+import static com.bupt.memes.util.NewsUtil.convertTag;
+import static com.bupt.memes.util.TimeUtil.getYMD;
+
 
 @RestController
 @RequestMapping("/news")
@@ -29,7 +30,7 @@ public class NewsUser {
 
     @GetMapping("/date/{date}")
     public ResultData<List<News>> findByDate(@PathVariable String date, HttpServletResponse response) {
-        String ymd = Utils.getYMD();
+        String ymd = getYMD();
         if (date.equals(ymd)) {
             // set cache for 1 hour
             response.setHeader("Cache-Control", "max-age=3600");
