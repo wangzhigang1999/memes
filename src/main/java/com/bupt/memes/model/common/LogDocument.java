@@ -17,13 +17,10 @@ public class LogDocument {
     private String url;
     private String method;
     private String ip;
-    private String classMethod;
-    private Object detail;
     private Map<String, String[]> parameterMap;
     private String uuid;
     private long timecost; // ms
     private long timestamp;
-    private String env;
     private String instanceUUID;
 
 }

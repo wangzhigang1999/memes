@@ -1,6 +1,7 @@
 package com.bupt.memes.aspect;
 
 import com.bupt.memes.model.common.LogDocument;
+import com.bupt.memes.util.Utils;
 import com.mongodb.client.MongoClient;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
@@ -106,18 +107,9 @@ public class Audit {
         pool.submit(() -> {
             String method = request.getMethod();
             String url = request.getRequestURL().toString();
-            String ip = request.getRemoteAddr();
+            String ip = Utils.getIpAddress(request);
             LogDocument document = new LogDocument();
-            document.setUrl(url)
-                    .setMethod(method)
-                    .setIp(ip)
-                    .setClassMethod(classMethod)
-                    .setParameterMap(request.getParameterMap())
-                    .setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid)
-                    .setTimecost(end - start)
-                    .setTimestamp(start)
-                    .setEnv(env)
-                    .setInstanceUUID(instanceUUID);
+            document.setUrl(url).setMethod(method).setIp(ip).setParameterMap(request.getParameterMap()).setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid).setTimecost(end - start).setTimestamp(start).setInstanceUUID(instanceUUID);
             template.save(document);
         });
     }
