@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Aspect
-public class SyncConfig {
+public class SysConfig {
 
     final MongoTemplate template;
 
-    final Logger logger = org.slf4j.LoggerFactory.getLogger(SyncConfig.class);
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(SysConfig.class);
 
-    public SyncConfig(MongoTemplate template) {
+    public SysConfig(MongoTemplate template) {
         this.template = template;
     }
 
