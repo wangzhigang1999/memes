@@ -1,6 +1,5 @@
 package com.bupt.memes.model.media;
 
-import com.bupt.memes.service.Interface.IndexMapKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -12,7 +11,7 @@ import java.util.Objects;
 @Document(collection = "submission")
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Submission implements IndexMapKey, Comparable<Submission> {
+public class Submission implements Comparable<Submission> {
 
     String id;
     SubmissionType submissionType;
@@ -48,10 +47,6 @@ public class Submission implements IndexMapKey, Comparable<Submission> {
         }
     }
 
-    public Submission setSubmissionType(SubmissionType submissionType) {
-        this.submissionType = submissionType;
-        return this;
-    }
 
     public boolean textFormat() {
         return this.submissionType == SubmissionType.BILIBILI || this.submissionType == SubmissionType.MARKDOWN;
@@ -79,11 +74,6 @@ public class Submission implements IndexMapKey, Comparable<Submission> {
         }
 
         return ((Submission) obj).getHash().equals(this.hash);
-    }
-
-    @Override
-    public String getIndexMapKey() {
-        return id;
     }
 
 
