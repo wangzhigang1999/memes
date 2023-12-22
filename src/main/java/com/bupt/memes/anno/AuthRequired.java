@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 
 /**
- * @author wangz
+ * @author wanz
  * 用来做权限校验的注解
  */
 @Target({ElementType.METHOD})

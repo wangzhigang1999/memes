@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -55,7 +54,7 @@ public class Audit {
 
     public final String env;
 
-    private final Map<String, Timer> timerMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Timer> timerMap = new ConcurrentHashMap<>();
 
 
     public Audit(MongoTemplate template, MongoClient client, MeterRegistry registry) {
@@ -95,29 +94,31 @@ public class Audit {
 
 
     private void doAudit(final HttpServletRequest request, String classMethod, String uuid, long start, long end) {
+        pool.submit(() -> timerMap
+                .computeIfAbsent(classMethod, this::getRequestTimer)
+                .record(end - start, TimeUnit.MILLISECONDS));
 
-        pool.submit(() -> {
-            if (!timerMap.containsKey(classMethod)) {
-                timerMap.put(classMethod, Timer.builder("http_request_time")
-                        .description("http request time")
-                        .tags(Tags.of("class_method", classMethod))
-                        .register(registry));
-            }
-            timerMap.get(classMethod).record(end - start, TimeUnit.MILLISECONDS);
-        });
+        pool.submit(() -> audit(request, uuid, start, end));
+    }
 
-        pool.submit(() -> {
-            String method = request.getMethod();
-            String url = request.getRequestURL().toString();
-            LogDocument document = new LogDocument();
-            document.setUrl(url)
-                    .setMethod(method)
-                    .setParameterMap(request.getParameterMap())
-                    .setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid)
-                    .setTimecost(end - start)
-                    .setTimestamp(start)
-                    .setInstanceUUID(instanceUUID);
-            template.save(document);
-        });
+    private void audit(HttpServletRequest request, String uuid, long start, long end) {
+        String method = request.getMethod();
+        String url = request.getRequestURL().toString();
+        LogDocument document = new LogDocument();
+        document.setUrl(url)
+                .setMethod(method)
+                .setParameterMap(request.getParameterMap())
+                .setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid)
+                .setTimecost(end - start)
+                .setTimestamp(start)
+                .setInstanceUUID(instanceUUID);
+        template.save(document);
+    }
+
+    private Timer getRequestTimer(String classMethod) {
+        return Timer.builder("http_request_time")
+                .description("http request time")
+                .tags(Tags.of("class_method", classMethod))
+                .register(registry);
     }
 }
