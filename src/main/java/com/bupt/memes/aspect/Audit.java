@@ -6,8 +6,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -42,9 +40,7 @@ public class Audit {
      */
     public final static ThreadLocal<String> threadLocalUUID = ThreadLocal.withInitial(() -> "anonymous");
 
-    public final static ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
-
-    public final static Logger logger = LogManager.getLogger(Audit.class);
+    public final static ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
 
     public final static String instanceUUID = UUID.randomUUID().toString();
@@ -79,7 +75,6 @@ public class Audit {
 
         if (uuid == null || uuid.isEmpty()) {
             uuid = "anonymous";
-            logger.warn("uuid is null, use anonymous");
         }
 
         threadLocalUUID.set(uuid);
@@ -94,11 +89,11 @@ public class Audit {
 
 
     private void doAudit(final HttpServletRequest request, String classMethod, String uuid, long start, long end) {
-        pool.submit(() -> timerMap
+        VIRTUAL_EXECUTOR.submit(() -> timerMap
                 .computeIfAbsent(classMethod, this::getRequestTimer)
                 .record(end - start, TimeUnit.MILLISECONDS));
 
-        pool.submit(() -> audit(request, uuid, start, end));
+        VIRTUAL_EXECUTOR.submit(() -> audit(request, uuid, start, end));
     }
 
     private void audit(HttpServletRequest request, String uuid, long start, long end) {
