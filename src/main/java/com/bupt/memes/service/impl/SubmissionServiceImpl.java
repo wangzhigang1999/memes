@@ -181,17 +181,16 @@ public class SubmissionServiceImpl implements ISubmission {
     /**
      * 分页查询
      *
-     * @param pageNum  页码
      * @param pageSize 每页大小
      * @param lastID   上一页最后一个元素的id
      * @return 分页结果
      */
     @Override
-    public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
+    public PageResult<Submission> getSubmissionByPage(int pageSize, String lastID) {
         logger.info("get submission from db, lastID: {}", Objects.equals(lastID, "") ? "null" : lastID);
         Query query = new Query();
         query.addCriteria(Criteria.where("reviewed").is(true));
-        return mongoPageHelper.pageQuery(query, Submission.class, pageSize, pageNum, lastID);
+        return mongoPageHelper.pageQuery(query, Submission.class, pageSize, lastID);
     }
 
     @Override

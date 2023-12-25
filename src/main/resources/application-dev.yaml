@@ -11,20 +11,3 @@ local:
   urlPrefix: ${urlPrefix}
 
 token: ${token}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  influx:
-    metrics:
-      export:
-        bucket: memes
-        org: c5184b753358157a
-        token: aiops
-        enabled: true
-        step: 5s
-        retention-policy: autogen
-        uri: ${influxUrl}
-        auto-create-db: true

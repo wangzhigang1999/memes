@@ -79,14 +79,13 @@ public class SubUser {
     /**
      * 分页获取投稿
      *
-     * @param pageNum  页码
      * @param pageSize 页大小
      * @param lastID   上一页最后一个的id
      * @return Page
      */
     @GetMapping("/page")
-    public PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID) {
-        return service.getSubmissionByPage(pageNum, pageSize, lastID);
+    public PageResult<Submission> getSubmissionByPage(int pageSize, String lastID) {
+        return service.getSubmissionByPage(pageSize, lastID);
     }
 
 

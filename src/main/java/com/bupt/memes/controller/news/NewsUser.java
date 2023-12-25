@@ -34,15 +34,12 @@ public class NewsUser {
 
 
     @GetMapping("/page")
-    public PageResult<News> page(Integer pageNum, Integer pageSize, String lastID) {
-        // set default value for pageNum and pageSize
-        if (pageNum == null) {
-            pageNum = 1;
-        }
+    public PageResult<News> page( Integer pageSize, String lastID) {
+
         if (pageSize == null) {
             pageSize = 10;
         }
 
-        return iNews.find(pageNum, false, pageSize, lastID);
+        return iNews.find( false, pageSize, lastID);
     }
 }

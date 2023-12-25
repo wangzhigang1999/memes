@@ -7,10 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 public interface INews {
 
 
     News addNews(News news, MultipartFile coverImage);
+
 
     News addTag(String newsId, Set<String> tag);
 
@@ -24,7 +26,7 @@ public interface INews {
 
     boolean deleteNews(String id);
 
-    PageResult<News> find(int pageNum,boolean hasContent, int pageSize, String lastID);
+    PageResult<News> find(boolean hasContent, int pageSize, String lastID);
 
-    PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageNum, int pageSize, String lastID);
+    PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageSize, String lastID);
 }

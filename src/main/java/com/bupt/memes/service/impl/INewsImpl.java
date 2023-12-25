@@ -140,24 +140,24 @@ public class INewsImpl implements INews {
     }
 
     @Override
-    public PageResult<News> find(int pageNum, boolean hasContent, int pageSize, String lastID) {
+    public PageResult<News> find(boolean hasContent, int pageSize, String lastID) {
         Query query = new Query();
         // if hasContent is true, then return news with content
         if (!hasContent) {
             query.fields().exclude("content");
         }
-        return mongoPageHelper.pageQuery(query, News.class, pageSize, pageNum, lastID);
+        return mongoPageHelper.pageQuery(query, News.class, pageSize, lastID);
     }
 
     @Override
-    public PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageNum, int pageSize, String lastID) {
+    public PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageSize, String lastID) {
         Query query = new Query();
         if (!hasContent) {
             query.fields().exclude("content");
         }
         // tag query, the result must contain all tags
         query.addCriteria(Criteria.where("tag").all(tags));
-        return mongoPageHelper.pageQuery(query, News.class, pageSize, pageNum, lastID);
+        return mongoPageHelper.pageQuery(query, News.class, pageSize, lastID);
     }
 
 

@@ -51,7 +51,7 @@ public interface ISubmission {
     void hardDeleteSubmission(String id);
 
 
-    PageResult<Submission> getSubmissionByPage(int pageNum, int pageSize, String lastID);
+    PageResult<Submission> getSubmissionByPage(int pageSize, String lastID);
 
     Submission getSubmissionById(String id);
 
