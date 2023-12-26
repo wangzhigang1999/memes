@@ -83,7 +83,7 @@ public class ReviewAdmin {
      */
     @GetMapping("/statistic")
     @AuthRequired
-    public Map<String, Integer> today() {
+    public Map<String, Long> today() {
         return service.getTodayInfo();
     }
 }

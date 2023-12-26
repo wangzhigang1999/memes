@@ -119,10 +119,10 @@ public class ReviewServiceImpl implements Review {
     }
 
     @Override
-    public Map<String, Integer> getTodayInfo() {
+    public Map<String, Long> getTodayInfo() {
         long passedNum = getPassedNum();
-        int waitingNum = getWaitingSubmissions().size();
-        return Map.of("passedNum", (int) passedNum, "waitingNum", waitingNum);
+        long waitingNum = getWaitingNum();
+        return Map.of("passedNum",  passedNum, "waitingNum", waitingNum);
     }
 
     /**

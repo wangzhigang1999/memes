@@ -5,6 +5,7 @@ import com.bupt.memes.model.media.Submission;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public interface Review {
 
     /**
@@ -61,5 +62,5 @@ public interface Review {
      *
      * @return 今日的统计信息
      */
-    Map<String, Integer> getTodayInfo();
+    Map<String, Long> getTodayInfo();
 }
