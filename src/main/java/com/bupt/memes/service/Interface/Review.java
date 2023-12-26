@@ -8,11 +8,13 @@ import java.util.Map;
 public interface Review {
 
     /**
-     * 列出从上一天的22：00到现在的所有未审核的submission
+     * 列出所有未审核的submission
      *
      * @return submission列表
      */
     List<Submission> getWaitingSubmissions();
+
+    List<Submission> getWaitingSubmissions(Integer limit);
 
     /**
      * 接受一个submission

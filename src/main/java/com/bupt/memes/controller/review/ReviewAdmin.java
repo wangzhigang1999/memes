@@ -1,7 +1,6 @@
 package com.bupt.memes.controller.review;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.model.common.ResultData;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Review;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +25,8 @@ public class ReviewAdmin {
      */
     @GetMapping("")
     @AuthRequired
-    public ResultData<List<Submission>> all() {
-        return ResultData.success(service.getWaitingSubmissions());
+    public List<Submission> all() {
+        return service.getWaitingSubmissions();
     }
 
     /**
@@ -38,8 +37,8 @@ public class ReviewAdmin {
      */
     @PostMapping("/accept/{id}")
     @AuthRequired
-    public ResultData<Boolean> accept(@PathVariable("id") String id) {
-        return ResultData.success(service.acceptSubmission(id));
+    public Boolean accept(@PathVariable("id") String id) {
+        return service.acceptSubmission(id);
     }
 
     /**
@@ -50,8 +49,8 @@ public class ReviewAdmin {
      */
     @PostMapping("/reject/{id}")
     @AuthRequired
-    public ResultData<Boolean> reject(@PathVariable("id") String id) {
-        return ResultData.success(service.rejectSubmission(id));
+    public Boolean reject(@PathVariable("id") String id) {
+        return service.rejectSubmission(id);
     }
 
     /**
@@ -62,8 +61,8 @@ public class ReviewAdmin {
      */
     @PostMapping("/accept/batch")
     @AuthRequired
-    public ResultData<Integer> batchAccept(@RequestBody List<String> ids) {
-        return ResultData.success(service.batchAcceptSubmission(ids));
+    public Integer batchAccept(@RequestBody List<String> ids) {
+        return service.batchAcceptSubmission(ids);
     }
 
     /**
@@ -84,7 +83,7 @@ public class ReviewAdmin {
      */
     @GetMapping("/statistic")
     @AuthRequired
-    public ResultData<Map<String, Integer>> today() {
-        return ResultData.success(service.getTodayInfo());
+    public Map<String, Integer> today() {
+        return service.getTodayInfo();
     }
 }
