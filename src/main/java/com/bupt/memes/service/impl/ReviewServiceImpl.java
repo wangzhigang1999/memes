@@ -3,16 +3,18 @@ package com.bupt.memes.service.impl;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Review;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.comparator.Comparators;
 
 import java.util.List;
 import java.util.Map;
 
+import static com.bupt.memes.model.common.SubmissionCollection.*;
 import static com.bupt.memes.util.TimeUtil.getTodayStartUnixEpochMilli;
 
 /**
@@ -33,18 +35,17 @@ public class ReviewServiceImpl implements Review {
      */
     @Override
     public List<Submission> getWaitingSubmissions() {
-        // 00:00:00 of today
-        var start = getTodayStartUnixEpochMilli();
-        // 向前推两个小时,从上一天的22点开始算起
-        var from = start - 2 * 60 * 60 * 1000;
-        Criteria criteria = Criteria
-                .where("timestamp").gte(from)
-                .and("deleted").ne(true)
-                .and("reviewed").ne(true);
-
-        List<Submission> submissions = template.find(Query.query(criteria), Submission.class);
+        List<Submission> submissions = template.findAll(Submission.class, WAITING_SUBMISSION);
         submissions.sort(Comparators.comparable());
         return submissions;
+    }
+
+    @Override
+    public List<Submission> getWaitingSubmissions(Integer limit) {
+        var query = new Query();
+        query.limit(limit);
+        query.with(Sort.by(Sort.Direction.ASC, "timestamp"));
+        return template.find(query, Submission.class, WAITING_SUBMISSION);
     }
 
     /**
@@ -54,8 +55,9 @@ public class ReviewServiceImpl implements Review {
      * @return 是否成功
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean acceptSubmission(String id) {
-        return updateSubmission(id, false);
+        return reviewSubmission(id, true);
     }
 
     /**
@@ -65,8 +67,9 @@ public class ReviewServiceImpl implements Review {
      * @return 是否成功
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean rejectSubmission(String id) {
-        return updateSubmission(id, true);
+        return reviewSubmission(id, false);
     }
 
     /**
@@ -101,10 +104,7 @@ public class ReviewServiceImpl implements Review {
         var start = getTodayStartUnixEpochMilli();
         // 向前推两个小时,从上一天的22点开始算起
         var from = start - 2 * 60 * 60 * 1000;
-        Criteria criteria = Criteria
-                .where("timestamp").gte(from)
-                .and("deleted").ne(true)
-                .and("reviewed").ne(false);
+        Criteria criteria = Criteria.where("timestamp").gte(from);
         return template.count(Query.query(criteria), Submission.class);
     }
 
@@ -114,33 +114,31 @@ public class ReviewServiceImpl implements Review {
         var start = getTodayStartUnixEpochMilli();
         // 向前推两个小时,从上一天的22点开始算起
         var from = start - 2 * 60 * 60 * 1000;
-        Criteria criteria = Criteria
-                .where("timestamp").gte(from)
-                .and("deleted").ne(true)
-                .and("reviewed").ne(true);
-        return template.count(Query.query(criteria), Submission.class);
+        Criteria criteria = Criteria.where("timestamp").gte(from);
+        return template.count(Query.query(criteria), Submission.class, WAITING_SUBMISSION);
     }
 
     @Override
-    public Map<String, Integer> getTodayInfo() {
+    public Map<String, Long> getTodayInfo() {
         long passedNum = getPassedNum();
-        int waitingNum = getWaitingSubmissions().size();
-        return Map.of("passedNum", (int) passedNum, "waitingNum", waitingNum);
+        long waitingNum = getWaitingNum();
+        return Map.of("passedNum",  passedNum, "waitingNum", waitingNum);
     }
-
 
     /**
      * 更新投稿的审核状态
      *
-     * @param id      投稿的id
-     * @param deleted 是否删除
+     * @param id     投稿的id
+     * @param passed 是否通过
      * @return 是否成功
      */
-    private boolean updateSubmission(String id, boolean deleted) {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean reviewSubmission(String id, boolean passed) {
         var query = new Query(Criteria.where("id").is(id));
-        template.update(Submission.class).matching(query).apply(new Update().set("deleted", deleted).set("reviewed", true)).all();
-        Submission one = template.findOne(query, Submission.class);
-        return one != null && !one.getDeleted();
+        var one = template.findAndRemove(query, Submission.class, WAITING_SUBMISSION);
+        assert one != null;
+        template.save(one, passed ? SUBMISSION : DELETED_SUBMISSION);
+        return true;
     }
 
 }

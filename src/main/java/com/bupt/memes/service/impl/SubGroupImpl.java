@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static com.bupt.memes.model.common.SubmissionCollection.WAITING_SUBMISSION;
+
 @Service
 @AllArgsConstructor
 public class SubGroupImpl implements ISubGroup {
@@ -34,8 +36,8 @@ public class SubGroupImpl implements ISubGroup {
         assert group.isPresent();
         SubmissionGroup submissionGroup = group.get();
         List<Submission> images = submissionGroup.getChildren();
-        images.forEach(template::remove);
-        template.insert(submissionGroup);
+        images.forEach(submission -> template.remove(submission, WAITING_SUBMISSION));
+        template.insert(submissionGroup, WAITING_SUBMISSION);
         return submissionGroup;
     }
 
@@ -51,19 +53,19 @@ public class SubGroupImpl implements ISubGroup {
             return null;
         }
         submissionGroup.addSubmissions(submissions);
-        template.save(submissionGroup);
-        submissions.forEach(template::remove);
+        template.save(submissionGroup, WAITING_SUBMISSION);
+        submissions.forEach(submission -> template.remove(submission, WAITING_SUBMISSION));
         return submissionGroup;
     }
 
 
     @Override
     public SubmissionGroup getById(String id) {
-        return template.findById(id, SubmissionGroup.class);
+        return template.findById(id, SubmissionGroup.class, WAITING_SUBMISSION);
     }
 
 
     private List<Submission> ensureSubmissionsExist(List<String> submissionsId) {
-        return template.find(Query.query(Criteria.where("id").in(submissionsId)), Submission.class);
+        return template.find(Query.query(Criteria.where("id").in(submissionsId)), Submission.class, WAITING_SUBMISSION);
     }
 }

@@ -20,8 +20,6 @@ public class Submission implements Comparable<Submission> {
     String uploader;
     Integer hash;
     String name;
-    Boolean deleted = false;
-    Boolean reviewed = false;
 
     long timestamp;
     long up;

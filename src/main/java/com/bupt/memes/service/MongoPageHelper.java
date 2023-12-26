@@ -60,7 +60,6 @@ public class MongoPageHelper {
         if (StringUtils.isNotBlank(lastId)) {
             criteria.and(ID).lt(new ObjectId(lastId));
         }
-        Criteria.where("deleted").ne(true);
 
         Query q = query.addCriteria(criteria)
                 .with(Sort.by(Sort.Direction.DESC, ID))

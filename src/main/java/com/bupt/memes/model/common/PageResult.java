@@ -17,16 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class PageResult<T> {
-
-    private Integer pageNum;
-
     private Integer pageSize;
-
-    private Long total;
-
-    private Integer pages;
-
     private List<T> list;
-
 }
 

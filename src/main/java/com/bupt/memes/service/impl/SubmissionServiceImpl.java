@@ -28,6 +28,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.bupt.memes.model.common.SubmissionCollection.DELETED_SUBMISSION;
+import static com.bupt.memes.model.common.SubmissionCollection.WAITING_SUBMISSION;
+
 @Service
 @AllArgsConstructor
 public class SubmissionServiceImpl implements ISubmission {
@@ -167,7 +170,7 @@ public class SubmissionServiceImpl implements ISubmission {
      */
     @Override
     public List<Submission> getDeletedSubmission() {
-        return mongoTemplate.find(Query.query(Criteria.where("deleted").is(true)), Submission.class);
+        return mongoTemplate.findAll(Submission.class, DELETED_SUBMISSION);
     }
 
     /**
@@ -175,7 +178,7 @@ public class SubmissionServiceImpl implements ISubmission {
      */
     @Override
     public void hardDeleteSubmission(String id) {
-        mongoTemplate.remove(Query.query(Criteria.where("id").is(id)), Submission.class);
+        mongoTemplate.remove(Query.query(Criteria.where("id").is(id)), Submission.class, DELETED_SUBMISSION);
     }
 
     /**
@@ -188,9 +191,7 @@ public class SubmissionServiceImpl implements ISubmission {
     @Override
     public PageResult<Submission> getSubmissionByPage(int pageSize, String lastID) {
         logger.info("get submission from db, lastID: {}", Objects.equals(lastID, "") ? "null" : lastID);
-        Query query = new Query();
-        query.addCriteria(Criteria.where("reviewed").is(true));
-        return mongoPageHelper.pageQuery(query, Submission.class, pageSize, lastID);
+        return mongoPageHelper.pageQuery(new Query(), Submission.class, pageSize, lastID);
     }
 
     @Override
@@ -204,13 +205,12 @@ public class SubmissionServiceImpl implements ISubmission {
         // subtract 2 hours
         start -= 2 * 60 * 60 * 1000;
         long end = start + 24 * 60 * 60 * 1000;
+        // time 上必须加索引
         var time = "timestamp";
         Query query = new Query();
         query.addCriteria(new Criteria().andOperator(
                 Criteria.where(time).gte(start),
-                Criteria.where(time).lt(end),
-                Criteria.where("reviewed").is(true),
-                Criteria.where("deleted").is(false)
+                Criteria.where(time).lt(end)
         ));
         return mongoTemplate.find(query, Submission.class);
     }
@@ -222,12 +222,17 @@ public class SubmissionServiceImpl implements ISubmission {
      * @return 插入后的投稿
      */
     private Submission insertSubmission(Submission submission) {
+        // 默认情况下，往 WAITING_SUBMISSION 中插入
         String uuid = Audit.threadLocalUUID.get();
         submission.setUploader(uuid);
         try {
-            mongoTemplate.save(submission);
+            mongoTemplate.save(submission, WAITING_SUBMISSION);
         } catch (DuplicateKeyException e) {
-            submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(submission.getHash())), Submission.class);
+            submission = mongoTemplate.findOne(
+                    Query.query(Criteria.where("hash").is(submission.getHash())),
+                    Submission.class,
+                    WAITING_SUBMISSION
+            );
         }
         return submission;
     }
