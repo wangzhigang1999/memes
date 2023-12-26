@@ -9,10 +9,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static com.bupt.memes.util.TimeUtil.getTodayStartUnixEpochMilli;
 
@@ -22,74 +23,33 @@ public class StatisticService {
 
     final MongoTemplate template;
 
+    ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+
     public StatisticService(MongoTemplate template) {
         this.template = template;
     }
 
     @SneakyThrows
+    @SuppressWarnings("rawtypes")
     public Map<String, Object> statistic() {
-        // start is the timestamp of 00:00:00 of today asia/shanghai
         final long start = getTodayStartUnixEpochMilli();
         final long end = System.currentTimeMillis();
 
-        AtomicLong total = new AtomicLong(0);
-        AtomicReference<Double> averageCost = new AtomicReference<>(0.0);
-        AtomicReference<Object> urlCountMap = new AtomicReference<>();
-        AtomicReference<Object> uuidCountMap = new AtomicReference<>();
-
-        CountDownLatch latch = new CountDownLatch(4);
-
-        // query the total number of records
-        Thread.ofVirtual().start(() -> {
+        Future<Long> total = executorService.submit(() -> {
             Query query = Query.query(Criteria.where("timestamp").gte(start).lte(end));
-            total.set(template.count(query, LogDocument.class));
-            latch.countDown();
+            return template.count(query, LogDocument.class);
         });
 
-        Thread.ofVirtual().start(
-                () -> {
-                    var avg = template.aggregate(Aggregation.newAggregation(
-                            Aggregation.match(Criteria.where("timestamp").gte(start).lte(end)),
-                            Aggregation.group().avg("timecost").as("avgTimecost")
-                    ), LogDocument.class, Map.class).getMappedResults().get(0).get("avgTimecost");
-                    averageCost.set((Double) avg);
-                    latch.countDown();
-                }
-        );
+        Future<Double> averageCost = executorService.submit(() -> {
+            Aggregation aggregation = Aggregation.newAggregation(
+                    Aggregation.match(Criteria.where("timestamp").gte(start).lte(end)),
+                    Aggregation.group().avg("timecost").as("avgTimecost")
+            );
+            return (Double) template.aggregate(aggregation, LogDocument.class, Map.class).getMappedResults().get(0).get("avgTimecost");
+        });
 
-        Thread.ofVirtual().start(
-                () -> {
-                    var countMap = template.aggregate(Aggregation.newAggregation(
-                            Aggregation.match(Criteria.where("timestamp").gte(start).lte(end)),
-                            Aggregation.group("url").count().as("count")
-                                    .avg("timecost").as("avgTimecost")
-                                    .max("timecost").as("maxTimecost")
-                                    .min("timecost").as("minTimecost"),
-                            Aggregation.sort(Sort.Direction.DESC, "count")
-                    ), LogDocument.class, Map.class).getMappedResults();
-                    urlCountMap.set(countMap);
-                    latch.countDown();
-                }
-        );
-
-        Thread.ofVirtual().start(
-                () -> {
-                    // count by uuid,rename '_id' to key
-                    var uuidMap = template.aggregate(Aggregation.newAggregation(
-                            Aggregation.match(Criteria.where("timestamp").gte(start).lte(end)),
-                            Aggregation.group("uuid").count().as("count")
-                                    .avg("timecost").as("avgTimecost")
-                                    .first("timestamp").as("firstTime")
-                                    .last("timestamp").as("lastTime"),
-                            Aggregation.sort(Sort.Direction.DESC, "count")
-                    ), LogDocument.class, Map.class).getMappedResults();
-                    uuidCountMap.set(uuidMap);
-                    latch.countDown();
-                }
-        );
-
-        latch.await();
-
+        Future<List<Map>> uuidCountMap = executorService.submit(() -> executeAggregation(start, end, "uuid"));
+        Future<List<Map>> urlCountMap = executorService.submit(() -> executeAggregation(start, end, "url"));
 
         return Map.of(
                 "reqNumber", total.get(),
@@ -98,8 +58,20 @@ public class StatisticService {
                 "averageCost", averageCost.get()
         );
 
-
     }
 
+    @SuppressWarnings("rawtypes")
+    private List<Map> executeAggregation(long start, long end, String groupBy) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("timestamp").gte(start).lte(end)),
+                Aggregation.group(groupBy)
+                        .count().as("count")
+                        .avg("timecost").as("avgTimecost")
+                        .max("timecost").as("maxTimecost")
+                        .min("timecost").as("minTimecost"),
+                Aggregation.sort(Sort.Direction.DESC, "count"));
+
+        return template.aggregate(aggregation, LogDocument.class, Map.class).getMappedResults();
+    }
 
 }
