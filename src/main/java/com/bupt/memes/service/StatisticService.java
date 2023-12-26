@@ -68,7 +68,9 @@ public class StatisticService {
                         .count().as("count")
                         .avg("timecost").as("avgTimecost")
                         .max("timecost").as("maxTimecost")
-                        .min("timecost").as("minTimecost"),
+                        .min("timecost").as("minTimecost")
+                        .first("timestamp").as("firstTime")
+                        .last("timestamp").as("lastTime"),
                 Aggregation.sort(Sort.Direction.DESC, "count"));
 
         return template.aggregate(aggregation, LogDocument.class, Map.class).getMappedResults();
