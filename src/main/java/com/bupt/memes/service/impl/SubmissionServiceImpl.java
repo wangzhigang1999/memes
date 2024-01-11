@@ -23,13 +23,13 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.bupt.memes.model.common.SubmissionCollection.DELETED_SUBMISSION;
-import static com.bupt.memes.model.common.SubmissionCollection.WAITING_SUBMISSION;
+import static com.bupt.memes.model.common.SubmissionCollection.*;
 
 @Service
 @AllArgsConstructor
@@ -76,7 +76,7 @@ public class SubmissionServiceImpl implements ISubmission {
     public Submission storeTextFormatSubmission(String text, String mime) {
 
         // check if the submission already exists
-        var submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(text.hashCode())), Submission.class);
+        var submission = getSubmission(text.hashCode());
         if (submission != null) {
             return submission;
         }
@@ -142,7 +142,7 @@ public class SubmissionServiceImpl implements ISubmission {
 
         // async query; 开启一个协程直接查询
         executor.submit(() -> {
-            var submission = mongoTemplate.findOne(Query.query(Criteria.where("hash").is(code)), Submission.class);
+            var submission = getSubmission(code);
             inDB.set(submission);
             latch.countDown();
             shortcut.countDown();
@@ -236,4 +236,24 @@ public class SubmissionServiceImpl implements ISubmission {
         }
         return submission;
     }
+
+    @SneakyThrows
+    @SuppressWarnings({"unchecked"})
+    private Submission getSubmission(Integer hash) {
+        CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
+                .map(collection -> CompletableFuture
+                        .supplyAsync(() -> mongoTemplate.findOne(Query.query(Criteria.where("hash").is(hash)), Submission.class, collection)))
+                .toArray(CompletableFuture[]::new);
+
+        return CompletableFuture
+                .allOf(futures)
+                .thenApply(ignored -> Arrays.stream(futures)
+                        .map(CompletableFuture::join)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null)).get();
+
+    }
+
+
 }
