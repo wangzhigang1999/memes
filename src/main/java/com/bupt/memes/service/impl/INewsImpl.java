@@ -118,7 +118,7 @@ public class INewsImpl implements INews {
             day = "0" + day;
         }
 
-        String monthAndDay = month + "-" + day;
+        String monthAndDay = ".*-" + month + "-" + day;
 
         Query query = new Query();
         query.addCriteria(Criteria.where("date").regex(monthAndDay));
