@@ -10,5 +10,4 @@ public class SubmissionCollection {
 
     public final static List<String> COLLECTIONS = List.of(WAITING_SUBMISSION, SUBMISSION, DELETED_SUBMISSION);
 
-
 }

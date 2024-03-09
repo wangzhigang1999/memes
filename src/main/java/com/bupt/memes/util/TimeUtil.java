@@ -26,7 +26,6 @@ public class TimeUtil {
         return today.toString();
     }
 
-
     /**
      * get current hour in Asia/Shanghai
      *
@@ -37,14 +36,11 @@ public class TimeUtil {
         return now.atZone(java.time.ZoneId.of("Asia/Shanghai")).getHour();
     }
 
-
     // convert YYYY-MM-DD to unix epoch milli
     public static long convertYMDToUnixEpochMilli(String ymd) {
         var localDate = java.time.LocalDate.parse(ymd);
         return localDate.atStartOfDay(java.time.ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli();
     }
-
-
 
     public static void main(String[] args) {
         System.out.println(getTodayStartUnixEpochMilli());
@@ -52,7 +48,7 @@ public class TimeUtil {
 
         long l = getTodayStartUnixEpochMilli() - 2 * 60 * 60 * 1000;
         System.out.println(l);
-        // convert l to  time format YYYY-MM-DD HH:mm:ss
+        // convert l to time format YYYY-MM-DD HH:mm:ss
         var str = Instant.ofEpochMilli(l).atZone(java.time.ZoneId.of("Asia/Shanghai")).toString();
         System.out.println(str);
     }

@@ -10,6 +10,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Service
+@SuppressWarnings("null")
 public class RSSChannelService {
 
     final MongoTemplate template;

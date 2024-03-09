@@ -7,12 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("unused")
 public interface INews {
 
-
     News addNews(News news, MultipartFile coverImage);
-
 
     News addTag(String newsId, Set<String> tag);
 

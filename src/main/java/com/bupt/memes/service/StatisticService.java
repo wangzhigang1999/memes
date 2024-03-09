@@ -20,7 +20,6 @@ import static com.bupt.memes.util.TimeUtil.getTodayStartUnixEpochMilli;
 @Service
 public class StatisticService {
 
-
     final MongoTemplate template;
 
     ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
@@ -43,9 +42,9 @@ public class StatisticService {
         Future<Double> averageCost = executorService.submit(() -> {
             Aggregation aggregation = Aggregation.newAggregation(
                     Aggregation.match(Criteria.where("timestamp").gte(start).lte(end)),
-                    Aggregation.group().avg("timecost").as("avgTimecost")
-            );
-            return (Double) template.aggregate(aggregation, LogDocument.class, Map.class).getMappedResults().get(0).get("avgTimecost");
+                    Aggregation.group().avg("timecost").as("avgTimecost"));
+            return (Double) template.aggregate(aggregation, LogDocument.class, Map.class).getMappedResults().get(0)
+                    .get("avgTimecost");
         });
 
         Future<List<Map>> uuidCountMap = executorService.submit(() -> executeAggregation(start, end, "uuid"));
@@ -55,8 +54,7 @@ public class StatisticService {
                 "reqNumber", total.get(),
                 "uuidCountMap", uuidCountMap.get(),
                 "urlCountMap", urlCountMap.get(),
-                "averageCost", averageCost.get()
-        );
+                "averageCost", averageCost.get());
 
     }
 

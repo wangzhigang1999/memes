@@ -9,7 +9,6 @@ import lombok.SneakyThrows;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,7 +58,7 @@ public class INewsImpl implements INews {
     }
 
     @Override
-    public News addTag(String newsId, @NonNull Set<String> tag) {
+    public News addTag(String newsId,  Set<String> tag) {
         News news = findById(newsId);
         if (news == null) {
             return null;
@@ -86,6 +85,7 @@ public class INewsImpl implements INews {
         return mongoTemplate.save(news);
     }
 
+    @SuppressWarnings("null")
     @Override
     public News findById(String id) {
         News news = mongoTemplate.findById(id, News.class);
@@ -150,6 +150,7 @@ public class INewsImpl implements INews {
     }
 
     @Override
+    @SuppressWarnings("null")
     public PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageSize, String lastID) {
         Query query = new Query();
         if (!hasContent) {
@@ -159,7 +160,6 @@ public class INewsImpl implements INews {
         query.addCriteria(Criteria.where("tag").all(tags));
         return mongoPageHelper.pageQuery(query, News.class, pageSize, lastID);
     }
-
 
     class AsyncUpload implements Callable<String> {
         final MultipartFile file;

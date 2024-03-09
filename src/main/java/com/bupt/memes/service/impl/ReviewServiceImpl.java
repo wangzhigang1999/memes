@@ -27,7 +27,6 @@ public class ReviewServiceImpl implements Review {
 
     final MongoTemplate template;
 
-
     /**
      * 获取今天的所有没有审核的投稿
      *
@@ -51,7 +50,7 @@ public class ReviewServiceImpl implements Review {
     /**
      * 审核通过
      *
-     * @param id submission的 id
+     * @param id submission 的 id
      * @return 是否成功
      */
     @Override
@@ -63,7 +62,7 @@ public class ReviewServiceImpl implements Review {
     /**
      * 审核不通过
      *
-     * @param id submission的id
+     * @param id submission 的 id
      * @return 是否成功
      */
     @Override
@@ -75,7 +74,7 @@ public class ReviewServiceImpl implements Review {
     /**
      * 批量通过
      *
-     * @param ids submission的id列表
+     * @param ids submission 的 id 列表
      * @return 成功通过的数量
      */
     @Override
@@ -92,17 +91,16 @@ public class ReviewServiceImpl implements Review {
         return ids.size();
     }
 
-
     /**
-     * 获取当前已经review的submission数量
+     * 获取当前已经 review 的 submission 数量
      *
-     * @return 当前已经review的submission数量
+     * @return 当前已经 review 的 submission 数量
      */
     @Override
     public long getPassedNum() {
         // 00:00:00 of today
         var start = getTodayStartUnixEpochMilli();
-        // 向前推两个小时,从上一天的22点开始算起
+        // 向前推两个小时，从上一天的 22 点开始算起
         var from = start - 2 * 60 * 60 * 1000;
         Criteria criteria = Criteria.where("timestamp").gte(from);
         return template.count(Query.query(criteria), Submission.class);
@@ -112,7 +110,7 @@ public class ReviewServiceImpl implements Review {
     public long getWaitingNum() {
         // 00:00:00 of today
         var start = getTodayStartUnixEpochMilli();
-        // 向前推两个小时,从上一天的22点开始算起
+        // 向前推两个小时，从上一天的 22 点开始算起
         var from = start - 2 * 60 * 60 * 1000;
         Criteria criteria = Criteria.where("timestamp").gte(from);
         return template.count(Query.query(criteria), Submission.class, WAITING_SUBMISSION);
@@ -122,17 +120,18 @@ public class ReviewServiceImpl implements Review {
     public Map<String, Long> getTodayInfo() {
         long passedNum = getPassedNum();
         long waitingNum = getWaitingNum();
-        return Map.of("passedNum",  passedNum, "waitingNum", waitingNum);
+        return Map.of("passedNum", passedNum, "waitingNum", waitingNum);
     }
 
     /**
      * 更新投稿的审核状态
      *
-     * @param id     投稿的id
+     * @param id     投稿的 id
      * @param passed 是否通过
      * @return 是否成功
      */
     @Transactional(rollbackFor = Exception.class)
+    @SuppressWarnings("null")
     public boolean reviewSubmission(String id, boolean passed) {
         var query = new Query(Criteria.where("id").is(id));
         var one = template.findAndRemove(query, Submission.class, WAITING_SUBMISSION);

@@ -33,6 +33,7 @@ import static com.bupt.memes.model.common.SubmissionCollection.*;
 
 @Service
 @AllArgsConstructor
+@SuppressWarnings("null")
 public class SubmissionServiceImpl implements ISubmission {
 
     final MongoTemplate mongoTemplate;
@@ -42,12 +43,11 @@ public class SubmissionServiceImpl implements ISubmission {
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     final static Logger logger = LogManager.getLogger(SubmissionServiceImpl.class);
 
-
     /**
      * 对投稿点赞/点踩
      *
-     * @param id 对应投稿的id
-     * @param up true为点赞，false为点踩
+     * @param id 对应投稿的 id
+     * @param up true 为点赞，false 为点踩
      * @return 是否成功
      */
     @Override
@@ -64,11 +64,10 @@ public class SubmissionServiceImpl implements ISubmission {
         return first.getMatchedCount() > 0;
     }
 
-
     /**
      * 存储文本类型的投稿
      *
-     * @param text url  text
+     * @param text url text
      * @param mime mime
      * @return 存储后的投稿
      */
@@ -84,7 +83,6 @@ public class SubmissionServiceImpl implements ISubmission {
         submission = new Submission();
         submission.setSubmissionType(mime);
         submission.setHash(text.hashCode());
-
 
         switch (submission.getSubmissionType()) {
             case BILIBILI:
@@ -108,7 +106,6 @@ public class SubmissionServiceImpl implements ISubmission {
             default:
                 return null;
         }
-
 
         return insertSubmission(submission);
     }
@@ -157,7 +154,6 @@ public class SubmissionServiceImpl implements ISubmission {
         // 数据库中没有，等待上传完成
         latch.await();
 
-
         if (uploaded.get() == null) {
             return null;
         }
@@ -185,7 +181,7 @@ public class SubmissionServiceImpl implements ISubmission {
      * 分页查询
      *
      * @param pageSize 每页大小
-     * @param lastID   上一页最后一个元素的id
+     * @param lastID   上一页最后一个元素的 id
      * @return 分页结果
      */
     @Override
@@ -210,8 +206,7 @@ public class SubmissionServiceImpl implements ISubmission {
         Query query = new Query();
         query.addCriteria(new Criteria().andOperator(
                 Criteria.where(time).gte(start),
-                Criteria.where(time).lt(end)
-        ));
+                Criteria.where(time).lt(end)));
         return mongoTemplate.find(query, Submission.class);
     }
 
@@ -231,18 +226,18 @@ public class SubmissionServiceImpl implements ISubmission {
             submission = mongoTemplate.findOne(
                     Query.query(Criteria.where("hash").is(submission.getHash())),
                     Submission.class,
-                    WAITING_SUBMISSION
-            );
+                    WAITING_SUBMISSION);
         }
         return submission;
     }
 
     @SneakyThrows
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     private Submission getSubmission(Integer hash) {
         CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
                 .map(collection -> CompletableFuture
-                        .supplyAsync(() -> mongoTemplate.findOne(Query.query(Criteria.where("hash").is(hash)), Submission.class, collection)))
+                        .supplyAsync(() -> mongoTemplate.findOne(Query.query(Criteria.where("hash").is(hash)),
+                                Submission.class, collection)))
                 .toArray(CompletableFuture[]::new);
 
         return CompletableFuture
@@ -251,9 +246,9 @@ public class SubmissionServiceImpl implements ISubmission {
                         .map(CompletableFuture::join)
                         .filter(Objects::nonNull)
                         .findFirst()
-                        .orElse(null)).get();
+                        .orElse(null))
+                .get();
 
     }
-
 
 }

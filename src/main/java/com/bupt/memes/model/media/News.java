@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import static com.bupt.memes.util.TimeUtil.getYMD;
 
-
 @Document(collection = "news")
 @Data
 public class News {

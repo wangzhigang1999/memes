@@ -22,5 +22,5 @@ public class RSSItem {
     private String comments;
     private String guid;
 
-    private String board="";
+    private String board = "";
 }

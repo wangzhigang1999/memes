@@ -42,7 +42,9 @@ public class Auth {
          * 进程内部的 token，只有在启动时才会生成，如果进程重启，token 会改变；也可以通过环境变量传入
          */
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        assert attributes != null;
+        if (attributes == null) {
+            return ResultData.fail(ReturnCode.RC401);
+        }
         var request = attributes.getRequest();
         var token = request.getHeader("token");
         if (token == null || !token.equals(localToken)) {

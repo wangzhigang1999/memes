@@ -13,11 +13,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RestControllerAdvice
 public class Response implements ResponseBodyAdvice<Object> {
 
+    @SuppressWarnings("null")
     @Override
-    public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {
+    public boolean supports(@NonNull MethodParameter returnType, @SuppressWarnings("rawtypes") @NonNull Class converterType) {
         return true;
     }
 
+    @SuppressWarnings({ "null", "rawtypes" })
     @Override
     public Object beforeBodyWrite(Object o,
             @NonNull MethodParameter returnType,

@@ -31,7 +31,6 @@ public class Schedule {
 
     final SysConfigService sysConfig;
 
-
     /**
      * 每隔 30min 自动开启或关闭机器人
      */
@@ -45,11 +44,12 @@ public class Schedule {
         boolean meets = meetsMinReq(passedNum, waitingNum, targetNum);
         if (meets) {
             sysConfig.enableBot();
-            logger.info("bot should enable because of waitingNum: {} passedNum: {} targetNum: {}", waitingNum, passedNum, targetNum);
+            logger.info("bot should enable because of waitingNum: {} passedNum: {} targetNum: {}", waitingNum,
+                    passedNum, targetNum);
             return;
         }
 
-        // 九点之后开启机器人，爬虫会在10点开始爬取
+        // 九点之后开启机器人，爬虫会在 10 点开始爬取
         int currentHour = getCurrentHour();
         if (currentHour >= 21 || currentHour <= 8) {
             sysConfig.enableBot();
@@ -61,7 +61,7 @@ public class Schedule {
     }
 
     /**
-     * 通过meme的数量判断机器人是否应该开启
+     * 通过 meme 的数量判断机器人是否应该开启
      *
      * @param passedNum  当前已审核通过的数量
      * @param waitingNum 待审核的数量
@@ -69,14 +69,14 @@ public class Schedule {
      * @return 是否应该开启
      */
     public static boolean meetsMinReq(long passedNum, long waitingNum, int targetNum) {
-        // 如果当前已发布的数量大于目标数量，直接返回false
+        // 如果当前已发布的数量大于目标数量，直接返回 false
         if (passedNum >= targetNum) {
             logger.info("bot should disable because of passedNum: {} more than targetNum: {}", passedNum, targetNum);
             return false;
         }
         int needed = (int) (targetNum - passedNum);
 
-        // 审核的通过率大概是2/3,所以需要的数量是1.5倍
+        // 审核的通过率大概是 2/3，所以需要的数量是 1.5 倍
         boolean b = waitingNum < (needed * 1.5);
         logger.info("bot should {} because of waitingNum: {} needed: {}", b ? "enable" : "disable", waitingNum, needed);
         return b;
@@ -125,7 +125,8 @@ public class Schedule {
                 submission.hardDeleteSubmission(nameIdMap.get(objName));
             }
         });
-        logger.info("clean  done, {} images deleted from storage.", nameStatusMap.entrySet().stream().filter(Map.Entry::getValue).count());
+        logger.info("clean  done, {} images deleted from storage.",
+                nameStatusMap.entrySet().stream().filter(Map.Entry::getValue).count());
     }
 
     @Scheduled(fixedRate = 1000 * 60)

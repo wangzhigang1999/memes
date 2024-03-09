@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
+@SuppressWarnings("null")
 public class RSSItemService {
     final MongoTemplate template;
 
@@ -30,7 +31,6 @@ public class RSSItemService {
     public List<RSSItem> getByBoard(String board) {
         return getByMap(Map.of("board", board), Set.of("description", "comments", "guid"));
     }
-
 
     public List<RSSItem> getByKeyword(String keyword) {
         Query query = new Query();

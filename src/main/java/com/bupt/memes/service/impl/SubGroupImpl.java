@@ -18,6 +18,7 @@ import static com.bupt.memes.model.common.SubmissionCollection.WAITING_SUBMISSIO
 
 @Service
 @AllArgsConstructor
+@SuppressWarnings("null")
 public class SubGroupImpl implements ISubGroup {
 
     final MongoTemplate template;
@@ -58,12 +59,10 @@ public class SubGroupImpl implements ISubGroup {
         return submissionGroup;
     }
 
-
     @Override
     public SubmissionGroup getById(String id) {
         return template.findById(id, SubmissionGroup.class, WAITING_SUBMISSION);
     }
-
 
     private List<Submission> ensureSubmissionsExist(List<String> submissionsId) {
         return template.find(Query.query(Criteria.where("id").in(submissionsId)), Submission.class, WAITING_SUBMISSION);

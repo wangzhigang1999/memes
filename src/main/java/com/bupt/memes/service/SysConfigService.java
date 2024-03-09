@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
+@SuppressWarnings("null")
 public class SysConfigService {
     final MongoTemplate mongoTemplate;
     private static Sys sys;

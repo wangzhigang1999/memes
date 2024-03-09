@@ -12,7 +12,6 @@ qiniu:
   bucket: ${bucket}
   urlPrefix: ${urlPrefix}
 
-
 token: ${token}
 
 management:

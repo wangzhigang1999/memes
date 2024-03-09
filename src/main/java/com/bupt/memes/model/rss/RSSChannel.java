@@ -29,16 +29,3 @@ public class RSSChannel {
                 rssLink != null && !rssLink.isEmpty();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

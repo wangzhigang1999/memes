@@ -45,7 +45,6 @@ public class Submission implements Comparable<Submission> {
         }
     }
 
-
     public boolean textFormat() {
         return this.submissionType == SubmissionType.BILIBILI || this.submissionType == SubmissionType.MARKDOWN;
     }
@@ -73,7 +72,6 @@ public class Submission implements Comparable<Submission> {
 
         return ((Submission) obj).getHash().equals(this.hash);
     }
-
 
     @Override
     public int compareTo(Submission o) {
