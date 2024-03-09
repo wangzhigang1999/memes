@@ -4,6 +4,21 @@
       "name": "storage.type",
       "type": "java.lang.String",
       "description": "The type of storage used by the application."
+    },
+    {
+      "name": "perf.url",
+      "type": "java.lang.String",
+      "description": "Description for perf.url."
+    },
+    {
+      "name": "perf.username",
+      "type": "java.lang.String",
+      "description": "Description for perf.username."
+    },
+    {
+      "name": "perf.password",
+      "type": "java.lang.String",
+      "description": "Description for perf.password."
     }
   ]
 }

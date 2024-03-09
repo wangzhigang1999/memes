@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 记录请求日志
- * 将网关的信息保存到mongodb中，一方面统计调用，另一方面也可以用于排查问题
+ * 将网关的信息保存到 mongodb 中，一方面统计调用，另一方面也可以用于排查问题
  */
 @Component
 @Aspect
@@ -69,6 +69,7 @@ public class Audit {
     public Object audit(ProceedingJoinPoint joinPoint) throws Throwable {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
+        @SuppressWarnings("null")
         var request = attributes.getRequest();
         var uuid = request.getHeader("uuid");
         var classMethod = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
