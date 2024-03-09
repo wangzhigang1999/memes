@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
 @RestController
 @RequestMapping("/admin/news")
 @CrossOrigin(origins = "*")
@@ -16,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class NewsAdmin {
 
     final INews iNews;
-
 
     @PostMapping("")
     @AuthRequired

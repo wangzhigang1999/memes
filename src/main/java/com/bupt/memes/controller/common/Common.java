@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-
 @RestController
 @RequestMapping("/admin")
 @CrossOrigin(origins = "*")
@@ -21,7 +20,7 @@ public class Common {
     final SysConfigService configService;
 
     /**
-     * 验证token
+     * 验证 token
      * 通过 aop 实现，不需要传参
      */
     @RequestMapping("/verify")
@@ -30,9 +29,8 @@ public class Common {
         return true;
     }
 
-
     /**
-     * 统计从00:00:00到现在的信息
+     * 统计从 00:00:00 到现在的信息
      */
     @RequestMapping("/statistic")
     @AuthRequired
@@ -51,7 +49,6 @@ public class Common {
         return "enable".equals(status) ? configService.enableBot() : configService.disableBot();
     }
 
-
     /**
      * 获取爬虫的状态
      */
@@ -59,7 +56,6 @@ public class Common {
     public Boolean botStatus() {
         return SysConfigService.getBotStatus();
     }
-
 
     @GetMapping("/sys")
     @AuthRequired

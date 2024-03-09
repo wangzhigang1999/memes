@@ -20,11 +20,11 @@ public class Response implements ResponseBodyAdvice<Object> {
 
     @Override
     public Object beforeBodyWrite(Object o,
-                                  @NonNull MethodParameter returnType,
-                                  @NonNull MediaType selectedContentType,
-                                  @NonNull Class selectedConverterType,
-                                  @NonNull ServerHttpRequest request,
-                                  @NonNull ServerHttpResponse response) {
+            @NonNull MethodParameter returnType,
+            @NonNull MediaType selectedContentType,
+            @NonNull Class selectedConverterType,
+            @NonNull ServerHttpRequest request,
+            @NonNull ServerHttpResponse response) {
         if (o == null) {
             return ResultData.fail(ReturnCode.RC400);
         }

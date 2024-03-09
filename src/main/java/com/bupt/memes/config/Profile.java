@@ -44,8 +44,7 @@ public class Profile {
                         .setServerAddress(perfUrl)
                         .setBasicAuthUser(perfUsername)
                         .setBasicAuthPassword(perfPassword)
-                        .build()
-        );
+                        .build());
         logger.info("Pyroscope is configured");
     }
 

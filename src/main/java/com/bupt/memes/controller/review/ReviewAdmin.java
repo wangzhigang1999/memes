@@ -32,7 +32,7 @@ public class ReviewAdmin {
     /**
      * 接受某个投稿
      *
-     * @param id 投稿的id
+     * @param id 投稿的 id
      * @return ResultData
      */
     @PostMapping("/accept/{id}")
@@ -76,7 +76,6 @@ public class ReviewAdmin {
     public Integer batchReject(@RequestBody List<String> ids) {
         return service.batchRejectSubmission(ids);
     }
-
 
     /**
      * 今日投稿的统计信息

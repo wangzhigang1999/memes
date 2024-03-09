@@ -31,10 +31,9 @@ public class SysConfigService {
         return sys.getTopSubmission();
     }
 
-
     /**
      * 初始化系统配置，如果有配置项不存在的，写一个默认值进去
-     * 最后保存回mongo
+     * 最后保存回 mongo
      * 如果有多个实例启动，会导致多次初始化，但是不会有问题，因为只有不存在的时候才会写入默认值，而且多个实例写入的默认值是一样的
      */
     private void init() {
@@ -42,7 +41,6 @@ public class SysConfigService {
         if (sys == null) {
             sys = new Sys();
         }
-
 
         if (sys.getMIN_SUBMISSIONS() == 0) {
             sys.setMIN_SUBMISSIONS(50);
@@ -69,7 +67,6 @@ public class SysConfigService {
         return target.getBotUp();
     }
 
-
     public boolean addTop(String id) {
         Submission submission = mongoTemplate.findById(id, Submission.class);
         if (submission == null) {
@@ -95,13 +92,13 @@ public class SysConfigService {
         return true;
     }
 
-
     @Transactional
     public void updateTopSubmission() {
         Set<Submission> submission = sys.getTopSubmission();
         // find and replace
         submission.forEach(s -> {
-            if (s == null) return;
+            if (s == null)
+                return;
 
             Submission byId = mongoTemplate.findById(s.getId(), Submission.class);
             assert byId != null;

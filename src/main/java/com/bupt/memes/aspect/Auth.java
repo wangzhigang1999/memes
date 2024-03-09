@@ -18,7 +18,7 @@ import java.util.UUID;
 
 /**
  * @author wangz
- * 用来做权限校验，有一些接口只有管理员才能访问
+ *         用来做权限校验，有一些接口只有管理员才能访问
  */
 @Component
 @Aspect
@@ -31,16 +31,15 @@ public class Auth {
     public void auth() {
     }
 
-
     /**
-     * 校验token
+     * 校验 token
      */
     @Around("auth()")
     public Object auth(ProceedingJoinPoint joinPoint) throws Throwable {
 
         /*
-         *  从请求头中获取token，如果token不正确，返回401
-         *  进程内部的token，只有在启动时才会生成，如果进程重启，token会改变；也可以通过环境变量传入
+         * 从请求头中获取 token，如果 token 不正确，返回 401
+         * 进程内部的 token，只有在启动时才会生成，如果进程重启，token 会改变；也可以通过环境变量传入
          */
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
@@ -56,6 +55,5 @@ public class Auth {
         }
         return joinPoint.proceed();
     }
-
 
 }

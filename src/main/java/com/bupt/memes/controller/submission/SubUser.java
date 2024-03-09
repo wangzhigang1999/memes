@@ -25,12 +25,11 @@ public class SubUser {
 
     final SysConfigService sysConfig;
 
-
     /**
      * upload file
      *
-     * @param file file,非必须
-     * @param text text,可能是一个url,将来会被嵌入到iframe中
+     * @param file file，非必须
+     * @param text text，可能是一个 url，将来会被嵌入到 iframe 中
      * @param mime mime,type
      * @return ResultData
      * @throws IOException IOException
@@ -63,7 +62,6 @@ public class SubUser {
         return SysConfigService.getTop();
     }
 
-
     // 点赞
     @PostMapping("{id}/like")
     public Boolean like(@PathVariable("id") String id) {
@@ -80,7 +78,7 @@ public class SubUser {
      * 分页获取投稿
      *
      * @param pageSize 页大小
-     * @param lastID   上一页最后一个的id
+     * @param lastID   上一页最后一个的 id
      * @return Page
      */
     @GetMapping("/page")
@@ -88,9 +86,8 @@ public class SubUser {
         return service.getSubmissionByPage(pageSize, lastID);
     }
 
-
     /**
-     * 获取某个id的投稿
+     * 获取某个 id 的投稿
      *
      * @param id id
      * @return Submission

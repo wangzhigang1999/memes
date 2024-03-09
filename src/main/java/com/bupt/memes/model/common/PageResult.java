@@ -20,4 +20,3 @@ public class PageResult<T> {
     private Integer pageSize;
     private List<T> list;
 }
-

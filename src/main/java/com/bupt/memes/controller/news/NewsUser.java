@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/news")
 @CrossOrigin(origins = "*")
@@ -32,14 +31,13 @@ public class NewsUser {
         return ResultData.success(iNews.findByMMDD(month, day));
     }
 
-
     @GetMapping("/page")
-    public PageResult<News> page( Integer pageSize, String lastID) {
+    public PageResult<News> page(Integer pageSize, String lastID) {
 
         if (pageSize == null) {
             pageSize = 10;
         }
 
-        return iNews.find( false, pageSize, lastID);
+        return iNews.find(false, pageSize, lastID);
     }
 }
