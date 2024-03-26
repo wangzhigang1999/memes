@@ -20,4 +20,4 @@ EXPOSE 8080
 #ENV token=hello;
 #ENV urlPrefix="http://localhost:8080/"
 
-ENTRYPOINT ["java", "-jar", "/app/application.jar"]
+ENTRYPOINT ["java","--enable-preview", "-jar", "/app/application.jar"]

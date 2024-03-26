@@ -54,19 +54,11 @@ public class Schedule {
         long passedNum = review.getPassedNum();
         int targetNum = sysConfig.getSys().getMIN_SUBMISSIONS();
 
-        boolean meets = meetsMinReq(passedNum, waitingNum, targetNum);
-        if (meets) {
-            sysConfig.enableBot();
-            logger.info("bot should enable because of waitingNum: {} passedNum: {} targetNum: {}", waitingNum,
-                    passedNum, targetNum);
-            return;
-        }
-
-        // 九点之后开启机器人，爬虫会在 10 点开始爬取
+        boolean notMeetsMinReq = notMeetsMinReq(passedNum, waitingNum, targetNum);
         int currentHour = getCurrentHour();
-        if (currentHour >= 21 || currentHour <= 8) {
+        if (notMeetsMinReq || (currentHour >= 21 || currentHour <= 8)) {
             sysConfig.enableBot();
-            logger.info("bot should enable because of time: {}", currentHour);
+            logger.info("enable bot notMeetsMinReq: {}  currentHour: {}", notMeetsMinReq, currentHour);
             return;
         }
         // 机器人关闭
@@ -81,7 +73,7 @@ public class Schedule {
      * @param targetNum  目标数量
      * @return 是否应该开启
      */
-    public static boolean meetsMinReq(long passedNum, long waitingNum, int targetNum) {
+    public static boolean notMeetsMinReq(long passedNum, long waitingNum, int targetNum) {
         // 如果当前已发布的数量大于目标数量，直接返回 false
         if (passedNum >= targetNum) {
             logger.info("bot should disable because of passedNum: {} more than targetNum: {}", passedNum, targetNum);
@@ -163,8 +155,7 @@ public class Schedule {
         map.computeIfAbsent("rss.count", _ -> registry.gauge("rss.count", new AtomicLong(rssCount))).set(rssCount);
 
         long newsCount = mongoTemplate.count(new Query(), News.class);
-        map.computeIfAbsent("news.count", _ -> registry.gauge("news.count", new AtomicLong(newsCount)))
-                .set(newsCount);
+        map.computeIfAbsent("news.count", _ -> registry.gauge("news.count", new AtomicLong(newsCount))).set(newsCount);
 
         logger.info("ScanDBStatus done, submissionCount: {}, logCount: {}, rssCount: {}, newsCount: {}",
                 submissionCount, logCount, rssCount, newsCount);
