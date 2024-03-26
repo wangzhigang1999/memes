@@ -54,13 +54,8 @@ public class SubmissionServiceImpl implements ISubmission {
     public boolean vote(String id, boolean up) {
         var query = new Query(Criteria.where("id").is(id));
         var update = new Update();
-        if (up) {
-            update.inc("up", 1);
-        } else {
-            update.inc("down", 1);
-        }
+        update.inc(up ? "up" : "down", 1);
         UpdateResult first = mongoTemplate.update(Submission.class).matching(query).apply(update).first();
-
         return first.getMatchedCount() > 0;
     }
 

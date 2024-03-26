@@ -1,5 +1,6 @@
 package com.bupt.memes.service;
 
+import com.bupt.memes.model.Sys;
 import com.bupt.memes.model.common.LogDocument;
 import com.bupt.memes.model.media.News;
 import com.bupt.memes.model.media.Submission;
@@ -135,10 +136,12 @@ public class Schedule {
     }
 
     @Scheduled(fixedRate = 1000 * 60)
-    public void SyncTopStatus() {
-        logger.info("SyncTopStatus start.");
+    public void syncSys() {
+        SysConfigService.setSys(mongoTemplate.findById("sys", Sys.class));
+        logger.info("Periodic sync sys done.");
+
         sysConfig.updateTopSubmission();
-        logger.info("SyncTopStatus done.");
+        logger.info("Periodic sync top submission done.");
     }
 
     @Scheduled(fixedRate = 1000 * 30)

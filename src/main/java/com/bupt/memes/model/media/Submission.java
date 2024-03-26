@@ -1,5 +1,6 @@
 package com.bupt.memes.model.media;
 
+import com.bupt.memes.model.common.SubmissionCollection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -8,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Objects;
 
 @Data
-@Document(collection = "submission")
+@Document(collection = SubmissionCollection.SUBMISSION)
 @AllArgsConstructor
 @Accessors(chain = true)
 public class Submission implements Comparable<Submission> {

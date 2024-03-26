@@ -48,6 +48,12 @@ public class SubmissionGroup extends Submission {
         return this.id.hashCode();
     }
 
+    /**
+     * 从多个投稿构建一个投稿组
+     * 
+     * @param submissions 投稿列表
+     * @return 投稿组
+     */
     public static Optional<SubmissionGroup> fromSubmission(List<Submission> submissions) {
         if (submissions == null || submissions.isEmpty()) {
             return Optional.empty();
@@ -57,10 +63,11 @@ public class SubmissionGroup extends Submission {
         if (submissionGroup.children.isEmpty()) {
             return Optional.empty();
         }
-        submissionGroup.id = submissionGroup.children.get(0).id;
-        submissionGroup.timestamp = submissionGroup.children.get(0).timestamp;
-        submissionGroup.uploader = submissionGroup.children.get(0).uploader;
-        submissionGroup.hash = submissionGroup.children.get(0).hash;
+        submissionGroup
+                .setId(submissions.get(0).id)
+                .setTimestamp(submissions.get(0).timestamp)
+                .setUploader(submissions.get(0).uploader)
+                .setHash(submissions.get(0).hash);
         return Optional.of(submissionGroup);
     }
 }

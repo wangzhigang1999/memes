@@ -42,7 +42,6 @@ public class Audit {
 
     public final static ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
-
     public final static String instanceUUID = UUID.randomUUID().toString();
 
     @Value("${spring.data.mongodb.database}")
@@ -51,7 +50,6 @@ public class Audit {
     public final String env;
 
     private final ConcurrentHashMap<String, Timer> timerMap = new ConcurrentHashMap<>();
-
 
     public Audit(MongoTemplate template, MongoClient client, MeterRegistry registry) {
         this.client = client;
@@ -64,11 +62,9 @@ public class Audit {
     public void controller() {
     }
 
-
     @Around(value = "controller()")
     public Object audit(ProceedingJoinPoint joinPoint) throws Throwable {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        assert attributes != null;
         @SuppressWarnings("null")
         var request = attributes.getRequest();
         var uuid = request.getHeader("uuid");
@@ -78,22 +74,26 @@ public class Audit {
             uuid = "anonymous";
         }
 
+        /*
+         * 这里使用 ThreadLocal 传递 uuid，在向数据库中插入数据时，可能会使用这个 uuid
+         */
         threadLocalUUID.set(uuid);
         long start = System.currentTimeMillis();
         Object proceed = joinPoint.proceed();
         long end = System.currentTimeMillis();
         threadLocalUUID.remove();
 
-        doAudit(request, classMethod, uuid, start, end);
+        asyncAudit(request, classMethod, uuid, start, end);
         return proceed;
     }
 
-
-    private void doAudit(final HttpServletRequest request, String classMethod, String uuid, long start, long end) {
+    /**
+     * 异步记录日志和监控打点
+     */
+    private void asyncAudit(final HttpServletRequest request, String classMethod, String uuid, long start, long end) {
         VIRTUAL_EXECUTOR.submit(() -> timerMap
                 .computeIfAbsent(classMethod, this::getRequestTimer)
                 .record(end - start, TimeUnit.MILLISECONDS));
-
         VIRTUAL_EXECUTOR.submit(() -> audit(request, uuid, start, end));
     }
 

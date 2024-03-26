@@ -2,6 +2,7 @@ package com.bupt.memes.aspect;
 
 import com.bupt.memes.model.common.ResultData;
 import com.bupt.memes.model.common.ReturnCode;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -10,10 +11,12 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -22,6 +25,7 @@ import java.util.UUID;
  */
 @Component
 @Aspect
+@Lazy(false)
 public class Auth {
     @Value("${token}")
     String localToken = UUID.randomUUID().toString();
@@ -48,7 +52,7 @@ public class Auth {
         var request = attributes.getRequest();
         var token = request.getHeader("token");
         if (token == null || !token.equals(localToken)) {
-            logger.warn("token is not correct");
+            logger.warn("token is not correct, token: {}", token);
             HttpServletResponse response = attributes.getResponse();
             if (response != null) {
                 response.setStatus(401);
@@ -56,6 +60,12 @@ public class Auth {
             return ResultData.fail(ReturnCode.RC401);
         }
         return joinPoint.proceed();
+    }
+
+    @PostConstruct
+    public void init() {
+        String encodedToken = Base64.getEncoder().encodeToString(localToken.getBytes());
+        logger.warn("Token: {}", encodedToken);
     }
 
 }

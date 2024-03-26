@@ -36,29 +36,24 @@ public class INewsImpl implements INews {
     @Override
     @SneakyThrows
     public News addNews(News news, MultipartFile coverImage) {
-
-        // use thread pool to upload image
+        /*
+         * 异步上传图片，返回图片 url
+         */
         Future<String> future = pool.submit(new AsyncUpload(coverImage));
-
-        // title content sourceURL must not null
         if (news.getTitle() == null || news.getContent() == null || news.getSourceURL() == null) {
             return null;
         }
-        // if date is null, then set date to now
         if (news.getDate() == null) {
-            // YYYY-MM-DD in Asia/Shanghai
             news.setDate(getYMD());
         }
-        // set timestamp to now
         news.setTimestamp(System.currentTimeMillis());
-
         String url = future.get(10, TimeUnit.SECONDS);
         news.setCoverImage(url);
         return mongoTemplate.insert(news);
     }
 
     @Override
-    public News addTag(String newsId,  Set<String> tag) {
+    public News addTag(String newsId, Set<String> tag) {
         News news = findById(newsId);
         if (news == null) {
             return null;
@@ -110,14 +105,10 @@ public class INewsImpl implements INews {
     @Override
     public List<News> findByMMDD(String month, String day) {
 
-        // ensure month and day is two digit
-        if (month.length() == 1) {
-            month = "0" + month;
-        }
-        if (day.length() == 1) {
-            day = "0" + day;
-        }
+        month = String.format("%02d", Integer.parseInt(month));
+        day = String.format("%02d", Integer.parseInt(day));
 
+        // 确保匹配的是 YYYY-MM-DD 格式
         String monthAndDay = ".*-" + month + "-" + day;
 
         Query query = new Query();

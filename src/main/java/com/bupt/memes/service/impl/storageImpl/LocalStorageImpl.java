@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-
 @Service("local")
 @Primary
 @ConditionalOnProperty(prefix = "storage", name = "type", havingValue = "local")
@@ -33,7 +32,6 @@ public class LocalStorageImpl implements Storage {
 
     @Value("${local.urlPrefix}")
     String urlPrefix;
-
 
     @Override
     @SneakyThrows
@@ -53,7 +51,6 @@ public class LocalStorageImpl implements Storage {
         submission.setSubmissionType(mime);
         return submission;
     }
-
 
     @Override
     public Map<String, Boolean> delete(String[] keyList) {

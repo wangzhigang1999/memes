@@ -17,7 +17,7 @@ public class Common {
 
     final StatisticService statisticService;
 
-    final SysConfigService configService;
+    final SysConfigService systemService;
 
     /**
      * 验证 token
@@ -46,7 +46,7 @@ public class Common {
     @PostMapping("/bot/status/{status}")
     @AuthRequired
     public Boolean enableBot(@PathVariable String status) {
-        return "enable".equals(status) ? configService.enableBot() : configService.disableBot();
+        return "enable".equals(status) ? systemService.enableBot() : systemService.disableBot();
     }
 
     /**
@@ -59,8 +59,8 @@ public class Common {
 
     @GetMapping("/sys")
     @AuthRequired
-    public Sys getConfigService() {
-        return configService.getSys();
+    public Sys getSystemService() {
+        return systemService.getSys();
     }
 
 }

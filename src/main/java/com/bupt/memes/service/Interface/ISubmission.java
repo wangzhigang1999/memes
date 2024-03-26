@@ -8,16 +8,14 @@ import java.util.List;
 
 public interface ISubmission {
 
-
     /**
      * 点赞或者点踩
      *
      * @param id 对应投稿的名字
-     * @param up true为点赞，false为点踩
+     * @param up true 为点赞，false 为点踩
      * @return 是否成功
      */
     boolean vote(String id, boolean up);
-
 
     /**
      * 存储文本类型的投稿
@@ -28,7 +26,6 @@ public interface ISubmission {
      */
     Submission storeTextFormatSubmission(String url, String mime);
 
-
     /**
      * 存储图片、视频类型的投稿
      *
@@ -38,18 +35,15 @@ public interface ISubmission {
      */
     Submission storeStreamSubmission(InputStream stream, String mime);
 
-
     /**
      * 获取被标记为删除的投稿
      */
     List<Submission> getDeletedSubmission();
 
-
     /**
      * 硬删除
      */
     void hardDeleteSubmission(String id);
-
 
     PageResult<Submission> getSubmissionByPage(int pageSize, String lastID);
 

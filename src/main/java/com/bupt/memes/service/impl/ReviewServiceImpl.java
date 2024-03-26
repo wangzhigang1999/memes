@@ -84,6 +84,12 @@ public class ReviewServiceImpl implements Review {
         return ids.size();
     }
 
+    /**
+     * 批量拒绝
+     * 
+     * @param ids submission 的 id 列表
+     * @return 成功拒绝的数量
+     */
     @Override
     public int batchRejectSubmission(List<String> ids) {
         ids.sort(String::compareTo);
@@ -134,6 +140,7 @@ public class ReviewServiceImpl implements Review {
     @SuppressWarnings("null")
     public boolean reviewSubmission(String id, boolean passed) {
         var query = new Query(Criteria.where("id").is(id));
+        // 当一个投稿被审核通过或者不通过的时候，就从等待审核的表中删除，然后插入到对应的表中
         var one = template.findAndRemove(query, Submission.class, WAITING_SUBMISSION);
         assert one != null;
         template.save(one, passed ? SUBMISSION : DELETED_SUBMISSION);

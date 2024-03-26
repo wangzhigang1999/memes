@@ -93,18 +93,18 @@ public class SysConfigService {
         return true;
     }
 
+    /**
+     * 更新置顶投稿
+     * 置顶的投稿是在单独的集合中存储的，而对于投稿的修改是在另一个集合中，因此需要定时的更新置顶投稿的状态，如点赞等
+     */
     @Transactional
     public void updateTopSubmission() {
         Set<Submission> submission = sys.getTopSubmission();
         // find and replace
-        submission.forEach(s -> {
-            if (s == null)
-                return;
-
-            Submission byId = mongoTemplate.findById(s.getId(), Submission.class);
-            assert byId != null;
-            submission.remove(s);
-            submission.add(byId);
+        submission.forEach(oldFromTop -> {
+            Submission newFromDB = mongoTemplate.findById(oldFromTop.getId(), Submission.class);
+            submission.remove(oldFromTop);
+            submission.add(newFromDB);
         });
         sys.setTopSubmission(submission);
         mongoTemplate.save(sys);

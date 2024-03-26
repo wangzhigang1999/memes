@@ -9,7 +9,6 @@ public interface ISubGroup {
 
     SubmissionGroup addToGroup(String groupId, List<String> submissionIds);
 
-
     SubmissionGroup getById(String id);
 
 }

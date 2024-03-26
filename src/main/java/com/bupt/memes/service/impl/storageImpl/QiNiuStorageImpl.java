@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.UUID;
 
-
 @Service("qiniu")
 @ConditionalOnProperty(prefix = "storage", name = "type", havingValue = "qiniu")
 public class QiNiuStorageImpl implements Storage {
@@ -32,7 +31,6 @@ public class QiNiuStorageImpl implements Storage {
     @Value("${qiniu.urlPrefix}")
     String urlPrefix;
 
-
     static final UploadManager manager;
 
     static {
@@ -41,13 +39,12 @@ public class QiNiuStorageImpl implements Storage {
         manager = new UploadManager(cfg);
     }
 
-
     /**
      * 上传图片到七牛云
      *
      * @param bytes 图片字节数组
      * @param ext   图片后缀/扩展名
-     * @return 七牛云上的图片名=文件路径+文件名
+     * @return 七牛云上的图片名=文件路径 + 文件名
      */
     @SneakyThrows
     private String putImg(byte[] bytes, String ext) {
@@ -60,7 +57,6 @@ public class QiNiuStorageImpl implements Storage {
         DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
         return putRet.key;
     }
-
 
     @Override
     @SneakyThrows
