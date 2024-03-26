@@ -1,15 +1,22 @@
 package com.bupt.memes.service;
 
+import com.bupt.memes.model.common.LogDocument;
+import com.bupt.memes.model.media.News;
 import com.bupt.memes.model.media.Submission;
+import com.bupt.memes.model.rss.RSSItem;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.Interface.Storage;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.bupt.memes.util.TimeUtil.getCurrentHour;
 
@@ -30,6 +37,12 @@ public class Schedule {
     final ISubmission submission;
 
     final SysConfigService sysConfig;
+
+    final MongoTemplate mongoTemplate;
+
+    final MeterRegistry registry;
+
+    private final static Map<String, AtomicLong> map = new HashMap<>();
 
     /**
      * 每隔 30min 自动开启或关闭机器人
@@ -134,6 +147,28 @@ public class Schedule {
         logger.info("SyncTopStatus start.");
         sysConfig.updateTopSubmission();
         logger.info("SyncTopStatus done.");
+    }
+
+    @Scheduled(fixedRate = 1000 * 30)
+    private void scanDBStatus() {
+
+        long submissionCount = mongoTemplate.count(new Query(), "submission");
+        map.computeIfAbsent("submission.count",
+                _ -> registry.gauge("submission.count", new AtomicLong(submissionCount))).set(submissionCount);
+
+        long logCount = mongoTemplate.count(new Query(), LogDocument.class);
+        map.computeIfAbsent("log.count", _ -> registry.gauge("log.count", new AtomicLong(logCount))).set(logCount);
+
+        long rssCount = mongoTemplate.count(new Query(), RSSItem.class);
+        map.computeIfAbsent("rss.count", _ -> registry.gauge("rss.count", new AtomicLong(rssCount))).set(rssCount);
+
+        long newsCount = mongoTemplate.count(new Query(), News.class);
+        map.computeIfAbsent("news.count", _ -> registry.gauge("news.count", new AtomicLong(newsCount)))
+                .set(newsCount);
+
+        logger.info("ScanDBStatus done, submissionCount: {}, logCount: {}, rssCount: {}, newsCount: {}",
+                submissionCount, logCount, rssCount, newsCount);
+
     }
 
 }
