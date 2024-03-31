@@ -85,7 +85,6 @@ public class SubmissionServiceImpl implements ISubmission {
                 submission.setUrl(text);
                 break;
             case MARKDOWN:
-                // if the text is an url, then set the url
                 if (text.startsWith("http")) {
                     submission.setUrl(text);
                     submission.setName(text);
@@ -116,12 +115,10 @@ public class SubmissionServiceImpl implements ISubmission {
     @SneakyThrows
     public Submission storeStreamSubmission(InputStream stream, String mime) {
         byte[] bytes = stream.readAllBytes();
-
         int code = Arrays.hashCode(bytes);
 
         CountDownLatch latch = new CountDownLatch(2);
         CountDownLatch shortcut = new CountDownLatch(1);
-
         AtomicReference<Submission> uploaded = new AtomicReference<>();
         AtomicReference<Submission> inDB = new AtomicReference<>();
 
@@ -148,7 +145,6 @@ public class SubmissionServiceImpl implements ISubmission {
 
         // 数据库中没有，等待上传完成
         latch.await();
-
         if (uploaded.get() == null) {
             return null;
         }

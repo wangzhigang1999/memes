@@ -30,7 +30,7 @@ public class SubGroupImpl implements ISubGroup {
     public SubmissionGroup createGroup(List<String> submissionIds) {
         List<Submission> submissions = ensureSubmissionsExist(submissionIds);
         if (submissions.size() != submissionIds.size()) {
-            logger.warn("create image group failed, submissions not exist");
+            logger.error("create image group failed, submissions not exist");
             return null;
         }
         Optional<SubmissionGroup> group = SubmissionGroup.fromSubmission(submissions);

@@ -5,9 +5,9 @@ spring:
       uri: ${mongoUri}
 
 storage:
-  type: ${storage}
+  type: ${storage:local}
 
 local:
-  urlPrefix: ${urlPrefix}
+  urlPrefix: ${urlPrefix:"localhost:8080"}
 
-token: ${token}
+token: ${token:hello}

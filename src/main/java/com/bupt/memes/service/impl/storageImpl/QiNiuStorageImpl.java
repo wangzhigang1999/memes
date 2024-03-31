@@ -31,6 +31,8 @@ public class QiNiuStorageImpl implements Storage {
     @Value("${qiniu.urlPrefix}")
     String urlPrefix;
 
+    private final static String ossDirName = "shadiao/";
+
     static final UploadManager manager;
 
     static {
@@ -39,31 +41,11 @@ public class QiNiuStorageImpl implements Storage {
         manager = new UploadManager(cfg);
     }
 
-    /**
-     * 上传图片到七牛云
-     *
-     * @param bytes 图片字节数组
-     * @param ext   图片后缀/扩展名
-     * @return 七牛云上的图片名=文件路径 + 文件名
-     */
-    @SneakyThrows
-    private String putImg(byte[] bytes, String ext) {
-        Auth auth = Auth.create(accessKey, secretKey);
-        String upToken = auth.uploadToken(bucket);
-        String uuid = UUID.randomUUID().toString();
-        long timeMillis = System.currentTimeMillis();
-        var fileName = "shadiao/".concat(String.valueOf(timeMillis)).concat("-").concat(uuid).concat(".").concat(ext);
-        Response response = manager.put(bytes, fileName, upToken);
-        DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
-        return putRet.key;
-    }
-
     @Override
     @SneakyThrows
     public Submission store(byte[] bytes, String mime) {
         String type = mime.split("/")[1];
         String fileName = putImg(bytes, type.toLowerCase());
-
         var url = urlPrefix.concat(fileName);
         Submission submission = new Submission();
         submission.setUrl(url);
@@ -95,5 +77,24 @@ public class QiNiuStorageImpl implements Storage {
         }
         return nameStatusMap;
 
+    }
+
+    /**
+     * 上传图片到七牛云
+     *
+     * @param bytes 图片字节数组
+     * @param ext   图片后缀/扩展名
+     * @return 七牛云上的图片名 =文件路径 + 文件名
+     */
+    @SneakyThrows
+    private String putImg(byte[] bytes, String ext) {
+        Auth auth = Auth.create(accessKey, secretKey);
+        String uploadToken = auth.uploadToken(bucket);
+        String uuid = UUID.randomUUID().toString();
+        long timeMillis = System.currentTimeMillis();
+        var fileName = ossDirName.concat(String.valueOf(timeMillis)).concat("-").concat(uuid).concat(".").concat(ext);
+        Response response = manager.put(bytes, fileName, uploadToken);
+        DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
+        return putRet.key;
     }
 }

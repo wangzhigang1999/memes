@@ -4,6 +4,7 @@ import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Storage;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
@@ -20,18 +21,28 @@ import java.util.UUID;
 @ConditionalOnProperty(prefix = "storage", name = "type", havingValue = "local")
 public class LocalStorageImpl implements Storage {
 
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(LocalStorageImpl.class);
+
     static final String localDir = "memes-img";
+
+    /**
+     * 在配置文件中配置的 url 前缀
+     * 这个 url 会被拼接到文件名前面然后写入数据库
+     */
+    @Value("${local.urlPrefix}")
+    String urlPrefix;
 
     static {
         File file = new File(localDir);
         if (!file.exists()) {
             boolean mkdir = file.mkdir();
-            assert mkdir;
+            if (!mkdir) {
+                throw new RuntimeException("create local dir failed" + localDir);
+            } else {
+                logger.info("create local dir success");
+            }
         }
     }
-
-    @Value("${local.urlPrefix}")
-    String urlPrefix;
 
     @Override
     @SneakyThrows
@@ -42,6 +53,7 @@ public class LocalStorageImpl implements Storage {
         try {
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), new File(path));
         } catch (Exception e) {
+            logger.error("store file failed,mime:{}", mime, e);
             return null;
         }
         var url = urlPrefix + fileName;

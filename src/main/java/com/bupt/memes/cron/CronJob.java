@@ -1,4 +1,4 @@
-package com.bupt.memes.service;
+package com.bupt.memes.cron;
 
 import com.bupt.memes.model.Sys;
 import com.bupt.memes.model.common.LogDocument;
@@ -8,6 +8,7 @@ import com.bupt.memes.model.rss.RSSItem;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.Interface.Storage;
+import com.bupt.memes.service.SysConfigService;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -27,15 +28,15 @@ import static com.bupt.memes.util.TimeUtil.getCurrentHour;
 
 @Service
 @AllArgsConstructor
-public class Schedule {
+public class CronJob {
 
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(Schedule.class);
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(CronJob.class);
 
     final Review review;
 
     final Storage storage;
 
-    final ISubmission submission;
+    final ISubmission submissionService;
 
     final SysConfigService sysConfig;
 
@@ -47,6 +48,10 @@ public class Schedule {
 
     /**
      * 每隔 30min 自动开启或关闭机器人
+     * 逻辑如下：
+     * 1. 如果已审核通过的 meme 数量大于等于目标数量，直接关闭机器人
+     * 2. 如果审核通过的 meme 数量小于目标数量，且待审核的 meme 数量小于需要的 meme 数量的 1.5 倍，开启机器人
+     * 3. 如果当前时间在 21 点到 8 点之间，开启机器人
      */
     @Scheduled(fixedRate = 1000 * 1800)
     public void autobots() {
@@ -62,45 +67,25 @@ public class Schedule {
             logger.info("enable bot notMeetsMinReq: {}  currentHour: {}", notMeetsMinReq, currentHour);
             return;
         }
-        // 机器人关闭
         sysConfig.disableBot();
     }
 
     /**
-     * 通过 meme 的数量判断机器人是否应该开启
-     *
-     * @param passedNum  当前已审核通过的数量
-     * @param waitingNum 待审核的数量
-     * @param targetNum  目标数量
-     * @return 是否应该开启
-     */
-    public static boolean notMeetsMinReq(long passedNum, long waitingNum, int targetNum) {
-        // 如果当前已发布的数量大于目标数量，直接返回 false
-        if (passedNum >= targetNum) {
-            logger.info("bot should disable because of passedNum: {} more than targetNum: {}", passedNum, targetNum);
-            return false;
-        }
-        int needed = (int) (targetNum - passedNum);
-
-        // 审核的通过率大概是 2/3，所以需要的数量是 1.5 倍
-        boolean b = waitingNum < (needed * 1.5);
-        logger.info("bot should {} because of waitingNum: {} needed: {}", b ? "enable" : "disable", waitingNum, needed);
-        return b;
-    }
-
-    /**
-     * 每天一次，清理一次存储
+     * 每天一次，清理一次存储，删除已经删除的 submission
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void cleanDeletedSub() {
-        logger.info("clean submissions start.");
-        List<Submission> deletedSubmission = submission.getDeletedSubmission();
+        logger.info("cleanDeletedSub start.");
+        List<Submission> deletedSubmission = submissionService.getDeletedSubmission();
         Iterator<Submission> iterator = deletedSubmission.iterator();
+        logger.info("cleanDeletedSub, deletedSubmission size: {}", deletedSubmission.size());
+        // 删除 textFormat 的 submission
         while (iterator.hasNext()) {
             Submission next = iterator.next();
             if (next.textFormat()) {
-                submission.hardDeleteSubmission(next.getId());
+                submissionService.hardDeleteSubmission(next.getId());
                 iterator.remove();
+                logger.info("clean textFormat submission, id: {}", next.getId());
             }
         }
 
@@ -108,8 +93,6 @@ public class Schedule {
             logger.info("clean submissions done, no images to be deleted from storage.");
             return;
         }
-
-        logger.info("clean images start, {} images to be deleted from storage.", deletedSubmission.size());
 
         List<String> keyList = new ArrayList<>();
         Map<String, String> nameIdMap = new HashMap<>();
@@ -122,29 +105,33 @@ public class Schedule {
         var nameStatusMap = storage.delete(array);
 
         if (nameStatusMap == null) {
-            logger.error("clean images failed,because of storage error.");
+            logger.error("clean images task failed,because of storage error.");
             return;
         }
 
-        nameStatusMap.forEach((objName, status) -> {
-            if (status) {
-                submission.hardDeleteSubmission(nameIdMap.get(objName));
+        nameStatusMap.forEach((objName, success) -> {
+            if (success) {
+                submissionService.hardDeleteSubmission(nameIdMap.get(objName));
+                logger.info("clean image done, name: {}", objName);
+            } else {
+                logger.error("clean image failed, name: {}", objName);
             }
         });
-        logger.info("clean  done, {} images deleted from storage.",
-                nameStatusMap.entrySet().stream().filter(Map.Entry::getValue).count());
+
     }
 
     @Scheduled(fixedRate = 1000 * 60)
     public void syncSys() {
+        logger.debug("Periodic sync sys done.");
         SysConfigService.setSys(mongoTemplate.findById("sys", Sys.class));
-        logger.info("Periodic sync sys done.");
-
         sysConfig.updateTopSubmission();
-        logger.info("Periodic sync top submission done.");
+        logger.debug("Periodic sync top submission done.");
     }
 
-    @Scheduled(fixedRate = 1000 * 30)
+    /**
+     * 每隔 5min 扫描一次数据库状态，用于监控
+     */
+    @Scheduled(fixedRate = 1000 * 60 * 5)
     private void scanDBStatus() {
 
         long submissionCount = mongoTemplate.count(new Query(), "submission");
@@ -163,6 +150,15 @@ public class Schedule {
         logger.info("ScanDBStatus done, submissionCount: {}, logCount: {}, rssCount: {}, newsCount: {}",
                 submissionCount, logCount, rssCount, newsCount);
 
+    }
+
+    private static boolean notMeetsMinReq(long passedNum, long waitingNum, int targetNum) {
+        if (passedNum >= targetNum) {
+            return false;
+        }
+        int needed = (int) (targetNum - passedNum);
+        // 审核的通过率大概是 2/3，所以需要的数量是 1.5 倍
+        return waitingNum < (needed * 1.5);
     }
 
 }
