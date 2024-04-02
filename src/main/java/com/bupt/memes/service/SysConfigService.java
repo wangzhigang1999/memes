@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class SysConfigService {
         return sys.getBotUp();
     }
 
-    public static void setSys(Sys sys) {
+    public synchronized static void setSys(Sys sys) {
         SysConfigService.sys = sys;
     }
 
@@ -37,7 +38,7 @@ public class SysConfigService {
      * 最后保存回 mongo
      * 如果有多个实例启动，会导致多次初始化，但是不会有问题，因为只有不存在的时候才会写入默认值，而且多个实例写入的默认值是一样的
      */
-    private void init() {
+    private synchronized void init() {
         sys = mongoTemplate.findById("sys", Sys.class);
         if (sys == null) {
             sys = new Sys();
@@ -50,7 +51,7 @@ public class SysConfigService {
         mongoTemplate.save(sys);
     }
 
-    public Boolean disableBot() {
+    public synchronized Boolean disableBot() {
         if (!sys.getBotUp()) {
             return true;
         }
@@ -59,7 +60,7 @@ public class SysConfigService {
         return !target.getBotUp();
     }
 
-    public Boolean enableBot() {
+    public synchronized Boolean enableBot() {
         if (sys.getBotUp()) {
             return true;
         }
@@ -68,7 +69,7 @@ public class SysConfigService {
         return target.getBotUp();
     }
 
-    public boolean addTop(String id) {
+    public synchronized boolean addTop(String id) {
         Submission submission = mongoTemplate.findById(id, Submission.class);
         if (submission == null) {
             return false;
@@ -78,13 +79,13 @@ public class SysConfigService {
         return true;
     }
 
-    public boolean removeTop(String id) {
+    public synchronized boolean removeTop(String id) {
         sys.getTopSubmission().removeIf(s -> Objects.equals(s.getId(), id));
         Sys save = mongoTemplate.save(sys);
         return save.getTopSubmission().stream().noneMatch(s -> Objects.equals(s.getId(), id));
     }
 
-    public boolean setMinSubmissions(int minSubmissions) {
+    public synchronized boolean setMinSubmissions(int minSubmissions) {
         if (minSubmissions < 0) {
             return false;
         }
@@ -98,15 +99,14 @@ public class SysConfigService {
      * 置顶的投稿是在单独的集合中存储的，而对于投稿的修改是在另一个集合中，因此需要定时的更新置顶投稿的状态，如点赞等
      */
     @Transactional
-    public void updateTopSubmission() {
-        Set<Submission> submission = sys.getTopSubmission();
-        // find and replace
-        submission.forEach(oldFromTop -> {
+    public synchronized void updateTopSubmission() {
+        Set<Submission> oldSubmission = sys.getTopSubmission();
+        Set<Submission> newSubmission = new HashSet<>();
+        oldSubmission.forEach(oldFromTop -> {
             Submission newFromDB = mongoTemplate.findById(oldFromTop.getId(), Submission.class);
-            submission.remove(oldFromTop);
-            submission.add(newFromDB);
+            newSubmission.add(newFromDB);
         });
-        sys.setTopSubmission(submission);
+        sys.setTopSubmission(newSubmission);
         mongoTemplate.save(sys);
     }
 
