@@ -24,10 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.bupt.memes.model.common.SubmissionCollection.*;
 
@@ -117,38 +115,23 @@ public class SubmissionServiceImpl implements ISubmission {
         byte[] bytes = stream.readAllBytes();
         int code = Arrays.hashCode(bytes);
 
-        CountDownLatch latch = new CountDownLatch(2);
-        CountDownLatch shortcut = new CountDownLatch(1);
-        AtomicReference<Submission> uploaded = new AtomicReference<>();
-        AtomicReference<Submission> inDB = new AtomicReference<>();
-
-        // async store; 开启一个协程直接上传
-        executor.submit(() -> {
-            Submission store = storage.store(bytes, mime);
-            uploaded.set(store);
-            latch.countDown();
-        });
-
-        // async query; 开启一个协程直接查询
-        executor.submit(() -> {
-            var submission = getSubmission(code);
-            inDB.set(submission);
-            latch.countDown();
-            shortcut.countDown();
-        });
-
-        // 短路一下，如果数据库中先查到了，就直接返回
-        shortcut.await();
-        if (inDB.get() != null) {
-            return inDB.get();
+        CompletableFuture<Submission> store = CompletableFuture.supplyAsync(() -> storage.store(bytes, mime), executor);
+        CompletableFuture<Submission> query = CompletableFuture.supplyAsync(() -> getSubmission(code), executor);
+        /*
+         * 从经验来看，queryFuture.get() 会比较快，所以先尝试从数据库中查询
+         * 如果查询到了，直接返回
+         */
+        Submission submission = query.get();
+        if (submission != null) {
+            store.cancel(true);
+            logger.info("get submission from db,cancel upload. hash: {}", code);
+            return submission;
         }
-
-        // 数据库中没有，等待上传完成
-        latch.await();
-        if (uploaded.get() == null) {
-            return null;
-        }
-        var submission = uploaded.get().setHash(code);
+        /*
+         * 如果没有查询到，那么就存储
+         */
+        submission = store.get();
+        submission.setHash(code);
         return insertSubmission(submission);
     }
 
