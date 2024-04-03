@@ -3,6 +3,8 @@ package com.bupt.memes.service.impl;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Review;
 import lombok.AllArgsConstructor;
+
+import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -26,6 +28,8 @@ import static com.bupt.memes.util.TimeUtil.getTodayStartUnixEpochMilli;
 public class ReviewServiceImpl implements Review {
 
     final MongoTemplate template;
+
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(ReviewServiceImpl.class);
 
     /**
      * 获取今天的所有没有审核的投稿
@@ -137,12 +141,14 @@ public class ReviewServiceImpl implements Review {
      * @return 是否成功
      */
     @Transactional(rollbackFor = Exception.class)
-    @SuppressWarnings("null")
     public boolean reviewSubmission(String id, boolean passed) {
         var query = new Query(Criteria.where("id").is(id));
         // 当一个投稿被审核通过或者不通过的时候，就从等待审核的表中删除，然后插入到对应的表中
         var one = template.findAndRemove(query, Submission.class, WAITING_SUBMISSION);
-        assert one != null;
+        if (one == null) {
+            logger.error("Submission with id {} not found but tried to review:{}", id, passed);
+            return false;
+        }
         template.save(one, passed ? SUBMISSION : DELETED_SUBMISSION);
         return true;
     }

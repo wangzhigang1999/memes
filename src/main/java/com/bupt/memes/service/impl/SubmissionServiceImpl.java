@@ -160,7 +160,7 @@ public class SubmissionServiceImpl implements ISubmission {
      */
     @Override
     public PageResult<Submission> getSubmissionByPage(int pageSize, String lastID) {
-        logger.info("get submission from db, lastID: {}", Objects.equals(lastID, "") ? "null" : lastID);
+        logger.debug("get submission from db, lastID: {}", Objects.equals(lastID, "") ? "null" : lastID);
         return mongoPageHelper.pageQuery(new Query(), Submission.class, pageSize, lastID);
     }
 

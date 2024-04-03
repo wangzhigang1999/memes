@@ -147,7 +147,7 @@ public class CronJob {
         long newsCount = mongoTemplate.count(new Query(), News.class);
         map.computeIfAbsent("news.count", _ -> registry.gauge("news.count", new AtomicLong(newsCount))).set(newsCount);
 
-        logger.info("ScanDBStatus done, submissionCount: {}, logCount: {}, rssCount: {}, newsCount: {}",
+        logger.debug("ScanDBStatus done, submissionCount: {}, logCount: {}, rssCount: {}, newsCount: {}",
                 submissionCount, logCount, rssCount, newsCount);
 
     }
