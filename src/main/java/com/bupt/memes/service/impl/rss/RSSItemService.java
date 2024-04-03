@@ -59,12 +59,9 @@ public class RSSItemService {
         for (String field : ignoreFields) {
             query.fields().exclude(field);
         }
-
         // sort by date
         query.with(Sort.by(Sort.Direction.DESC, "pubDate"));
-
         query.limit(50);
-        template.getDb().getCollection("rssitem").createIndex(new org.bson.Document("title", "text"));
         return template.find(query, RSSItem.class);
     }
 
