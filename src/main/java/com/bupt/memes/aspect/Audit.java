@@ -42,7 +42,9 @@ public class Audit {
 
     public final static ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
-    public final static String instanceUUID = UUID.randomUUID().toString();
+    // 用于标识当前实例
+    public final static String instanceUUID = "MEMES-" + System.currentTimeMillis() + "-"
+            + UUID.randomUUID().toString().substring(0, 8);
 
     @Value("${spring.data.mongodb.database}")
     public String database;
