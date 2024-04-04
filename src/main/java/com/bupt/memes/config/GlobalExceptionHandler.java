@@ -5,10 +5,10 @@ import com.bupt.memes.model.common.ReturnCode;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -18,21 +18,43 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = NullPointerException.class)
     @ResponseBody
     public ResultData<?> exceptionHandler(HttpServletRequest request, NullPointerException e) {
-        logger.error("发生空指针异常！原因是:", e);
+        String requestUrl = request.getRequestURL().toString();
+        logger.error("请求地址：" + requestUrl + "发生空指针异常！原因是：", e);
         return ResultData.fail(ReturnCode.RC500);
     }
 
-    /**
-     * 处理其他异常
-     *
-     * @param request
-     * @param e
-     * @return
-     */
+    // IllegalArgumentException
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    @ResponseBody
+    public ResultData<?> exceptionHandler(HttpServletRequest request, IllegalArgumentException e) {
+        String requestUrl = request.getRequestURL().toString();
+        logger.error("请求地址：" + requestUrl + "发生非法参数异常！原因是：", e);
+        return ResultData.fail(ReturnCode.RC500);
+    }
+
+    // ClassCastException
+    @ExceptionHandler(value = ClassCastException.class)
+    @ResponseBody
+    public ResultData<?> exceptionHandler(HttpServletRequest request, ClassCastException e) {
+        String requestUrl = request.getRequestURL().toString();
+        logger.error("请求地址：" + requestUrl + "发生类型转换异常！原因是：", e);
+        return ResultData.fail(ReturnCode.RC500);
+    }
+
+    // HttpMediaTypeNotAcceptableException
+    @ExceptionHandler(value = HttpMediaTypeNotAcceptableException.class)
+    @ResponseBody
+    public ResultData<?> exceptionHandler(HttpServletRequest request, HttpMediaTypeNotAcceptableException e) {
+        String requestUrl = request.getRequestURL().toString();
+        logger.error("请求地址：" + requestUrl + "发生媒体类型不可接受异常！原因是：", e);
+        return ResultData.fail(ReturnCode.RC500);
+    }
+
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public ResultData exceptionHandler(HttpServletRequest request, Exception e) {
-        logger.error("未知异常！原因是:", e);
+    public ResultData<?> exceptionHandler(HttpServletRequest request, Exception e) {
+        String requestUrl = request.getRequestURL().toString();
+        logger.error("请求地址：" + requestUrl + "发生异常！原因是：", e);
         return ResultData.fail(ReturnCode.RC500);
     }
 }
