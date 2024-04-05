@@ -7,11 +7,14 @@ import io.pyroscope.javaagent.config.Config;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
 @Lazy(false)
+@ConditionalOnProperty(value = "perf.enable", havingValue = "true", matchIfMissing = false)
 public class Profile {
 
     @Value("${perf.url}")

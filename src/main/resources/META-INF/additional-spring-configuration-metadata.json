@@ -6,9 +6,14 @@
       "description": "The type of storage used by the application."
     },
     {
+      "name": "perf.enable",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable perf"
+    },
+    {
       "name": "perf.url",
       "type": "java.lang.String",
-      "description": "Description for perf.url."
+      "description": "url of grafana perf"
     },
     {
       "name": "perf.username",

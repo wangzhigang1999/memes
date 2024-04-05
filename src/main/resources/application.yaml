@@ -21,6 +21,7 @@ server:
   port: 8080
 
 perf:
+  enabled: false
   url: ${perfUrl}
   username: ${perfUsername}
   password: ${perfPassword}
