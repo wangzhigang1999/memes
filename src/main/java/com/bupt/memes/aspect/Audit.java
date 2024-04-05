@@ -10,13 +10,16 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,7 +43,9 @@ public class Audit {
      */
     public final static ThreadLocal<String> threadLocalUUID = ThreadLocal.withInitial(() -> "anonymous");
 
-    public final static ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
+    public final static ExecutorService virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();
+
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(Audit.class);
 
     // 用于标识当前实例
     public final static String instanceUUID = "MEMES-" + System.currentTimeMillis() + "-"
@@ -93,24 +98,28 @@ public class Audit {
      * 异步记录日志和监控打点
      */
     private void asyncAudit(final HttpServletRequest request, String classMethod, String uuid, long start, long end) {
-        VIRTUAL_EXECUTOR.submit(() -> timerMap
+        virtualExecutor.submit(() -> timerMap
                 .computeIfAbsent(classMethod, this::getRequestTimer)
                 .record(end - start, TimeUnit.MILLISECONDS));
-        VIRTUAL_EXECUTOR.submit(() -> audit(request, uuid, start, end));
+        virtualExecutor.submit(() -> audit(request, uuid, start, end));
     }
 
     private void audit(HttpServletRequest request, String uuid, long start, long end) {
-        String method = request.getMethod();
-        String url = request.getRequestURL().toString();
-        LogDocument document = new LogDocument();
-        document.setUrl(url)
-                .setMethod(method)
-                .setParameterMap(request.getParameterMap())
-                .setUuid((uuid == null || uuid.isEmpty()) ? "anonymous" : uuid)
-                .setTimecost(end - start)
-                .setTimestamp(start)
-                .setInstanceUUID(instanceUUID);
-        template.save(document);
+        try {
+            String method = request.getMethod();
+            String url = request.getRequestURL().toString();
+            LogDocument document = new LogDocument();
+            document.setUrl(url)
+                    .setMethod(method)
+                    .setParameterMap(request.getParameterMap())
+                    .setUuid(uuid)
+                    .setTimecost(end - start)
+                    .setTimestamp(start)
+                    .setInstanceUUID(instanceUUID);
+            template.save(document);
+        } catch (Exception e) {
+            logger.error("audit error", e);
+        }
     }
 
     private Timer getRequestTimer(String classMethod) {

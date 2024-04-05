@@ -20,8 +20,7 @@ import java.util.Base64;
 import java.util.UUID;
 
 /**
- * @author wangz
- *         用来做权限校验，有一些接口只有管理员才能访问
+ * 用来做权限校验，有一些接口只有管理员才能访问
  */
 @Component
 @Aspect

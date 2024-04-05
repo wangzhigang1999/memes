@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+/**
+ * Pyroscope 的简单接入，可以将 perf 数据上报至 Pyroscope，在 Grafana 中展示
+ */
 @Component
 @Lazy(false)
 @ConditionalOnProperty(value = "perf.enable", havingValue = "true", matchIfMissing = false)
