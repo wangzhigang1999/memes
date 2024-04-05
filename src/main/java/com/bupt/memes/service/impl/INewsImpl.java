@@ -5,17 +5,21 @@ import com.bupt.memes.model.media.News;
 import com.bupt.memes.service.Interface.INews;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
+import com.bupt.memes.util.AsyncUploader;
 import lombok.SneakyThrows;
+import org.slf4j.Logger;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static com.bupt.memes.util.TimeUtil.getYMD;
 
@@ -23,9 +27,10 @@ import static com.bupt.memes.util.TimeUtil.getYMD;
 public class INewsImpl implements INews {
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
-
     final Storage storage;
     final ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
+
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(INewsImpl.class);
 
     public INewsImpl(MongoTemplate mongoTemplate, MongoPageHelper mongoPageHelper, Storage storage) {
         this.mongoTemplate = mongoTemplate;
@@ -39,8 +44,9 @@ public class INewsImpl implements INews {
         /*
          * 异步上传图片，返回图片 url
          */
-        Future<String> future = pool.submit(new AsyncUpload(coverImage));
-        if (news.getTitle() == null || news.getContent() == null || news.getSourceURL() == null) {
+        Future<String> future = pool.submit(new AsyncUploader(coverImage, storage));
+        if (!news.validate()) {
+            logger.warn("add news failed, news invalid, news: {}", news);
             return null;
         }
         if (news.getDate() == null) {
@@ -48,6 +54,10 @@ public class INewsImpl implements INews {
         }
         news.setTimestamp(System.currentTimeMillis());
         String url = future.get(10, TimeUnit.SECONDS);
+        if (url.isEmpty()) {
+            logger.warn("add news failed, upload image failed, news: {}", news);
+            return null;
+        }
         news.setCoverImage(url);
         return mongoTemplate.insert(news);
     }
@@ -80,7 +90,6 @@ public class INewsImpl implements INews {
         return mongoTemplate.save(news);
     }
 
-    @SuppressWarnings("null")
     @Override
     public News findById(String id) {
         News news = mongoTemplate.findById(id, News.class);
@@ -92,7 +101,7 @@ public class INewsImpl implements INews {
 
     @Override
     public List<News> findByDate(String date) {
-        // if empty then set to today
+        // if empty, then set to today
         if (date == null || date.isEmpty()) {
             date = getYMD();
         }
@@ -122,6 +131,7 @@ public class INewsImpl implements INews {
     public boolean deleteNews(String id) {
         News news = findById(id);
         if (news == null) {
+            logger.warn("delete news failed, news not found, id: {}", id);
             return false;
         }
         // logic delete
@@ -137,34 +147,20 @@ public class INewsImpl implements INews {
         if (!hasContent) {
             query.fields().exclude("content");
         }
+        query.addCriteria(Criteria.where("deleted").is(false));
         return mongoPageHelper.pageQuery(query, News.class, pageSize, lastID);
     }
 
     @Override
-    @SuppressWarnings("null")
     public PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageSize, String lastID) {
         Query query = new Query();
         if (!hasContent) {
             query.fields().exclude("content");
+            query.addCriteria(Criteria.where("deleted").is(false));
         }
         // tag query, the result must contain all tags
         query.addCriteria(Criteria.where("tag").all(tags));
         return mongoPageHelper.pageQuery(query, News.class, pageSize, lastID);
     }
 
-    class AsyncUpload implements Callable<String> {
-        final MultipartFile file;
-
-        public AsyncUpload(MultipartFile file) {
-            this.file = file;
-        }
-
-        @Override
-        public String call() throws IOException {
-            if (file == null) {
-                return "";
-            }
-            return storage.store(file.getBytes(), file.getContentType()).getUrl();
-        }
-    }
 }

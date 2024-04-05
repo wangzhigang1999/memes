@@ -31,6 +31,10 @@ public class News {
     private int dislike;
     private boolean deleted;
 
+    public boolean validate() {
+        return title != null && content != null && sourceURL != null;
+    }
+
     public static News fromJson(String data) {
         return new Gson().fromJson(data, News.class);
     }

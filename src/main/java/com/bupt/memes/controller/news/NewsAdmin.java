@@ -23,4 +23,10 @@ public class NewsAdmin {
         return ResultData.success(iNews.addNews(news, coverImage));
     }
 
+    @DeleteMapping("/{id}")
+    @AuthRequired
+    public Boolean deleteNews(@PathVariable String id) {
+        return iNews.deleteNews(id);
+    }
+
 }

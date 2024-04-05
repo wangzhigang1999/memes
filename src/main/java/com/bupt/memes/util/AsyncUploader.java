@@ -7,8 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-public record AsyncUpload(MultipartFile file, Storage storage) implements Callable<String> {
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(AsyncUpload.class);
+public record AsyncUploader(MultipartFile file, Storage storage) implements Callable<String> {
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(AsyncUploader.class);
 
     @Override
     public String call() {
