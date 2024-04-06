@@ -5,7 +5,6 @@ import com.mongodb.client.MongoClient;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
-import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,16 +13,13 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * 记录请求日志
@@ -43,7 +39,7 @@ public class Audit {
      */
     public final static ThreadLocal<String> threadLocalUUID = ThreadLocal.withInitial(() -> "anonymous");
 
-    public final static ExecutorService virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();
+    public final static ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(Audit.class);
 
@@ -72,10 +68,12 @@ public class Audit {
     @Around(value = "controller()")
     public Object audit(ProceedingJoinPoint joinPoint) throws Throwable {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        @SuppressWarnings("null")
-        var request = attributes.getRequest();
+        var request = Objects.requireNonNull(attributes).getRequest();
         var uuid = request.getHeader("uuid");
         var classMethod = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
+        var url = request.getRequestURL().toString();
+        var method = request.getMethod();
+        var parameterMap = request.getParameterMap();
 
         if (uuid == null || uuid.isEmpty()) {
             uuid = "anonymous";
@@ -90,28 +88,18 @@ public class Audit {
         long end = System.currentTimeMillis();
         threadLocalUUID.remove();
 
-        asyncAudit(request, classMethod, uuid, start, end);
+        String finalUuid = uuid;
+        CompletableFuture.runAsync(() -> audit(classMethod, url, method, finalUuid, start, end, parameterMap), pool);
         return proceed;
     }
 
-    /**
-     * 异步记录日志和监控打点
-     */
-    private void asyncAudit(final HttpServletRequest request, String classMethod, String uuid, long start, long end) {
-        virtualExecutor.submit(() -> timerMap
-                .computeIfAbsent(classMethod, this::getRequestTimer)
-                .record(end - start, TimeUnit.MILLISECONDS));
-        virtualExecutor.submit(() -> audit(request, uuid, start, end));
-    }
-
-    private void audit(HttpServletRequest request, String uuid, long start, long end) {
+    private void audit(String classMethod, String url, String method, String uuid, long start, long end,
+            Map<String, String[]> map) {
         try {
-            String method = request.getMethod();
-            String url = request.getRequestURL().toString();
             LogDocument document = new LogDocument();
             document.setUrl(url)
                     .setMethod(method)
-                    .setParameterMap(request.getParameterMap())
+                    .setParameterMap(map)
                     .setUuid(uuid)
                     .setTimecost(end - start)
                     .setTimestamp(start)
@@ -119,13 +107,12 @@ public class Audit {
             template.save(document);
         } catch (Exception e) {
             logger.error("audit error", e);
+        } finally {
+            timerMap.computeIfAbsent(classMethod, _ -> Timer.builder("http_request_time")
+                    .description("http request time")
+                    .tags(Tags.of("class_method", classMethod))
+                    .register(registry))
+                    .record(end - start, TimeUnit.MILLISECONDS);
         }
-    }
-
-    private Timer getRequestTimer(String classMethod) {
-        return Timer.builder("http_request_time")
-                .description("http request time")
-                .tags(Tags.of("class_method", classMethod))
-                .register(registry);
     }
 }
