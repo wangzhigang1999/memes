@@ -1,5 +1,6 @@
 package com.bupt.memes.service.impl.storageImpl;
 
+import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Storage;
 import lombok.SneakyThrows;
@@ -46,8 +47,8 @@ public class LocalStorageImpl implements Storage {
 
     @Override
     @SneakyThrows
-    public Submission store(byte[] bytes, String mime) {
-        String type = mime.split("/")[1];
+    public FileUploadResult store(byte[] bytes, String mime) {
+        String type = getExtension(mime);
         String fileName = System.currentTimeMillis() + "-" + UUID.randomUUID() + "." + type;
         var path = localDir + "/" + fileName;
         try {
@@ -57,11 +58,7 @@ public class LocalStorageImpl implements Storage {
             return null;
         }
         var url = urlPrefix + fileName;
-        Submission submission = new Submission();
-        submission.setUrl(url);
-        submission.setName(fileName);
-        submission.setSubmissionType(mime);
-        return submission;
+        return new FileUploadResult(url, fileName, type);
     }
 
     @Override

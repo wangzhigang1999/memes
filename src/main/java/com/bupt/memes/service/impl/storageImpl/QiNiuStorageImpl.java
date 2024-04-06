@@ -1,6 +1,6 @@
 package com.bupt.memes.service.impl.storageImpl;
 
-import com.bupt.memes.model.media.Submission;
+import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.service.Interface.Storage;
 import com.google.gson.Gson;
 import com.qiniu.http.Response;
@@ -11,6 +11,7 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.BatchStatus;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,9 +32,12 @@ public class QiNiuStorageImpl implements Storage {
     @Value("${qiniu.urlPrefix}")
     String urlPrefix;
 
-    private final static String ossDirName = "shadiao/";
+    @Value("${qiniu.dirName}")
+    String ossDirName = "shadiao";
 
     static final UploadManager manager;
+
+    final static Gson gson = new Gson();
 
     static {
         Configuration cfg = new Configuration(Region.autoRegion());
@@ -41,17 +45,23 @@ public class QiNiuStorageImpl implements Storage {
         manager = new UploadManager(cfg);
     }
 
+    @PostConstruct
+    void init() {
+        if (!ossDirName.endsWith("/")) {
+            ossDirName = ossDirName.concat("/");
+        }
+    }
+
     @Override
     @SneakyThrows
-    public Submission store(byte[] bytes, String mime) {
-        String type = mime.split("/")[1];
-        String fileName = putImg(bytes, type.toLowerCase());
+    public FileUploadResult store(byte[] bytes, String mime) {
+        String type = getExtension(mime);
+        String fileName = putImg(bytes, type);
+        if (fileName == null) {
+            return null;
+        }
         var url = urlPrefix.concat(fileName);
-        Submission submission = new Submission();
-        submission.setUrl(url);
-        submission.setName(fileName);
-        submission.setSubmissionType(mime);
-        return submission;
+        return new FileUploadResult(url, fileName, mime);
     }
 
     @Override
@@ -92,9 +102,10 @@ public class QiNiuStorageImpl implements Storage {
         String uploadToken = auth.uploadToken(bucket);
         String uuid = UUID.randomUUID().toString();
         long timeMillis = System.currentTimeMillis();
+        // timestamp-uuid.ext, time is used to sort the images
         var fileName = ossDirName.concat(String.valueOf(timeMillis)).concat("-").concat(uuid).concat(".").concat(ext);
         Response response = manager.put(bytes, fileName, uploadToken);
-        DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
+        DefaultPutRet putRet = gson.fromJson(response.bodyString(), DefaultPutRet.class);
         return putRet.key;
     }
 }

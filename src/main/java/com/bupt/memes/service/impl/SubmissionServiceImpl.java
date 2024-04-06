@@ -1,6 +1,7 @@
 package com.bupt.memes.service.impl;
 
 import com.bupt.memes.aspect.Audit;
+import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
@@ -115,7 +116,7 @@ public class SubmissionServiceImpl implements ISubmission {
         byte[] bytes = stream.readAllBytes();
         int code = Arrays.hashCode(bytes);
 
-        CompletableFuture<Submission> store = CompletableFuture.supplyAsync(() -> storage.store(bytes, mime), executor);
+        CompletableFuture<FileUploadResult> upload = CompletableFuture.supplyAsync(() -> storage.store(bytes, mime), executor);
         CompletableFuture<Submission> query = CompletableFuture.supplyAsync(() -> getSubmission(code), executor);
         /*
          * 从经验来看，queryFuture.get() 会比较快，所以先尝试从数据库中查询
@@ -123,15 +124,22 @@ public class SubmissionServiceImpl implements ISubmission {
          */
         Submission submission = query.get();
         if (submission != null) {
-            store.cancel(true);
+            upload.cancel(true);
             logger.info("get submission from db,cancel upload. hash: {}", code);
             return submission;
         }
         /*
-         * 如果没有查询到，那么就存储
+         * 如果没有查询到，那么等待存储结果
          */
-        submission = store.get();
+        FileUploadResult result = upload.get();
+        if (result == null) {
+            return null;
+        }
+        submission = new Submission();
         submission.setHash(code);
+        submission.setSubmissionType(mime);
+        submission.setUrl(result.url());
+        submission.setName(result.fileName());
         return insertSubmission(submission);
     }
 
@@ -206,7 +214,7 @@ public class SubmissionServiceImpl implements ISubmission {
     }
 
     @SneakyThrows
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     private Submission getSubmission(Integer hash) {
         CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
                 .map(collection -> CompletableFuture

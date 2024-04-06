@@ -1,16 +1,18 @@
 package com.bupt.memes.service.impl;
 
+import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.media.News;
 import com.bupt.memes.service.Interface.INews;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
-import com.bupt.memes.util.AsyncUploader;
+import com.bupt.memes.util.FileUploader;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,8 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import static com.bupt.memes.util.TimeUtil.getYMD;
 
@@ -28,7 +28,6 @@ public class INewsImpl implements INews {
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
     final Storage storage;
-    final ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(INewsImpl.class);
 
@@ -40,11 +39,15 @@ public class INewsImpl implements INews {
 
     @Override
     @SneakyThrows
-    public News addNews(News news, MultipartFile coverImage) {
-        /*
-         * 异步上传图片，返回图片 url
-         */
-        Future<String> future = pool.submit(new AsyncUploader(coverImage, storage));
+    public News addNews(News news, @Nullable MultipartFile coverImage) {
+        if (coverImage != null) {
+            /*
+             * 上传封面图片，封面图片并不是必须的
+             * 如果没有上传封面图片，则使用默认的封面图片或者 news 对象中的封面图片
+             */
+            FileUploadResult coverImg = new FileUploader(coverImage, storage).upload();
+            news.setCoverImage(coverImg.url());
+        }
         if (!news.validate()) {
             logger.warn("add news failed, news invalid, news: {}", news);
             return null;
@@ -53,12 +56,6 @@ public class INewsImpl implements INews {
             news.setDate(getYMD());
         }
         news.setTimestamp(System.currentTimeMillis());
-        String url = future.get(10, TimeUnit.SECONDS);
-        if (url.isEmpty()) {
-            logger.warn("add news failed, upload image failed, news: {}", news);
-            return null;
-        }
-        news.setCoverImage(url);
         return mongoTemplate.insert(news);
     }
 
