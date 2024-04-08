@@ -36,6 +36,10 @@ public enum ReturnCode {
      * access_denied
      **/
     RC403(403, "无访问权限，请联系管理员授予权限"),
+
+    // 405
+    RC405(405, "请求方法不支持"),
+
     /**
      * access_denied
      **/

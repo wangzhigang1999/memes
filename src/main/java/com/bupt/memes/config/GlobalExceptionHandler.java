@@ -1,14 +1,17 @@
 package com.bupt.memes.config;
 
-import com.bupt.memes.model.common.ResultData;
-import com.bupt.memes.model.common.ReturnCode;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.common.ReturnCode;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -56,5 +59,11 @@ public class GlobalExceptionHandler {
         String requestUrl = request.getRequestURL().toString();
         logger.error("请求地址：" + requestUrl + "发生异常！原因是：", e);
         return ResultData.fail(ReturnCode.RC500);
+    }
+
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    @ResponseBody
+    public ResultData<?> exceptionHandler(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
+        return ResultData.fail(ReturnCode.RC405);
     }
 }
