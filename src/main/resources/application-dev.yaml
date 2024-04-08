@@ -11,3 +11,9 @@ local:
   urlPrefix: ${urlPrefix:"localhost:8080"}
 
 token: ${token:hello}
+
+management:
+  influx:
+    metrics:
+      export:
+        enabled: false

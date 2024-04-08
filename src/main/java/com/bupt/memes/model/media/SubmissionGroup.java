@@ -50,8 +50,8 @@ public class SubmissionGroup extends Submission {
 
     /**
      * 从多个投稿构建一个投稿组
-     * 
-     * @param submissions 投稿列表
+     *
+     * @param submissions 投稿列表，不能为空
      * @return 投稿组
      */
     public static Optional<SubmissionGroup> fromSubmission(List<Submission> submissions) {

@@ -1,6 +1,9 @@
 package com.bupt.memes.controller.submission;
 
 import com.bupt.memes.anno.AuthRequired;
+import com.bupt.memes.model.common.ResultData;
+import com.bupt.memes.model.common.ReturnCode;
+import com.bupt.memes.model.media.SubmissionGroup;
 import com.bupt.memes.service.Interface.ISubGroup;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +29,11 @@ public class SubGroup {
     @PostMapping("/{id}")
     @AuthRequired
     public Object update(@PathVariable("id") String id, @RequestBody List<String> submissionIds) {
-        return subGroup.addToGroup(id, submissionIds);
+        SubmissionGroup submissionGroup = subGroup.addToGroup(id, submissionIds);
+        if (submissionGroup == null) {
+            ResultData.fail(ReturnCode.RC400);
+        }
+        return submissionGroup;
     }
 
     // get

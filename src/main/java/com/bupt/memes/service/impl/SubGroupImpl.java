@@ -2,6 +2,7 @@ package com.bupt.memes.service.impl;
 
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.model.media.SubmissionGroup;
+import com.bupt.memes.model.media.SubmissionType;
 import com.bupt.memes.service.Interface.ISubGroup;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class SubGroupImpl implements ISubGroup {
     public SubmissionGroup createGroup(List<String> submissionIds) {
         List<Submission> submissions = ensureSubmissionsExist(submissionIds);
         if (submissions.size() != submissionIds.size()) {
-            logger.error("create image group failed, submissions not exist");
+            logger.error("create image group failed,some submissions not exist");
             return null;
         }
         Optional<SubmissionGroup> group = SubmissionGroup.fromSubmission(submissions);
@@ -47,10 +48,17 @@ public class SubGroupImpl implements ISubGroup {
     public SubmissionGroup addToGroup(String groupId, List<String> submissionIds) {
         SubmissionGroup submissionGroup = getById(groupId);
         if (submissionGroup == null) {
+            logger.error("add image to group failed, group:{} not exist", groupId);
             return null;
         }
         List<Submission> submissions = ensureSubmissionsExist(submissionIds);
         if (submissions.size() != submissionIds.size()) {
+            logger.error("add image to group:{} failed,some submissions not exist", groupId);
+            return null;
+        }
+        // 不能合并两个 group
+        if (submissions.stream().anyMatch(submission -> submission.getSubmissionType() == SubmissionType.BATCH)) {
+            logger.error("add image to group failed,can not add group to group:{}", groupId);
             return null;
         }
         submissionGroup.addSubmissions(submissions);
@@ -64,6 +72,12 @@ public class SubGroupImpl implements ISubGroup {
         return template.findById(id, SubmissionGroup.class, WAITING_SUBMISSION);
     }
 
+    /**
+     * 确保所有的 submission 都存在 waitingSubmission 中
+     *
+     * @param submissionsId submission id 列表
+     * @return 存在的 submission 列表
+     */
     private List<Submission> ensureSubmissionsExist(List<String> submissionsId) {
         return template.find(Query.query(Criteria.where("id").in(submissionsId)), Submission.class, WAITING_SUBMISSION);
     }
