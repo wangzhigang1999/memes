@@ -135,18 +135,17 @@ public class CronJob {
     private void scanDBStatus() {
 
         long submissionCount = mongoTemplate.count(new Query(), "submission");
-        map.computeIfAbsent("submission.count",
-                _ -> registry.gauge("submission.count", new AtomicLong(submissionCount))).set(submissionCount);
-
+        Objects.requireNonNull(map.computeIfAbsent("submission.count", k -> registry.gauge(k, new AtomicLong(submissionCount))))
+                .set(submissionCount);
         long logCount = mongoTemplate.count(new Query(), LogDocument.class);
-        map.computeIfAbsent("log.count", _ -> registry.gauge("log.count", new AtomicLong(logCount))).set(logCount);
-
+        Objects.requireNonNull(map.computeIfAbsent("log.count", k -> registry.gauge(k, new AtomicLong(logCount))))
+                .set(logCount);
         long rssCount = mongoTemplate.count(new Query(), RSSItem.class);
-        map.computeIfAbsent("rss.count", _ -> registry.gauge("rss.count", new AtomicLong(rssCount))).set(rssCount);
-
+        Objects.requireNonNull(map.computeIfAbsent("rss.count", k -> registry.gauge(k, new AtomicLong(rssCount))))
+                .set(rssCount);
         long newsCount = mongoTemplate.count(new Query(), News.class);
-        map.computeIfAbsent("news.count", _ -> registry.gauge("news.count", new AtomicLong(newsCount))).set(newsCount);
-
+        Objects.requireNonNull(map.computeIfAbsent("news.count", k -> registry.gauge(k, new AtomicLong(newsCount))))
+                .set(newsCount);
         logger.debug("ScanDBStatus done, submissionCount: {}, logCount: {}, rssCount: {}, newsCount: {}",
                 submissionCount, logCount, rssCount, newsCount);
 
