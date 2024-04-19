@@ -1,16 +1,14 @@
 package com.bupt.memes.util;
 
-import java.util.Properties;
-
+import com.bupt.memes.model.transport.MediaMessage;
+import com.bupt.memes.model.transport.MediaType;
+import com.google.protobuf.ByteString;
+import lombok.SneakyThrows;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 
-import com.bupt.memes.model.transport.MediaMessage;
-import com.bupt.memes.model.transport.MediaType;
-import com.google.protobuf.ByteString;
-
-import lombok.SneakyThrows;
+import java.util.Properties;
 
 public class KafkaUtil {
 
@@ -36,7 +34,7 @@ public class KafkaUtil {
                 """.formatted(username, password);
         PROPS.put("sasl.jaas.config", saslJaasConfig);
         PROPS.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        PROPS.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        PROPS.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
         init();
         logger.warn(saslJaasConfig);
         logger.info("Kafka producer init success");
