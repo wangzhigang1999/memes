@@ -26,8 +26,9 @@ public class SubmissionGroup extends Submission {
     }
 
     @Override
-    public void setSubmissionType(String mime) {
+    public Submission setSubmissionType(String mime) {
         this.submissionType = SubmissionType.BATCH;
+        return this;
     }
 
     @Override

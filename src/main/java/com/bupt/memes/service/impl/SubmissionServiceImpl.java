@@ -4,12 +4,14 @@ import com.bupt.memes.aspect.Audit;
 import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.media.Submission;
+import com.bupt.memes.service.MongoPageHelper;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
-import com.bupt.memes.service.MongoPageHelper;
+import com.bupt.memes.util.KafkaUtil;
 import com.bupt.memes.util.TimeUtil;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
+
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -67,17 +69,24 @@ public class SubmissionServiceImpl implements ISubmission {
      */
     @Override
     public Submission storeTextFormatSubmission(String text, String mime) {
-
-        // check if the submission already exists
         var submission = getSubmission(text.hashCode());
         if (submission != null) {
             return submission;
         }
+        submission = new Submission().setSubmissionType(mime);
+        if (!formatDetected(text, submission)) {
+            logger.error("format not detected, text: {},mime: {}", text, mime);
+            return null;
+        }
+        Submission inserted = insertSubmission(submission);
+        if (inserted == null) {
+            return null;
+        }
+        KafkaUtil.send(inserted.getId(), text);
+        return inserted;
+    }
 
-        submission = new Submission();
-        submission.setSubmissionType(mime);
-        submission.setHash(text.hashCode());
-
+    private static boolean formatDetected(String text, Submission submission) {
         switch (submission.getSubmissionType()) {
             case BILIBILI:
                 submission.setName(text);
@@ -97,10 +106,10 @@ public class SubmissionServiceImpl implements ISubmission {
                 submission.setName(text);
                 break;
             default:
-                return null;
+                return false;
         }
-
-        return insertSubmission(submission);
+        submission.setHash(text.hashCode());
+        return true;
     }
 
     /**
@@ -116,7 +125,8 @@ public class SubmissionServiceImpl implements ISubmission {
         byte[] bytes = stream.readAllBytes();
         int code = Arrays.hashCode(bytes);
 
-        CompletableFuture<FileUploadResult> upload = CompletableFuture.supplyAsync(() -> storage.store(bytes, mime), executor);
+        CompletableFuture<FileUploadResult> upload = CompletableFuture.supplyAsync(() -> storage.store(bytes, mime),
+                executor);
         CompletableFuture<Submission> query = CompletableFuture.supplyAsync(() -> getSubmission(code), executor);
         /*
          * 从经验来看，queryFuture.get() 会比较快，所以先尝试从数据库中查询
@@ -136,11 +146,13 @@ public class SubmissionServiceImpl implements ISubmission {
             return null;
         }
         submission = new Submission();
-        submission.setHash(code);
-        submission.setSubmissionType(mime);
-        submission.setUrl(result.url());
-        submission.setName(result.fileName());
-        return insertSubmission(submission);
+        submission.setHash(code).setSubmissionType(mime).setUrl(result.url()).setName(result.fileName());
+        Submission inserted = insertSubmission(submission);
+        if (inserted == null) {
+            return null;
+        }
+        KafkaUtil.send(inserted.getId(), bytes);
+        return inserted;
     }
 
     /**
@@ -214,7 +226,7 @@ public class SubmissionServiceImpl implements ISubmission {
     }
 
     @SneakyThrows
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     private Submission getSubmission(Integer hash) {
         CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
                 .map(collection -> CompletableFuture

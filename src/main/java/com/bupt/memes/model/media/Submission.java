@@ -34,7 +34,7 @@ public class Submission implements Comparable<Submission> {
         this.id = id;
     }
 
-    public void setSubmissionType(String mime) {
+    public Submission setSubmissionType(String mime) {
         if (mime.startsWith("image")) {
             this.submissionType = SubmissionType.IMAGE;
         } else if (mime.startsWith("video")) {
@@ -44,6 +44,7 @@ public class Submission implements Comparable<Submission> {
         } else if (mime.startsWith("text/markdown")) {
             this.submissionType = SubmissionType.MARKDOWN;
         }
+        return this;
     }
 
     public boolean textFormat() {
