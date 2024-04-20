@@ -1,14 +1,13 @@
 package com.bupt.memes.service;
 
 import com.bupt.memes.model.HNSWItem;
-import com.bupt.memes.model.transport.Embedding;
-import com.bupt.memes.util.KafkaUtil;
 import com.github.jelmerk.knn.DistanceFunctions;
 import com.github.jelmerk.knn.SearchResult;
 import com.github.jelmerk.knn.hnsw.HnswIndex;
+import lombok.Data;
 import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import org.apache.commons.io.FileUtils;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,18 +16,18 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.bupt.memes.aspect.Audit.instanceUUID;
 
+
 @Component
-public class HNSWIndex {
+@Data
+@Accessors(chain = true)
+public class AnnIndex {
 
     @Value("${hnsw.dimension}")
     private int dimension = 768;
@@ -44,18 +43,14 @@ public class HNSWIndex {
 
     @Value("${hnsw.maxElements}")
     private int maxElements = 1000000;
+    private long indexVersion = 0;
 
-    @Value("${hnsw.indexFile}")
-    private String indexFile = "hnsw.index";
-    private int indexVersion = 20;
 
-    private HnswIndex index;
-    private final Logger logger = LoggerFactory.getLogger(HNSWIndex.class);
+    private HnswIndex<String, float[], HNSWItem, Float> index;
+    private final Logger logger = LoggerFactory.getLogger(AnnIndex.class);
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock readLock = lock.readLock();
     private final Lock writeLock = lock.writeLock();
-    private final AtomicBoolean kafkaAlive = new AtomicBoolean(false);
-
 
     private void setNewIndex(HnswIndex<String, float[], HNSWItem, Float> newIndex) {
         writeLock.lock();
@@ -63,8 +58,7 @@ public class HNSWIndex {
         writeLock.unlock();
     }
 
-    @SneakyThrows
-    public void initIndex() {
+    public void initIndex(String indexFile) {
 
         HnswIndex<String, float[], HNSWItem, Float> loadedFromLocal = loadFromLocal(indexFile);
         if (loadedFromLocal != null) {
@@ -80,50 +74,45 @@ public class HNSWIndex {
             return;
         }
 
+        initIndex();
+    }
 
-        HnswIndex<String, float[], HNSWItem, Float> newIndex =
-                HnswIndex.newBuilder(dimension, DistanceFunctions.FLOAT_EUCLIDEAN_DISTANCE, maxElements)
-                        .withM(m)
-                        .withEf(efSearch)
-                        .withEfConstruction(efConstruction)
-                        .build();
-
+    public void initIndex() {
+        HnswIndex<String, float[], HNSWItem, Float> newIndex = HnswIndex.newBuilder(dimension, DistanceFunctions.FLOAT_EUCLIDEAN_DISTANCE, maxElements).withM(m).withEf(efSearch).withEfConstruction(efConstruction).build();
         writeLock.lock();
         index = newIndex;
         writeLock.unlock();
-        logger.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}",
-                dimension, m, efSearch, efConstruction, maxElements);
-        Thread.ofVirtual().start(this::watchKafka);
-
+        logger.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}", dimension, m, efSearch, efConstruction, maxElements);
     }
 
     @SneakyThrows
     private HnswIndex<String, float[], HNSWItem, Float> loadFromNet(String url) {
-        URI uri = new URI(url);
-        Path path = Path.of(instanceUUID + ".index");
-        FileUtils.copyURLToFile(uri.toURL(), path.toFile());
-        return HnswIndex.load(path);
-    }
-
-    @SneakyThrows
-    private HnswIndex<String, float[], HNSWItem, Float> loadFromLocal(String indexFile) {
-        Path path = Path.of(indexFile);
-        if (!Files.exists(path)) {
+        try {
+            URI uri = new URI(url);
+            Path path = Path.of(instanceUUID + ".index");
+            FileUtils.copyURLToFile(uri.toURL(), path.toFile());
+            return HnswIndex.load(path);
+        } catch (Exception e) {
+            logger.error("Failed to load index from network: {}", url);
             return null;
         }
-        return HnswIndex.load(path);
     }
 
-    @SneakyThrows
-    public synchronized void saveIndex() {
-        if (index != null) {
-            index.save(Path.of(indexFile));
-        } else {
-            logger.error("HNSWIndex is not initialized. Cannot save.");
+    private HnswIndex<String, float[], HNSWItem, Float> loadFromLocal(String indexFile) {
+        try {
+            Path path = Path.of(indexFile);
+            if (!Files.exists(path)) {
+                return null;
+            }
+            return HnswIndex.load(path);
+        } catch (Exception e) {
+            logger.error("Failed to load index from local file: {}", indexFile);
+            return null;
         }
     }
 
-    public List<SearchResult> search(float[] vector, int topK) {
+
+    public List<SearchResult<HNSWItem, Float>> search(float[] vector, int topK) {
         if (index == null) {
             logger.error("HNSWIndex is not initialized");
             return List.of();
@@ -136,70 +125,63 @@ public class HNSWIndex {
         }
     }
 
-    public void add(HNSWItem item) {
+    public List<SearchResult<HNSWItem, Float>> search(String key, int topK) {
+        if (index == null) {
+            logger.error("HNSWIndex is not initialized");
+            return List.of();
+        }
+        try {
+            readLock.lock();
+            return index.findNeighbors(key, topK);
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public void reloadIndex(long targetVersion, String indexFile, boolean forceReload) {
+        if (forceReload || indexVersion < targetVersion) {
+            logger.info("Reloading index from file: {}", indexFile);
+            initIndex(indexFile);
+            indexVersion = targetVersion;
+            logger.info("Reloaded index with version: {}", indexVersion);
+        }
+    }
+
+    public void add(String key, float[] vector) {
+        if (index == null) {
+            logger.error("HNSWIndex is not initialized");
+            return;
+        }
+        HNSWItem hnswItem = new HNSWItem();
+        hnswItem.setId(key);
+        hnswItem.setVector(vector);
+        try {
+            writeLock.lock();
+            index.add(hnswItem);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    @SneakyThrows
+    public void saveIndex(String indexFile) {
         if (index == null) {
             logger.error("HNSWIndex is not initialized");
             return;
         }
         try {
             writeLock.lock();
-            index.add(item);
+            index.save(Path.of(indexFile));
         } finally {
             writeLock.unlock();
         }
     }
 
-    public synchronized void reloadIndex(int targetVersion, boolean forceReload) {
-        if (forceReload || indexVersion < targetVersion) {
-            initIndex();
-            indexVersion = targetVersion;
-        }
-    }
-
-    private void watchKafka() {
-        if (!kafkaAlive.compareAndSet(false, true)) {
-            logger.info("Kafka consumer is already running");
-            return;
-        }
-        KafkaConsumer<String, byte[]> consumer = KafkaUtil.getConsumer("embedding", instanceUUID);
-        do {
-            try {
-                var records = consumer.poll(Duration.ZERO);
-                for (var record : records) {
-                    Embedding embedding = Embedding.parseFrom(record.value());
-                    HNSWItem item = new HNSWItem();
-                    float[] vector = new float[dimension];
-                    for (int i = 0; i < dimension; i++) {
-                        vector[i] = embedding.getData(i);
-                    }
-                    item.setId(embedding.getId());
-                    item.setVector(vector);
-                    add(item);
-                    logger.debug("Added item: {}", item.getId());
-                }
-            } catch (Exception e) {
-                logger.error("Error while consuming messages", e);
-                consumer = null;
-            }
-        } while (consumer != null);
-    }
-
     public static void main(String[] args) {
-        HNSWIndex index = new HNSWIndex();
-        index.initIndex();
-        Random random = new Random();
-        for (int i = 0; i < 1000; i++) {
-            HNSWItem item = new HNSWItem();
-            item.setId(String.valueOf(random.nextInt()));
-            float[] vector = new float[index.dimension];
-            for (int j = 0; j < index.dimension; j++) {
-                vector[j] = random.nextFloat();
-            }
-            item.setVector(vector);
-            index.index.add(item);
+        AnnIndex annIndex = new AnnIndex();
+        annIndex.initIndex("hnsw.index");
+        for (SearchResult<HNSWItem, Float> neighbor : (annIndex.index.findNeighbors("66233f9d73d05a71e01a6462", 100))) {
+            System.out.println(neighbor.item().getId() + " " + neighbor.distance());
         }
-
-        index.saveIndex();
-        System.out.println(index.index.size());
     }
 }

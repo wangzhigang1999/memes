@@ -1,8 +1,18 @@
 package com.bupt.memes.model;
 
 import com.github.jelmerk.knn.Item;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
-public class HNSWSearchResult implements Item<String, float[]> {
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
+@Accessors(chain = true)
+@Builder
+public class HNSWItem implements Item<String, float[]> {
 
     String id;
     float[] vector;
@@ -19,7 +29,7 @@ public class HNSWSearchResult implements Item<String, float[]> {
 
     @Override
     public int dimensions() {
-        return vector.length == 0 ? 0 : vector.length;
+        return vector.length;
     }
 
     @Override
