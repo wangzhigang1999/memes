@@ -1,13 +1,16 @@
 package com.bupt.memes.util;
 
+import com.bupt.memes.model.transport.Embedding;
 import com.bupt.memes.model.transport.MediaMessage;
 import com.bupt.memes.model.transport.MediaType;
 import com.google.protobuf.ByteString;
 import lombok.SneakyThrows;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 
+import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,11 +26,10 @@ public class KafkaUtil {
     private static final AtomicBoolean alive = new AtomicBoolean(true);
 
     static {
-
         try {
             init();
         } catch (Exception e) {
-            logger.error("Kafka producer init failed", e);
+            logger.error("Kafka producer init failed");
         }
     }
 
@@ -37,13 +39,12 @@ public class KafkaUtil {
         PROPS.put("security.protocol", "SASL_SSL");
         PROPS.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         PROPS.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
-
         PROPS.put("bootstrap.servers", System.getenv("BOOTSTRAP_ENDPOINT"));
         var username = System.getenv("UPSTASH_KAFKA_USERNAME");
         var password = System.getenv("UPSTASH_KAFKA_PASSWORD");
 
         String saslJaasConfig = """
-                org.apache.kafka.common.security.scram.ScramLoginModule required 
+                org.apache.kafka.common.security.scram.ScramLoginModule required
                 username="%s"
                 password="%s";
                 """.formatted(username, password);
@@ -69,25 +70,16 @@ public class KafkaUtil {
     }
 
     public static void send(String id, String text) {
-        MediaMessage message = MediaMessage.newBuilder()
-                .setId(id)
-                .setMediaType(MediaType.TEXT)
-                .setData(ByteString.copyFrom(text.getBytes()))
-                .setTimestamp(System.currentTimeMillis())
-                .build();
+        MediaMessage message = MediaMessage.newBuilder().setId(id).setMediaType(MediaType.TEXT)
+                .setData(ByteString.copyFrom(text.getBytes())).setTimestamp(System.currentTimeMillis()).build();
         send(message);
     }
 
     public static void send(String id, byte[] data) {
-        MediaMessage message = MediaMessage.newBuilder()
-                .setId(id)
-                .setMediaType(MediaType.IMAGE)
-                .setData(ByteString.copyFrom(data))
-                .setTimestamp(System.currentTimeMillis())
-                .build();
+        MediaMessage message = MediaMessage.newBuilder().setId(id).setMediaType(MediaType.IMAGE)
+                .setData(ByteString.copyFrom(data)).setTimestamp(System.currentTimeMillis()).build();
         send(message);
     }
-
 
     public static void flush() {
         if (producer == null) {
@@ -95,6 +87,19 @@ public class KafkaUtil {
             return;
         }
         producer.flush();
+    }
+
+    public static KafkaConsumer<String, byte[]> getConsumer(String topic, String groupId) {
+        var props = new Properties();
+        props.putAll(PROPS);
+        props.put("group.id", groupId);
+        KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(props);
+        consumer.subscribe(java.util.Collections.singletonList(topic));
+        return consumer;
+    }
+
+    public static KafkaConsumer<String, byte[]> getConsumer(String topic) {
+        return getConsumer(topic, "default");
     }
 
     public static void close() {
@@ -107,19 +112,21 @@ public class KafkaUtil {
         producer.close();
     }
 
-
     public static void main(String[] args) {
-        MediaMessage message = MediaMessage.newBuilder()
-                .setMediaType(MediaType.TEXT)
-                .setData(ByteString.copyFrom("data".getBytes()))
-                .setTimestamp(System.currentTimeMillis())
-                .build();
+        var consumer = KafkaUtil.getConsumer("embedding");
+        do {
+            try {
+                var records = consumer.poll(Duration.ZERO);
+                for (var record : records) {
+                    Embedding embedding = Embedding.parseFrom(record.value());
+                    System.out.println(embedding.getDataList());
+                }
+            } catch (Exception e) {
+                logger.error("Error while consuming messages", e);
+                consumer = null;
+            }
 
-        for (int i = 0; i < 10; i++) {
-            send(message);
-            System.out.println("send success");
-        }
-
+        } while (consumer != null);
     }
 
 }
