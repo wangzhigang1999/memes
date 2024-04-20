@@ -1,17 +1,19 @@
 package com.bupt.memes.service.impl;
 
 import com.bupt.memes.aspect.Audit;
+import com.bupt.memes.model.HNSWItem;
 import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.media.Submission;
-import com.bupt.memes.service.MongoPageHelper;
+import com.bupt.memes.service.AnnIndex;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
+import com.bupt.memes.service.MongoPageHelper;
 import com.bupt.memes.util.KafkaUtil;
 import com.bupt.memes.util.TimeUtil;
+import com.github.jelmerk.knn.SearchResult;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
-
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -39,6 +41,8 @@ public class SubmissionServiceImpl implements ISubmission {
 
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
+
+    final AnnIndex annIndex;
 
     final Storage storage;
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
@@ -204,6 +208,17 @@ public class SubmissionServiceImpl implements ISubmission {
         return mongoTemplate.find(query, Submission.class);
     }
 
+    @Override
+    public List<Submission> getSimilarSubmission(String id, int size) {
+        List<SearchResult<HNSWItem, Float>> search = annIndex.search(id, size);
+        logger.info("get similar submission from index, id: {}, size: {}", id, size);
+        return search.parallelStream()
+                .map(SearchResult::item)
+                .map(HNSWItem::getId)
+                .map(s -> mongoTemplate.findById(s, Submission.class))
+                .toList();
+    }
+
     /**
      * 插入投稿
      *
@@ -226,7 +241,7 @@ public class SubmissionServiceImpl implements ISubmission {
     }
 
     @SneakyThrows
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     private Submission getSubmission(Integer hash) {
         CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
                 .map(collection -> CompletableFuture

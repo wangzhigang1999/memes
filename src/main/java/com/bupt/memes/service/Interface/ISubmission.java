@@ -51,4 +51,6 @@ public interface ISubmission {
 
     List<Submission> getSubmissionByDate(String date);
 
+    List<Submission> getSimilarSubmission(String id, int size);
+
 }

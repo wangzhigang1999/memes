@@ -108,4 +108,11 @@ public class SubUser {
         return service.getSubmissionByDate(date);
     }
 
+
+    @GetMapping("/similar/{id}")
+    public List<Submission> getSimilarSubmission(@PathVariable("id") String id, Integer size) {
+        size = size == null ? 10 : Math.min(size, 50);
+        return service.getSimilarSubmission(id, size);
+    }
+
 }
