@@ -5,16 +5,8 @@ option java_package = "com.bupt.memes.model.transport";
 
 option java_multiple_files = true;
 
-enum MediaType{
-  IMAGE = 0;
-  TEXT = 1;
-}
-
-message MediaMessage {
-
-  string  id = 1;
+message Embedding {
+  string id = 1;
   int64 timestamp = 2;
-
-  MediaType mediaType = 3;
-  bytes data = 4;
+  repeated float data = 3;
 }
