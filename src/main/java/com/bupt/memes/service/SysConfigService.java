@@ -1,14 +1,15 @@
 package com.bupt.memes.service;
 
-import com.bupt.memes.model.Sys;
-import com.bupt.memes.model.media.Submission;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import com.bupt.memes.model.Sys;
+import com.bupt.memes.model.media.Submission;
 
 @Service
 @SuppressWarnings("null")
