@@ -58,14 +58,4 @@ public class GlobalExceptionHandler {
         logger.error("请求地址：" + requestUrl, e.getMessage());
         return ResultData.fail(ReturnCode.RC405);
     }
-
-    @ExceptionHandler(value = Exception.class)
-    @ResponseBody
-    public ResultData<?> exceptionHandler(HttpServletRequest request, Exception e) {
-        String requestUrl = request.getRequestURL().toString();
-        logger.error("请求地址：" + requestUrl + "发生异常！", e.getMessage());
-        return ResultData.fail(ReturnCode.RC500);
-    }
-
-
 }
