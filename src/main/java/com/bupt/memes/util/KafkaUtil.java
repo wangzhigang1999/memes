@@ -19,7 +19,8 @@ public class KafkaUtil {
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(KafkaUtil.class);
     public final static Properties PROPS = new Properties();
 
-    public final static String TOPIC = "original-msg";
+    public final static String ORIGINAL_MSG = "original-msg";
+    public final static String EMBEDDING = "embedding";
 
     private volatile static KafkaProducer<String, byte[]> producer;
 
@@ -66,18 +67,16 @@ public class KafkaUtil {
             logger.error("Kafka producer is not alive,maybe the producer is closed");
             return;
         }
-        producer.send(new ProducerRecord<>(TOPIC, message.toByteArray()));
+        producer.send(new ProducerRecord<>(ORIGINAL_MSG, message.toByteArray()));
     }
 
     public static void send(String id, String text) {
-        MediaMessage message = MediaMessage.newBuilder().setId(id).setMediaType(MediaType.TEXT)
-                .setData(ByteString.copyFrom(text.getBytes())).setTimestamp(System.currentTimeMillis()).build();
+        MediaMessage message = MediaMessage.newBuilder().setId(id).setMediaType(MediaType.TEXT).setData(ByteString.copyFrom(text.getBytes())).setTimestamp(System.currentTimeMillis()).build();
         send(message);
     }
 
     public static void send(String id, byte[] data) {
-        MediaMessage message = MediaMessage.newBuilder().setId(id).setMediaType(MediaType.IMAGE)
-                .setData(ByteString.copyFrom(data)).setTimestamp(System.currentTimeMillis()).build();
+        MediaMessage message = MediaMessage.newBuilder().setId(id).setMediaType(MediaType.IMAGE).setData(ByteString.copyFrom(data)).setTimestamp(System.currentTimeMillis()).build();
         send(message);
     }
 

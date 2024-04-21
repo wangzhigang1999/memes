@@ -1,13 +1,17 @@
 package com.bupt.memes.service;
 
 import com.bupt.memes.model.HNSWItem;
+import com.bupt.memes.model.transport.Embedding;
+import com.bupt.memes.util.KafkaUtil;
 import com.github.jelmerk.knn.DistanceFunctions;
 import com.github.jelmerk.knn.SearchResult;
 import com.github.jelmerk.knn.hnsw.HnswIndex;
+import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import org.apache.commons.io.FileUtils;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -75,14 +80,23 @@ public class AnnIndex {
         }
 
         initIndex();
+        Thread.ofVirtual().start(this::listenKafka);
     }
 
-    public void initIndex() {
-        HnswIndex<String, float[], HNSWItem, Float> newIndex = HnswIndex.newBuilder(dimension, DistanceFunctions.FLOAT_EUCLIDEAN_DISTANCE, maxElements).withM(m).withEf(efSearch).withEfConstruction(efConstruction).build();
+    public boolean initIndex() {
+        HnswIndex<String, float[], HNSWItem, Float> newIndex =
+                HnswIndex.newBuilder(dimension, DistanceFunctions.FLOAT_EUCLIDEAN_DISTANCE, maxElements)
+                        .withM(m)
+                        .withEf(efSearch)
+                        .withEfConstruction(efConstruction)
+                        .withRemoveEnabled()
+                        .build();
         writeLock.lock();
         index = newIndex;
         writeLock.unlock();
-        logger.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}", dimension, m, efSearch, efConstruction, maxElements);
+        logger.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}",
+                dimension, m, efSearch, efConstruction, maxElements);
+        return index == null;
     }
 
     @SneakyThrows
@@ -148,8 +162,8 @@ public class AnnIndex {
     }
 
     public void add(String key, float[] vector) {
-        if (index == null) {
-            logger.error("HNSWIndex is not initialized");
+        if (index == null || !initIndex()) {
+            logger.error("Failed to add item to index, index is not initialized");
             return;
         }
         HNSWItem hnswItem = new HNSWItem();
@@ -157,7 +171,10 @@ public class AnnIndex {
         hnswItem.setVector(vector);
         try {
             writeLock.lock();
-            index.add(hnswItem);
+            boolean added = index.add(hnswItem);
+            if (!added) {
+                logger.error("Failed to add item to index, key: {}, maybe the key already exists", key);
+            }
         } finally {
             writeLock.unlock();
         }
@@ -174,6 +191,29 @@ public class AnnIndex {
             index.save(Path.of(indexFile));
         } finally {
             writeLock.unlock();
+        }
+    }
+
+    public void listenKafka() {
+        KafkaConsumer<String, byte[]> consumer = KafkaUtil.getConsumer(KafkaUtil.EMBEDDING);
+        while (true) {
+            var records = consumer.poll(Duration.ZERO);
+            for (var record : records) {
+                try {
+                    Embedding embedding = Embedding.parseFrom(record.value());
+                    List<Float> dataList = embedding.getDataList();
+                    float[] vector = new float[dataList.size()];
+                    for (int i = 0; i < dataList.size(); i++) {
+                        vector[i] = dataList.get(i);
+                    }
+                    add(embedding.getId(), vector);
+                    logger.info("Added embedding from kafka message,key:{}", record.key());
+                } catch (InvalidProtocolBufferException e) {
+                    logger.warn("Failed to parse embedding from kafka message,key:{}", record.key());
+                } catch (Exception e) {
+                    logger.error("Failed to add embedding from kafka message,key:{}", record.key(), e);
+                }
+            }
         }
     }
 

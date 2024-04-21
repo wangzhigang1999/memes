@@ -211,8 +211,20 @@ public class SubmissionServiceImpl implements ISubmission {
     @Override
     public List<Submission> getSimilarSubmission(String id, int size) {
         List<SearchResult<HNSWItem, Float>> search = annIndex.search(id, size);
-        logger.info("get similar submission from index, id: {}, size: {}", id, size);
         return search.parallelStream()
+                .map(SearchResult::item)
+                .map(HNSWItem::getId)
+                .map(s -> mongoTemplate.findById(s, Submission.class))
+                .toList();
+    }
+
+    @Override
+    public List<Submission> randomSubmission(int size) {
+        float[] vector = new float[768];
+        for (int i = 0; i < 768; i++) {
+            vector[i] = (float) Math.random();
+        }
+        return annIndex.search(vector, size).parallelStream()
                 .map(SearchResult::item)
                 .map(HNSWItem::getId)
                 .map(s -> mongoTemplate.findById(s, Submission.class))

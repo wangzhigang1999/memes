@@ -115,4 +115,10 @@ public class SubUser {
         return service.getSimilarSubmission(id, size);
     }
 
+    @GetMapping("/random")
+    public List<Submission> randomSubmission(Integer size) {
+        size = size == null ? 10 : Math.min(size, 50);
+        return service.randomSubmission(size);
+    }
+
 }

@@ -53,4 +53,6 @@ public interface ISubmission {
 
     List<Submission> getSimilarSubmission(String id, int size);
 
+    List<Submission> randomSubmission(int size);
+
 }
