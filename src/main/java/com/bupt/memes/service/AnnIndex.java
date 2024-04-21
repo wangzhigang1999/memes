@@ -198,6 +198,11 @@ public class AnnIndex {
         KafkaConsumer<String, byte[]> consumer = KafkaUtil.getConsumer(KafkaUtil.EMBEDDING);
         while (true) {
             var records = consumer.poll(Duration.ZERO);
+
+            // 离线批量索引构建+Kafka 实时增量索引
+            // 离线每天凌晨全量索引构建
+            consumer.seekToBeginning(consumer.assignment());
+
             for (var record : records) {
                 try {
                     Embedding embedding = Embedding.parseFrom(record.value());
