@@ -173,7 +173,7 @@ public class AnnIndex {
             writeLock.lock();
             boolean added = index.add(hnswItem);
             if (!added) {
-                logger.error("Failed to add item to index, key: {}, maybe the key already exists", key);
+                logger.warn("Failed to add item to index, key: {}, maybe the key already exists", key);
             }
         } finally {
             writeLock.unlock();
@@ -233,7 +233,6 @@ public class AnnIndex {
                         vector[i] = dataList.get(i);
                     }
                     add(embedding.getId(), vector);
-                    logger.info("Added embedding from kafka message,key:{}", record.key());
                 } catch (InvalidProtocolBufferException e) {
                     logger.warn("Failed to parse embedding from kafka message,key:{}", record.key());
                 } catch (Exception e) {
