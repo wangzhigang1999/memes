@@ -210,14 +210,20 @@ public class AnnIndex {
     }
 
     private void listenKafka() {
-        KafkaConsumer<String, byte[]> consumer = KafkaUtil.getConsumer(KafkaUtil.EMBEDDING);
-        while (consumerHealthy.get()) {
-            var records = consumer.poll(Duration.ZERO);
+        KafkaConsumer<String, byte[]> consumer;
+        try {
+            consumer = KafkaUtil.getConsumer(KafkaUtil.EMBEDDING);
+            consumer.seekToBeginning(consumer.assignment());
+        } catch (Exception e) {
+            logger.error("Failed to init kafka consumer for embedding", e);
+            consumerHealthy.set(false);
+            return;
+        }
 
+        while (consumerHealthy.get()) {
             // 离线批量索引构建+Kafka 实时增量索引
             // 离线每天凌晨全量索引构建
-            consumer.seekToBeginning(consumer.assignment());
-
+            var records = consumer.poll(Duration.ofSeconds(1));
             for (var record : records) {
                 try {
                     Embedding embedding = Embedding.parseFrom(record.value());

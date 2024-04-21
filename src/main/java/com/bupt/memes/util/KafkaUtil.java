@@ -82,7 +82,6 @@ public class KafkaUtil {
 
     public static void flush() {
         if (producer == null) {
-            init();
             logger.error("Kafka producer is null, maybe the producer is not init");
             return;
         }
