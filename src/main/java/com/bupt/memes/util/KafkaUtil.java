@@ -24,7 +24,7 @@ public class KafkaUtil {
 
     private volatile static KafkaProducer<String, byte[]> producer;
 
-    private static final AtomicBoolean alive = new AtomicBoolean(true);
+    private static final AtomicBoolean producerAlive = new AtomicBoolean(true);
 
     static {
         try {
@@ -63,7 +63,7 @@ public class KafkaUtil {
 
     @SneakyThrows
     public static void send(MediaMessage message) {
-        if (!alive.get()) {
+        if (!producerAlive.get()) {
             logger.error("Kafka producer is not alive,maybe the producer is closed");
             return;
         }
@@ -82,6 +82,7 @@ public class KafkaUtil {
 
     public static void flush() {
         if (producer == null) {
+            init();
             logger.error("Kafka producer is null, maybe the producer is not init");
             return;
         }
@@ -92,6 +93,8 @@ public class KafkaUtil {
         var props = new Properties();
         props.putAll(PROPS);
         props.put("group.id", groupId);
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(props);
         consumer.subscribe(java.util.Collections.singletonList(topic));
         return consumer;
@@ -103,7 +106,7 @@ public class KafkaUtil {
 
     public static void close() {
         logger.warn("Kafka producer is closing.............");
-        boolean compared = alive.compareAndSet(true, false);
+        boolean compared = producerAlive.compareAndSet(true, false);
         if (!compared || producer == null) {
             return;
         }
