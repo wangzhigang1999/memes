@@ -21,5 +21,6 @@ public class IndexLoader {
     public void reload() {
         Sys sys = sysConfig.getSys();
         annIndex.reloadIndex(sys.getIndexVersion(), sys.getIndexFile(), false);
+        annIndex.initKafkaConsumer();
     }
 }

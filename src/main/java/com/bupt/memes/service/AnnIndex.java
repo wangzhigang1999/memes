@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -57,6 +58,8 @@ public class AnnIndex {
     private final Lock readLock = lock.readLock();
     private final Lock writeLock = lock.writeLock();
 
+    private final AtomicBoolean consumerHealthy = new AtomicBoolean(false);
+
     private void setNewIndex(HnswIndex<String, float[], HNSWItem, Float> newIndex) {
         writeLock.lock();
         index = newIndex;
@@ -64,7 +67,6 @@ public class AnnIndex {
     }
 
     public void initIndex(String indexFile) {
-
         HnswIndex<String, float[], HNSWItem, Float> loadedFromLocal = loadFromLocal(indexFile);
         if (loadedFromLocal != null) {
             setNewIndex(loadedFromLocal);
@@ -80,10 +82,9 @@ public class AnnIndex {
         }
 
         initIndex();
-        Thread.ofVirtual().start(this::listenKafka);
     }
 
-    public boolean initIndex() {
+    public void initIndex() {
         HnswIndex<String, float[], HNSWItem, Float> newIndex =
                 HnswIndex.newBuilder(dimension, DistanceFunctions.FLOAT_EUCLIDEAN_DISTANCE, maxElements)
                         .withM(m)
@@ -96,7 +97,6 @@ public class AnnIndex {
         writeLock.unlock();
         logger.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}",
                 dimension, m, efSearch, efConstruction, maxElements);
-        return index == null;
     }
 
     @SneakyThrows
@@ -162,7 +162,7 @@ public class AnnIndex {
     }
 
     public void add(String key, float[] vector) {
-        if (index == null || !initIndex()) {
+        if (index == null) {
             logger.error("Failed to add item to index, index is not initialized");
             return;
         }
@@ -181,6 +181,7 @@ public class AnnIndex {
     }
 
     @SneakyThrows
+    @SuppressWarnings("unused")
     public void saveIndex(String indexFile) {
         if (index == null) {
             logger.error("HNSWIndex is not initialized");
@@ -194,9 +195,23 @@ public class AnnIndex {
         }
     }
 
-    public void listenKafka() {
+    public void initKafkaConsumer() {
+        if (index == null) {
+            logger.error("Failed to init kafka consumer, index is not initialized,will retry later");
+            return;
+        }
+        if (consumerHealthy.get()) {
+            return;
+        }
+        if (consumerHealthy.compareAndSet(false, true)) {
+            Thread.ofVirtual().start(this::listenKafka);
+            logger.info("Started kafka consumer for embedding");
+        }
+    }
+
+    private void listenKafka() {
         KafkaConsumer<String, byte[]> consumer = KafkaUtil.getConsumer(KafkaUtil.EMBEDDING);
-        while (true) {
+        while (consumerHealthy.get()) {
             var records = consumer.poll(Duration.ZERO);
 
             // 离线批量索引构建+Kafka 实时增量索引
@@ -216,7 +231,7 @@ public class AnnIndex {
                 } catch (InvalidProtocolBufferException e) {
                     logger.warn("Failed to parse embedding from kafka message,key:{}", record.key());
                 } catch (Exception e) {
-                    logger.error("Failed to add embedding from kafka message,key:{}", record.key(), e);
+                    consumerHealthy.compareAndSet(true, false);
                 }
             }
         }
