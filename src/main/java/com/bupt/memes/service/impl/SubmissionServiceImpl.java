@@ -215,6 +215,8 @@ public class SubmissionServiceImpl implements ISubmission {
                 .map(SearchResult::item)
                 .map(HNSWItem::getId)
                 .map(s -> mongoTemplate.findById(s, Submission.class))
+                .filter(Objects::nonNull)
+                .distinct()
                 .toList();
     }
 
@@ -228,6 +230,8 @@ public class SubmissionServiceImpl implements ISubmission {
                 .map(SearchResult::item)
                 .map(HNSWItem::getId)
                 .map(s -> mongoTemplate.findById(s, Submission.class))
+                .filter(Objects::nonNull)
+                .distinct()
                 .toList();
     }
 
@@ -253,7 +257,7 @@ public class SubmissionServiceImpl implements ISubmission {
     }
 
     @SneakyThrows
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     private Submission getSubmission(Integer hash) {
         CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
                 .map(collection -> CompletableFuture
