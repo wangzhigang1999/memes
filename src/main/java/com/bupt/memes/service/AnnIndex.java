@@ -27,7 +27,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.bupt.memes.aspect.Audit.instanceUUID;
+import static com.bupt.memes.aspect.Audit.INSTANCE_UUID;
 
 
 @Component
@@ -103,7 +103,7 @@ public class AnnIndex {
     private HnswIndex<String, float[], HNSWItem, Float> loadFromNet(String url) {
         try {
             URI uri = new URI(url);
-            Path path = Path.of(instanceUUID + ".index");
+            Path path = Path.of(INSTANCE_UUID + ".index");
             FileUtils.copyURLToFile(uri.toURL(), path.toFile());
             return HnswIndex.load(path);
         } catch (Exception e) {
@@ -213,7 +213,6 @@ public class AnnIndex {
         KafkaConsumer<String, byte[]> consumer;
         try {
             consumer = KafkaUtil.getConsumer(KafkaUtil.EMBEDDING);
-            consumer.seekToBeginning(consumer.assignment());
         } catch (Exception e) {
             logger.error("Failed to init kafka consumer for embedding", e);
             consumerHealthy.set(false);
@@ -233,20 +232,13 @@ public class AnnIndex {
                         vector[i] = dataList.get(i);
                     }
                     add(embedding.getId(), vector);
+                    logger.info("Added embedding to index, key: {}", embedding.getId());
                 } catch (InvalidProtocolBufferException e) {
                     logger.warn("Failed to parse embedding from kafka message,key:{}", record.key());
                 } catch (Exception e) {
                     consumerHealthy.compareAndSet(true, false);
                 }
             }
-        }
-    }
-
-    public static void main(String[] args) {
-        AnnIndex annIndex = new AnnIndex();
-        annIndex.initIndex("hnsw.index");
-        for (SearchResult<HNSWItem, Float> neighbor : (annIndex.index.findNeighbors("66233f9d73d05a71e01a6462", 100))) {
-            System.out.println(neighbor.item().getId() + " " + neighbor.distance());
         }
     }
 }

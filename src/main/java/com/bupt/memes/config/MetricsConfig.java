@@ -36,7 +36,7 @@ public class MetricsConfig {
         List<Tag> tags = new LinkedList<>();
         tags.add(Tag.of("hostname", hostname));
         tags.add(Tag.of("applicationName", applicationName));
-        tags.add(Tag.of("instance", Audit.instanceUUID));
+        tags.add(Tag.of("instance", Audit.INSTANCE_UUID));
         return registry -> registry.config().commonTags(tags);
     }
 }

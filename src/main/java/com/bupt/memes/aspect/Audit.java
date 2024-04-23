@@ -44,7 +44,7 @@ public class Audit {
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(Audit.class);
 
     // 用于标识当前实例
-    public final static String instanceUUID = "MEMES-" + System.currentTimeMillis() + "-"
+    public final static String INSTANCE_UUID = "MEMES-" + System.currentTimeMillis() + "-"
             + UUID.randomUUID().toString().substring(0, 8);
 
     @Value("${spring.data.mongodb.database}")
@@ -103,7 +103,7 @@ public class Audit {
                     .setUuid(uuid)
                     .setTimecost(end - start)
                     .setTimestamp(start)
-                    .setInstanceUUID(instanceUUID);
+                    .setInstanceUUID(INSTANCE_UUID);
             template.save(document);
         } catch (Exception e) {
             logger.error("audit error", e);

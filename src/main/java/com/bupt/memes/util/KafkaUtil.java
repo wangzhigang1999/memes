@@ -14,6 +14,8 @@ import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.bupt.memes.aspect.Audit.INSTANCE_UUID;
+
 public class KafkaUtil {
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(KafkaUtil.class);
@@ -94,13 +96,14 @@ public class KafkaUtil {
         props.put("group.id", groupId);
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+        props.put("auto.offset.reset", "earliest");
         KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(props);
         consumer.subscribe(java.util.Collections.singletonList(topic));
         return consumer;
     }
 
     public static KafkaConsumer<String, byte[]> getConsumer(String topic) {
-        return getConsumer(topic, "default");
+        return getConsumer(topic, INSTANCE_UUID);
     }
 
     public static void close() {
