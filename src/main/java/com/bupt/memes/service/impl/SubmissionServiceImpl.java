@@ -5,7 +5,7 @@ import com.bupt.memes.model.HNSWItem;
 import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.media.Submission;
-import com.bupt.memes.service.AnnIndex;
+import com.bupt.memes.service.AnnIndexService;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
@@ -42,7 +42,7 @@ public class SubmissionServiceImpl implements ISubmission {
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
 
-    final AnnIndex annIndex;
+    final AnnIndexService annIndexService;
 
     final Storage storage;
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
@@ -210,7 +210,7 @@ public class SubmissionServiceImpl implements ISubmission {
 
     @Override
     public List<Submission> getSimilarSubmission(String id, int size) {
-        List<SearchResult<HNSWItem, Float>> search = annIndex.search(id, size);
+        List<SearchResult<HNSWItem, Float>> search = annIndexService.search(id, size);
         return search.parallelStream()
                 .map(SearchResult::item)
                 .map(HNSWItem::getId)
@@ -226,7 +226,7 @@ public class SubmissionServiceImpl implements ISubmission {
         for (int i = 0; i < 768; i++) {
             vector[i] = (float) Math.random();
         }
-        return annIndex.search(vector, size).parallelStream()
+        return annIndexService.search(vector, size).parallelStream()
                 .map(SearchResult::item)
                 .map(HNSWItem::getId)
                 .map(s -> mongoTemplate.findById(s, Submission.class))

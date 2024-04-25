@@ -33,7 +33,7 @@ import static com.bupt.memes.aspect.Audit.INSTANCE_UUID;
 @Component
 @Data
 @Accessors(chain = true)
-public class AnnIndex {
+public class AnnIndexService {
 
     @Value("${hnsw.dimension}")
     private int dimension = 768;
@@ -53,7 +53,7 @@ public class AnnIndex {
 
 
     private HnswIndex<String, float[], HNSWItem, Float> index;
-    private final Logger logger = LoggerFactory.getLogger(AnnIndex.class);
+    private final Logger logger = LoggerFactory.getLogger(AnnIndexService.class);
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock readLock = lock.readLock();
     private final Lock writeLock = lock.writeLock();
