@@ -11,6 +11,8 @@ import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
 import com.bupt.memes.util.KafkaUtil;
 import com.bupt.memes.util.TimeUtil;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.jelmerk.knn.SearchResult;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
@@ -47,6 +49,10 @@ public class SubmissionServiceImpl implements ISubmission {
     final Storage storage;
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     final static Logger logger = LogManager.getLogger(SubmissionServiceImpl.class);
+
+    private static final Cache<String, Submission> submissionCache = Caffeine.newBuilder()
+            .maximumSize(10000)
+            .build();
 
     /**
      * 对投稿点赞/点踩
@@ -190,7 +196,8 @@ public class SubmissionServiceImpl implements ISubmission {
 
     @Override
     public Submission getSubmissionById(String id) {
-        return mongoTemplate.findById(id, Submission.class);
+        // 在 submission 这个 collection 中的 id 是唯一的，并且每一个记录是不可变且不会被删除的
+        return submissionCache.get(id, k -> mongoTemplate.findById(k, Submission.class));
     }
 
     @Override
@@ -211,10 +218,12 @@ public class SubmissionServiceImpl implements ISubmission {
     @Override
     public List<Submission> getSimilarSubmission(String id, int size) {
         List<SearchResult<HNSWItem, Float>> search = annIndexService.search(id, size);
-        return search.parallelStream()
+        List<CompletableFuture<Submission>> list = search.stream()
                 .map(SearchResult::item)
                 .map(HNSWItem::getId)
-                .map(s -> mongoTemplate.findById(s, Submission.class))
+                .map(k -> CompletableFuture.supplyAsync(() -> getSubmissionById(k), executor))
+                .toList();
+        return list.stream().map(CompletableFuture::join)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
@@ -257,7 +266,7 @@ public class SubmissionServiceImpl implements ISubmission {
     }
 
     @SneakyThrows
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     private Submission getSubmission(Integer hash) {
         CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
                 .map(collection -> CompletableFuture
