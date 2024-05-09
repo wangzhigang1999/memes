@@ -9,6 +9,7 @@ import com.bupt.memes.service.AnnIndexService;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
+import com.bupt.memes.service.SysConfigService;
 import com.bupt.memes.util.KafkaUtil;
 import com.bupt.memes.util.TimeUtil;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -43,16 +44,15 @@ public class SubmissionServiceImpl implements ISubmission {
 
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
-
+    final SysConfigService sysConfigService;
     final AnnIndexService annIndexService;
 
     final Storage storage;
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     final static Logger logger = LogManager.getLogger(SubmissionServiceImpl.class);
 
-    private static final Cache<String, Submission> submissionCache = Caffeine.newBuilder()
-            .maximumSize(10000)
-            .build();
+    private static volatile Cache<String, Submission> submissionCache;
+
 
     /**
      * 对投稿点赞/点踩
@@ -196,6 +196,14 @@ public class SubmissionServiceImpl implements ISubmission {
 
     @Override
     public Submission getSubmissionById(String id) {
+        if (submissionCache == null) {
+            synchronized (SubmissionServiceImpl.class) {
+                if (submissionCache == null) {
+                    submissionCache = Caffeine.newBuilder().maximumSize(sysConfigService.getSubmissionCacheSize()).build();
+                    logger.info("init cache, submission cache size: {}", sysConfigService.getSubmissionCacheSize());
+                }
+            }
+        }
         // 在 submission 这个 collection 中的 id 是唯一的，并且每一个记录是不可变且不会被删除的
         return submissionCache.get(id, k -> mongoTemplate.findById(k, Submission.class));
     }
@@ -217,16 +225,10 @@ public class SubmissionServiceImpl implements ISubmission {
 
     @Override
     public List<Submission> getSimilarSubmission(String id, int size) {
+        // todo 如果内存资源充足,允许 size 从外部传递
+        size = sysConfigService.getTopK();
         List<SearchResult<HNSWItem, Float>> search = annIndexService.search(id, size);
-        List<CompletableFuture<Submission>> list = search.stream()
-                .map(SearchResult::item)
-                .map(HNSWItem::getId)
-                .map(k -> CompletableFuture.supplyAsync(() -> getSubmissionById(k), executor))
-                .toList();
-        return list.stream().map(CompletableFuture::join)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        return getSubmissionsByHNSWItems(search);
     }
 
     @Override
@@ -235,13 +237,10 @@ public class SubmissionServiceImpl implements ISubmission {
         for (int i = 0; i < 768; i++) {
             vector[i] = (float) Math.random();
         }
-        return annIndexService.search(vector, size).parallelStream()
-                .map(SearchResult::item)
-                .map(HNSWItem::getId)
-                .map(s -> mongoTemplate.findById(s, Submission.class))
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        // todo 如果内存资源充足,允许 size 从外部传递
+        size = sysConfigService.getTopK();
+        List<SearchResult<HNSWItem, Float>> search = annIndexService.search(vector, size);
+        return getSubmissionsByHNSWItems(search);
     }
 
     /**
@@ -283,6 +282,18 @@ public class SubmissionServiceImpl implements ISubmission {
                         .orElse(null))
                 .get();
 
+    }
+
+    private List<Submission> getSubmissionsByHNSWItems(List<SearchResult<HNSWItem, Float>> search) {
+        List<CompletableFuture<Submission>> list = search.stream()
+                .map(SearchResult::item)
+                .map(HNSWItem::getId)
+                .map(k -> CompletableFuture.supplyAsync(() -> getSubmissionById(k), executor))
+                .toList();
+        return list.stream().map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
 
 }

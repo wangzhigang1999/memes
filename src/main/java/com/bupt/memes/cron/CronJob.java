@@ -120,11 +120,18 @@ public class CronJob {
 
     }
 
-    @Scheduled(fixedRate = 1000 * 60)
+    @Scheduled(fixedRate = 1000 * 5)
     public void syncSys() {
         logger.debug("Periodic sync sys done.");
-        SysConfigService.setSys(mongoTemplate.findById("sys", Sys.class));
-        sysConfig.updateTopSubmission();
+        sysConfig.setSys(mongoTemplate.findById("sys", Sys.class));
+        logger.debug("Periodic sync top submission done.");
+    }
+
+    // 每分钟同步一次 top submission
+    @Scheduled(fixedRate = 1000 * 60)
+    public void syncTopSubmission() {
+        logger.debug("Periodic sync top submission start.");
+        sysConfig.syncTopSubmission();
         logger.debug("Periodic sync top submission done.");
     }
 

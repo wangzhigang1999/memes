@@ -59,7 +59,7 @@ public class SubUser {
      */
     @GetMapping("/top")
     public Set<Submission> getTop() {
-        return SysConfigService.getTop();
+        return sysConfig.getTopSubmission();
     }
 
     // 点赞

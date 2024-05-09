@@ -54,13 +54,33 @@ public class Common {
      */
     @GetMapping("/bot/status")
     public Boolean botStatus() {
-        return SysConfigService.getBotStatus();
+        return systemService.botUp();
     }
 
     @GetMapping("/sys")
     @AuthRequired
     public Sys getSystemService() {
         return systemService.getSys();
+    }
+
+    @PostMapping("/topK/{topK}")
+    @AuthRequired
+    public Boolean setTopK(@PathVariable int topK) {
+        return systemService.setTopK(topK);
+    }
+
+    // cache size
+    @PostMapping("/cacheSize/{cacheSize}")
+    @AuthRequired
+    public Boolean setCacheSize(@PathVariable int cacheSize) {
+        return systemService.setCacheSize(cacheSize);
+    }
+
+    @GetMapping("/gc")
+    @AuthRequired
+    public Boolean gc() {
+        System.gc();
+        return true;
     }
 
 }
