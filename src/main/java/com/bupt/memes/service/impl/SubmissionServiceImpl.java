@@ -225,8 +225,7 @@ public class SubmissionServiceImpl implements ISubmission {
 
     @Override
     public List<Submission> getSimilarSubmission(String id, int size) {
-        // todo 如果内存资源充足,允许 size 从外部传递
-        size = sysConfigService.getTopK();
+        size = Math.min(sysConfigService.getTopK(), size);
         List<SearchResult<HNSWItem, Float>> search = annIndexService.search(id, size);
         return getSubmissionsByHNSWItems(search);
     }
@@ -237,8 +236,7 @@ public class SubmissionServiceImpl implements ISubmission {
         for (int i = 0; i < 768; i++) {
             vector[i] = (float) Math.random();
         }
-        // todo 如果内存资源充足,允许 size 从外部传递
-        size = sysConfigService.getTopK();
+        size = Math.min(sysConfigService.getTopK(), size);
         List<SearchResult<HNSWItem, Float>> search = annIndexService.search(vector, size);
         return getSubmissionsByHNSWItems(search);
     }

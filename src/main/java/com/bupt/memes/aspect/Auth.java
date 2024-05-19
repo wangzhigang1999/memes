@@ -48,16 +48,21 @@ public class Auth {
         if (attributes == null) {
             return ResultData.fail(ReturnCode.RC401);
         }
+
+        var httpMethod = attributes.getRequest().getMethod();
+        var path = "%s %s".formatted(httpMethod, attributes.getRequest().getRequestURI());
+
         var request = attributes.getRequest();
         var token = request.getHeader("token");
         if (token == null || !token.equals(localToken)) {
-            logger.warn("token is not correct, token: {}", token);
+            logger.warn("Unauthorized access: {},token is {}", path, token);
             HttpServletResponse response = attributes.getResponse();
             if (response != null) {
                 response.setStatus(401);
             }
             return ResultData.fail(ReturnCode.RC401);
         }
+        logger.info("Authorized access: {}", path);
         return joinPoint.proceed();
     }
 

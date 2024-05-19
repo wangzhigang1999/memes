@@ -114,6 +114,8 @@ public class AnnIndexService {
 
     private HnswIndex<String, float[], HNSWItem, Float> loadFromLocal(String indexFile) {
         try {
+            String[] split = indexFile.split("/");
+            indexFile = split[split.length - 1];
             Path path = Path.of(indexFile);
             if (!Files.exists(path)) {
                 return null;
