@@ -8,7 +8,7 @@
     {
       "name": "perf.url",
       "type": "java.lang.String",
-      "description": "url of grafana perf"
+      "description": "url of grafana perf."
     },
     {
       "name": "perf.username",

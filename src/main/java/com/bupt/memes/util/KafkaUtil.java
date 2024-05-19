@@ -116,7 +116,7 @@ public class KafkaUtil {
         producer.close();
     }
 
-    public static void main(String[] args) {
+    public static void main() {
         var consumer = KafkaUtil.getConsumer("embedding");
         do {
             try {
