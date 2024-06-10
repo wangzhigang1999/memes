@@ -5,14 +5,13 @@ import com.bupt.memes.model.transport.Embedding;
 import com.bupt.memes.model.transport.MediaMessage;
 import com.bupt.memes.model.transport.MediaType;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.MessageLite;
 import lombok.SneakyThrows;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -143,10 +142,14 @@ public class KafkaUtil {
 
     @SneakyThrows
     public static byte[] toBytes(Object obj) {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); ObjectOutputStream oos = new ObjectOutputStream(bos)) {
-            oos.writeObject(obj);
-            return bos.toByteArray();
+        if (obj instanceof byte[]) {
+            return (byte[]) obj;
         }
+        // for protobuf message
+        if (obj instanceof MessageLite) {
+            return ((MessageLite) obj).toByteArray();
+        }
+        throw new IllegalArgumentException("Unsupported object type: %s".formatted(obj.getClass().getName()));
     }
 
     public static void main() {
