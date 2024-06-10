@@ -1,5 +1,6 @@
 package com.bupt.memes.util;
 
+import com.bupt.memes.model.transport.BroadcastMessage;
 import com.bupt.memes.model.transport.Embedding;
 import com.bupt.memes.model.transport.MediaMessage;
 import com.bupt.memes.model.transport.MediaType;
@@ -10,6 +11,8 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,8 +24,12 @@ public class KafkaUtil {
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(KafkaUtil.class);
     public final static Properties PROPS = new Properties();
 
+    // 用户直接的投稿
     public final static String ORIGINAL_MSG = "original-msg";
+    // embedding后的向量
     public final static String EMBEDDING = "embedding";
+    // 控制信令
+    public final static String BROADCAST = "broadcast";
 
     private volatile static KafkaProducer<String, byte[]> producer;
 
@@ -63,23 +70,41 @@ public class KafkaUtil {
         logger.info("Kafka producer init success");
     }
 
-    @SneakyThrows
-    public static void send(MediaMessage message) {
-        if (!producerAlive.get()) {
-            logger.error("Kafka producer is not alive,maybe the producer is closed");
+    public static void sendTextSubmission(String id, String text) {
+        MediaMessage message = MediaMessage.newBuilder()
+                .setId(id)
+                .setMediaType(MediaType.TEXT)
+                .setData(ByteString.copyFrom(text.getBytes()))
+                .setTimestamp(System.currentTimeMillis())
+                .build();
+        send(ORIGINAL_MSG, message);
+    }
+
+    public static void sendBinarySubmission(String id, byte[] data) {
+        MediaMessage message = MediaMessage.newBuilder()
+                .setId(id).setMediaType(MediaType.IMAGE)
+                .setData(ByteString.copyFrom(data))
+                .setTimestamp(System.currentTimeMillis())
+                .build();
+        send(ORIGINAL_MSG, message);
+    }
+
+    @SuppressWarnings("unused")
+    public static void broadcast(BroadcastMessage message) {
+        String sourceNode = message.getSourceNode();
+        if (!INSTANCE_UUID.equals(sourceNode)) {
+            logger.error("Broadcast message source node is {}, current node is {}", sourceNode, INSTANCE_UUID);
             return;
         }
-        producer.send(new ProducerRecord<>(ORIGINAL_MSG, message.toByteArray()));
+        send(BROADCAST, message);
     }
 
-    public static void send(String id, String text) {
-        MediaMessage message = MediaMessage.newBuilder().setId(id).setMediaType(MediaType.TEXT).setData(ByteString.copyFrom(text.getBytes())).setTimestamp(System.currentTimeMillis()).build();
-        send(message);
-    }
-
-    public static void send(String id, byte[] data) {
-        MediaMessage message = MediaMessage.newBuilder().setId(id).setMediaType(MediaType.IMAGE).setData(ByteString.copyFrom(data)).setTimestamp(System.currentTimeMillis()).build();
-        send(message);
+    private static void send(String topic, Object message) {
+        if (!producerAlive.get()) {
+            logger.warn("Kafka producer is not alive,maybe the producer is closing...");
+            return;
+        }
+        producer.send(new ProducerRecord<>(topic, toBytes(message)));
     }
 
     public static void flush() {
@@ -114,6 +139,14 @@ public class KafkaUtil {
         }
         flush();
         producer.close();
+    }
+
+    @SneakyThrows
+    public static byte[] toBytes(Object obj) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(obj);
+            return bos.toByteArray();
+        }
     }
 
     public static void main() {
