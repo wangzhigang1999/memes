@@ -40,6 +40,7 @@ public interface ISubmission {
      */
     List<Submission> getDeletedSubmission();
 
+    boolean markDelete(String id);
     /**
      * 硬删除
      */

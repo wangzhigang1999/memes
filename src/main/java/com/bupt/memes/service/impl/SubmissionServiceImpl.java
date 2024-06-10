@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -92,7 +93,7 @@ public class SubmissionServiceImpl implements ISubmission {
         if (inserted == null) {
             return null;
         }
-        KafkaUtil.send(inserted.getId(), text);
+        KafkaUtil.sendTextSubmission(inserted.getId(), text);
         return inserted;
     }
 
@@ -161,7 +162,7 @@ public class SubmissionServiceImpl implements ISubmission {
         if (inserted == null) {
             return null;
         }
-        KafkaUtil.send(inserted.getId(), bytes);
+        KafkaUtil.sendBinarySubmission(inserted.getId(), bytes);
         return inserted;
     }
 
@@ -171,6 +172,25 @@ public class SubmissionServiceImpl implements ISubmission {
     @Override
     public List<Submission> getDeletedSubmission() {
         return mongoTemplate.findAll(Submission.class, DELETED_SUBMISSION);
+    }
+
+    /**
+     * 标记删除，只有通过审核的投稿才能被标记删除，所以不用考虑 WAITING_SUBMISSION
+     *
+     * @param id 投稿 id
+     * @return 是否成功
+     */
+    @Transactional
+    @Override
+    public boolean markDelete(String id) {
+        Submission submission = getSubmissionById(id);
+        if (submission == null) {
+            return false;
+        }
+        mongoTemplate.save(submission, DELETED_SUBMISSION);
+        mongoTemplate.remove(submission, SUBMISSION);
+        // todo: 删除索引,删除缓存
+        return true;
     }
 
     /**

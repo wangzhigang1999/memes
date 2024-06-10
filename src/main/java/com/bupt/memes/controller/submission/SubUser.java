@@ -97,6 +97,11 @@ public class SubUser {
         return service.getSubmissionById(id);
     }
 
+    @DeleteMapping("/id/{id}")
+    public Boolean deleteSubmissionById(@PathVariable("id") String id) {
+        return service.markDelete(id);
+    }
+
     /**
      * 获取某一天的提交
      *
