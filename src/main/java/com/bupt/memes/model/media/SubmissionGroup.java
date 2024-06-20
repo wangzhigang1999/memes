@@ -13,62 +13,63 @@ import java.util.Optional;
 @Data
 public class SubmissionGroup extends Submission {
 
-    List<Submission> children = new ArrayList<>();
+	List<Submission> children = new ArrayList<>();
 
-    public SubmissionGroup() {
-        super();
-        this.submissionType = SubmissionType.BATCH;
-        this.timestamp = 0;
-    }
+	public SubmissionGroup() {
+		super();
+		this.submissionType = SubmissionType.BATCH;
+		this.timestamp = 0;
+	}
 
-    public void addSubmissions(List<Submission> submissions) {
-        this.children.addAll(submissions);
-    }
+	public void addSubmissions(List<Submission> submissions) {
+		this.children.addAll(submissions);
+	}
 
-    @Override
-    public Submission setSubmissionType(String mime) {
-        this.submissionType = SubmissionType.BATCH;
-        return this;
-    }
+	@Override
+	public Submission setSubmissionType(String mime) {
+		this.submissionType = SubmissionType.BATCH;
+		return this;
+	}
 
-    @Override
-    public boolean textFormat() {
-        return true;
-    }
+	@Override
+	public boolean textFormat() {
+		return true;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof SubmissionGroup) {
-            return this.id.equals(((SubmissionGroup) obj).id);
-        }
-        return false;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SubmissionGroup) {
+			return this.id.equals(((SubmissionGroup) obj).id);
+		}
+		return false;
+	}
 
-    @Override
-    public int hashCode() {
-        return this.id.hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return this.id.hashCode();
+	}
 
-    /**
-     * 从多个投稿构建一个投稿组
-     *
-     * @param submissions 投稿列表，不能为空
-     * @return 投稿组
-     */
-    public static Optional<SubmissionGroup> fromSubmission(List<Submission> submissions) {
-        if (submissions == null || submissions.isEmpty()) {
-            return Optional.empty();
-        }
-        SubmissionGroup submissionGroup = new SubmissionGroup();
-        submissionGroup.addSubmissions(submissions);
-        if (submissionGroup.children.isEmpty()) {
-            return Optional.empty();
-        }
-        submissionGroup
-                .setId(submissions.get(0).id)
-                .setTimestamp(submissions.get(0).timestamp)
-                .setUploader(submissions.get(0).uploader)
-                .setHash(submissions.get(0).hash);
-        return Optional.of(submissionGroup);
-    }
+	/**
+	 * 从多个投稿构建一个投稿组
+	 *
+	 * @param submissions
+	 *            投稿列表，不能为空
+	 * @return 投稿组
+	 */
+	public static Optional<SubmissionGroup> fromSubmission(List<Submission> submissions) {
+		if (submissions == null || submissions.isEmpty()) {
+			return Optional.empty();
+		}
+		SubmissionGroup submissionGroup = new SubmissionGroup();
+		submissionGroup.addSubmissions(submissions);
+		if (submissionGroup.children.isEmpty()) {
+			return Optional.empty();
+		}
+		submissionGroup
+				.setId(submissions.get(0).id)
+				.setTimestamp(submissions.get(0).timestamp)
+				.setUploader(submissions.get(0).uploader)
+				.setHash(submissions.get(0).hash);
+		return Optional.of(submissionGroup);
+	}
 }

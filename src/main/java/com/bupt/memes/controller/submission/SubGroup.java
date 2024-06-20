@@ -16,30 +16,30 @@ import java.util.List;
 @AllArgsConstructor
 public class SubGroup {
 
-    final ISubGroup subGroup;
+	final ISubGroup subGroup;
 
-    // create
-    @PutMapping("")
-    @AuthRequired
-    public Object create(@RequestBody List<String> submissionIds) {
-        return subGroup.createGroup(submissionIds);
-    }
+	// create
+	@PutMapping("")
+	@AuthRequired
+	public Object create(@RequestBody List<String> submissionIds) {
+		return subGroup.createGroup(submissionIds);
+	}
 
-    // post
-    @PostMapping("/{id}")
-    @AuthRequired
-    public Object update(@PathVariable("id") String id, @RequestBody List<String> submissionIds) {
-        SubmissionGroup submissionGroup = subGroup.addToGroup(id, submissionIds);
-        if (submissionGroup == null) {
-            ResultData.fail(ReturnCode.RC400);
-        }
-        return submissionGroup;
-    }
+	// post
+	@PostMapping("/{id}")
+	@AuthRequired
+	public Object update(@PathVariable("id") String id, @RequestBody List<String> submissionIds) {
+		SubmissionGroup submissionGroup = subGroup.addToGroup(id, submissionIds);
+		if (submissionGroup == null) {
+			ResultData.fail(ReturnCode.RC400);
+		}
+		return submissionGroup;
+	}
 
-    // get
-    @GetMapping("/{id}")
-    @AuthRequired
-    public Object get(@PathVariable("id") String id) {
-        return subGroup.getById(id);
-    }
+	// get
+	@GetMapping("/{id}")
+	@AuthRequired
+	public Object get(@PathVariable("id") String id) {
+		return subGroup.getById(id);
+	}
 }

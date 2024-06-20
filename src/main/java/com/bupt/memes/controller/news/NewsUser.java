@@ -14,30 +14,30 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @AllArgsConstructor
 public class NewsUser {
-    final INews iNews;
+	final INews iNews;
 
-    @GetMapping("/id/{id}")
-    public ResultData<News> findById(@PathVariable String id) {
-        return ResultData.success(iNews.findById(id));
-    }
+	@GetMapping("/id/{id}")
+	public ResultData<News> findById(@PathVariable String id) {
+		return ResultData.success(iNews.findById(id));
+	}
 
-    @GetMapping("/date/{date}")
-    public ResultData<List<News>> findByDate(@PathVariable String date) {
-        return ResultData.success(iNews.findByDate(date));
-    }
+	@GetMapping("/date/{date}")
+	public ResultData<List<News>> findByDate(@PathVariable String date) {
+		return ResultData.success(iNews.findByDate(date));
+	}
 
-    @GetMapping("/month/{month}/day/{day}")
-    public ResultData<List<News>> findByMMDD(@PathVariable String month, @PathVariable String day) {
-        return ResultData.success(iNews.findByMMDD(month, day));
-    }
+	@GetMapping("/month/{month}/day/{day}")
+	public ResultData<List<News>> findByMMDD(@PathVariable String month, @PathVariable String day) {
+		return ResultData.success(iNews.findByMMDD(month, day));
+	}
 
-    @GetMapping("/page")
-    public PageResult<News> page(Integer pageSize, String lastID) {
+	@GetMapping("/page")
+	public PageResult<News> page(Integer pageSize, String lastID) {
 
-        if (pageSize == null) {
-            pageSize = 10;
-        }
+		if (pageSize == null) {
+			pageSize = 10;
+		}
 
-        return iNews.find(false, pageSize, lastID);
-    }
+		return iNews.find(false, pageSize, lastID);
+	}
 }

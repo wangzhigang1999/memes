@@ -13,26 +13,26 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RestControllerAdvice
 public class Response implements ResponseBodyAdvice<Object> {
 
-    @SuppressWarnings("null")
-    @Override
-    public boolean supports(@NonNull MethodParameter returnType, @SuppressWarnings("rawtypes") @NonNull Class converterType) {
-        return true;
-    }
+	@SuppressWarnings("null")
+	@Override
+	public boolean supports(@NonNull MethodParameter returnType, @SuppressWarnings("rawtypes") @NonNull Class converterType) {
+		return true;
+	}
 
-    @SuppressWarnings({ "null", "rawtypes" })
-    @Override
-    public Object beforeBodyWrite(Object o,
-            @NonNull MethodParameter returnType,
-            @NonNull MediaType selectedContentType,
-            @NonNull Class selectedConverterType,
-            @NonNull ServerHttpRequest request,
-            @NonNull ServerHttpResponse response) {
-        if (o == null) {
-            return ResultData.fail(ReturnCode.RC400);
-        }
-        if (o instanceof ResultData<?>) {
-            return o;
-        }
-        return ResultData.success(o);
-    }
+	@SuppressWarnings({ "null", "rawtypes" })
+	@Override
+	public Object beforeBodyWrite(Object o,
+			@NonNull MethodParameter returnType,
+			@NonNull MediaType selectedContentType,
+			@NonNull Class selectedConverterType,
+			@NonNull ServerHttpRequest request,
+			@NonNull ServerHttpResponse response) {
+		if (o == null) {
+			return ResultData.fail(ReturnCode.RC400);
+		}
+		if (o instanceof ResultData<?>) {
+			return o;
+		}
+		return ResultData.success(o);
+	}
 }

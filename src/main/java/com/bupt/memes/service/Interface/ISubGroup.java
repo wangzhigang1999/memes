@@ -5,10 +5,10 @@ import com.bupt.memes.model.media.SubmissionGroup;
 import java.util.List;
 
 public interface ISubGroup {
-    SubmissionGroup createGroup(List<String> submissionIds);
+	SubmissionGroup createGroup(List<String> submissionIds);
 
-    SubmissionGroup addToGroup(String groupId, List<String> submissionIds);
+	SubmissionGroup addToGroup(String groupId, List<String> submissionIds);
 
-    SubmissionGroup getById(String id);
+	SubmissionGroup getById(String id);
 
 }

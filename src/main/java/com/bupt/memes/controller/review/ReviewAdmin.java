@@ -12,77 +12,81 @@ import java.util.Map;
 @RequestMapping("/admin/review")
 @CrossOrigin(origins = "*")
 public class ReviewAdmin {
-    final Review service;
+	final Review service;
 
-    public ReviewAdmin(Review service) {
-        this.service = service;
-    }
+	public ReviewAdmin(Review service) {
+		this.service = service;
+	}
 
-    /**
-     * 获取所有待审核的提交
-     *
-     * @return ResultData
-     */
-    @GetMapping("")
-    @AuthRequired
-    public List<Submission> all() {
-        return service.getWaitingSubmissions();
-    }
+	/**
+	 * 获取所有待审核的提交
+	 *
+	 * @return ResultData
+	 */
+	@GetMapping("")
+	@AuthRequired
+	public List<Submission> all() {
+		return service.getWaitingSubmissions();
+	}
 
-    /**
-     * 接受某个投稿
-     *
-     * @param id 投稿的 id
-     * @return ResultData
-     */
-    @PostMapping("/accept/{id}")
-    @AuthRequired
-    public Boolean accept(@PathVariable("id") String id) {
-        return service.acceptSubmission(id);
-    }
+	/**
+	 * 接受某个投稿
+	 *
+	 * @param id
+	 *            投稿的 id
+	 * @return ResultData
+	 */
+	@PostMapping("/accept/{id}")
+	@AuthRequired
+	public Boolean accept(@PathVariable("id") String id) {
+		return service.acceptSubmission(id);
+	}
 
-    /**
-     * 拒绝某个投稿
-     *
-     * @param id 投稿的 id
-     * @return ResultData
-     */
-    @PostMapping("/reject/{id}")
-    @AuthRequired
-    public Boolean reject(@PathVariable("id") String id) {
-        return service.rejectSubmission(id);
-    }
+	/**
+	 * 拒绝某个投稿
+	 *
+	 * @param id
+	 *            投稿的 id
+	 * @return ResultData
+	 */
+	@PostMapping("/reject/{id}")
+	@AuthRequired
+	public Boolean reject(@PathVariable("id") String id) {
+		return service.rejectSubmission(id);
+	}
 
-    /**
-     * 批量接受投稿
-     *
-     * @param ids 投稿的 id
-     * @return ResultData
-     */
-    @PostMapping("/accept/batch")
-    @AuthRequired
-    public Integer batchAccept(@RequestBody List<String> ids) {
-        return service.batchAcceptSubmission(ids);
-    }
+	/**
+	 * 批量接受投稿
+	 *
+	 * @param ids
+	 *            投稿的 id
+	 * @return ResultData
+	 */
+	@PostMapping("/accept/batch")
+	@AuthRequired
+	public Integer batchAccept(@RequestBody List<String> ids) {
+		return service.batchAcceptSubmission(ids);
+	}
 
-    /**
-     * 批量拒绝投稿
-     *
-     * @param ids 投稿的 id
-     * @return Integer
-     */
-    @PostMapping("/reject/batch")
-    @AuthRequired
-    public Integer batchReject(@RequestBody List<String> ids) {
-        return service.batchRejectSubmission(ids);
-    }
+	/**
+	 * 批量拒绝投稿
+	 *
+	 * @param ids
+	 *            投稿的 id
+	 * @return Integer
+	 */
+	@PostMapping("/reject/batch")
+	@AuthRequired
+	public Integer batchReject(@RequestBody List<String> ids) {
+		return service.batchRejectSubmission(ids);
+	}
 
-    /**
-     * 今日投稿的统计信息
-     */
-    @GetMapping("/statistic")
-    @AuthRequired
-    public Map<String, Long> today() {
-        return service.getTodayInfo();
-    }
+	/**
+	 * 今日投稿的统计信息
+	 */
+	@GetMapping("/statistic")
+	@AuthRequired
+	public Map<String, Long> today() {
+		return service.getTodayInfo();
+	}
 }

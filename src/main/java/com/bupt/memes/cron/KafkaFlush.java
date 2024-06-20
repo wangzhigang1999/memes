@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class KafkaFlush {
-    @Scheduled(fixedRate = 5000)
-    public void flush() {
-        KafkaUtil.flush();
-    }
+	@Scheduled(fixedRate = 5000)
+	public void flush() {
+		KafkaUtil.flush();
+	}
 
-    @PreDestroy
-    public void destroy() {
-        KafkaUtil.close();
-    }
+	@PreDestroy
+	public void destroy() {
+		KafkaUtil.close();
+	}
 
 }

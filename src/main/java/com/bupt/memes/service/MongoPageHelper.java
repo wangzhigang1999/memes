@@ -23,56 +23,63 @@ import java.util.stream.Collectors;
 @SuppressWarnings("null")
 public class MongoPageHelper {
 
-    public static final String ID = "_id";
-    private final MongoTemplate mongoTemplate;
+	public static final String ID = "_id";
+	private final MongoTemplate mongoTemplate;
 
-    @Autowired
-    public MongoPageHelper(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
+	@Autowired
+	public MongoPageHelper(MongoTemplate mongoTemplate) {
+		this.mongoTemplate = mongoTemplate;
+	}
 
-    /**
-     * 分页查询，直接返回集合类型的结果.
-     */
-    public <T> PageResult<T> pageQuery(Query query, Class<T> entityClass, Integer pageSize, String lastId) {
-        return pageQuery(query, entityClass, Function.identity(), pageSize, lastId);
-    }
+	/**
+	 * 分页查询，直接返回集合类型的结果.
+	 */
+	public <T> PageResult<T> pageQuery(Query query, Class<T> entityClass, Integer pageSize, String lastId) {
+		return pageQuery(query, entityClass, Function.identity(), pageSize, lastId);
+	}
 
-    /**
-     * 分页查询.
-     *
-     * @param query       Mongo Query 对象，构造你自己的查询条件.
-     * @param entityClass Mongo collection 定义的 entity class，用来确定查询哪个集合.
-     * @param mapper      映射器，你从 db 查出来的 list 的元素类型是 entityClass,
-     *                    如果你想要转换成另一个对象，比如去掉敏感字段等，可以使用 mapper 来决定如何转换.
-     * @param pageSize    分页的大小.
-     * @param lastId      条件分页参数，区别于 skip-limit，采用 find(_id<lastId).limit 分页.
-     *                    如果不跳页，像朋友圈，微博这样下拉刷新的分页需求，需要传递上一页的最后一条记录的 ObjectId。
-     *                    如果是 null，则返回 pageNum 那一页.
-     * @param <T>         collection 定义的 class 类型.
-     * @param <R>         最终返回时，展现给页面时的一条记录的类型。
-     * @return PageResult, 一个封装 page 信息的对象.
-     */
-    public <T, R> PageResult<R> pageQuery(Query query, Class<T> entityClass, Function<T, R> mapper, Integer pageSize,
-            String lastId) {
-        Criteria criteria = new Criteria();
+	/**
+	 * 分页查询.
+	 *
+	 * @param query
+	 *            Mongo Query 对象，构造你自己的查询条件.
+	 * @param entityClass
+	 *            Mongo collection 定义的 entity class，用来确定查询哪个集合.
+	 * @param mapper
+	 *            映射器，你从 db 查出来的 list 的元素类型是 entityClass,
+	 *            如果你想要转换成另一个对象，比如去掉敏感字段等，可以使用 mapper 来决定如何转换.
+	 * @param pageSize
+	 *            分页的大小.
+	 * @param lastId
+	 *            条件分页参数，区别于 skip-limit，采用 find(_id<lastId).limit 分页.
+	 *            如果不跳页，像朋友圈，微博这样下拉刷新的分页需求，需要传递上一页的最后一条记录的 ObjectId。
+	 *            如果是 null，则返回 pageNum 那一页.
+	 * @param <T>
+	 *            collection 定义的 class 类型.
+	 * @param <R>
+	 *            最终返回时，展现给页面时的一条记录的类型。
+	 * @return PageResult, 一个封装 page 信息的对象.
+	 */
+	public <T, R> PageResult<R> pageQuery(Query query, Class<T> entityClass, Function<T, R> mapper, Integer pageSize,
+			String lastId) {
+		Criteria criteria = new Criteria();
 
-        // if it has lastId, means skip page
-        if (StringUtils.isNotBlank(lastId)) {
-            criteria.and(ID).lt(new ObjectId(lastId));
-        }
+		// if it has lastId, means skip page
+		if (StringUtils.isNotBlank(lastId)) {
+			criteria.and(ID).lt(new ObjectId(lastId));
+		}
 
-        Query q = query.addCriteria(criteria)
-                .with(Sort.by(Sort.Direction.DESC, ID))
-                .limit(pageSize);
+		Query q = query.addCriteria(criteria)
+				.with(Sort.by(Sort.Direction.DESC, ID))
+				.limit(pageSize);
 
-        List<T> entityList = mongoTemplate.find(q, entityClass);
+		List<T> entityList = mongoTemplate.find(q, entityClass);
 
-        PageResult<R> pageResult = new PageResult<>();
-        pageResult.setPageSize(pageSize);
-        pageResult.setList(entityList.stream().map(mapper).collect(Collectors.toList()));
-        return pageResult;
+		PageResult<R> pageResult = new PageResult<>();
+		pageResult.setPageSize(pageSize);
+		pageResult.setList(entityList.stream().map(mapper).collect(Collectors.toList()));
+		return pageResult;
 
-    }
+	}
 
 }

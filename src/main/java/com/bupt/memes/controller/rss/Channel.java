@@ -12,38 +12,38 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class Channel {
 
-    final RSSChannelService service;
+	final RSSChannelService service;
 
-    public Channel(RSSChannelService service) {
-        this.service = service;
-    }
+	public Channel(RSSChannelService service) {
+		this.service = service;
+	}
 
-    // list all channels
-    @GetMapping("")
-    @AuthRequired
-    List<RSSChannel> list() {
-        return service.list();
-    }
+	// list all channels
+	@GetMapping("")
+	@AuthRequired
+	List<RSSChannel> list() {
+		return service.list();
+	}
 
-    // list by keyword
-    @RequestMapping("/keyword/{keyword}")
-    @AuthRequired
-    List<RSSChannel> listByKeyword(@PathVariable String keyword) {
-        return service.listByKeyword(keyword);
-    }
+	// list by keyword
+	@RequestMapping("/keyword/{keyword}")
+	@AuthRequired
+	List<RSSChannel> listByKeyword(@PathVariable String keyword) {
+		return service.listByKeyword(keyword);
+	}
 
-    // delete by id restful api
-    @DeleteMapping("/{id}")
-    @AuthRequired
-    boolean deleteById(@PathVariable String id) {
-        return service.deleteById(id);
-    }
+	// delete by id restful api
+	@DeleteMapping("/{id}")
+	@AuthRequired
+	boolean deleteById(@PathVariable String id) {
+		return service.deleteById(id);
+	}
 
-    // add
-    @PostMapping("/{title}")
-    @AuthRequired
-    RSSChannel add(@RequestBody RSSChannel channel) {
-        return service.add(channel);
-    }
+	// add
+	@PostMapping("/{title}")
+	@AuthRequired
+	RSSChannel add(@RequestBody RSSChannel channel) {
+		return service.add(channel);
+	}
 
 }

@@ -9,21 +9,21 @@ import java.util.Set;
 
 public interface INews {
 
-    News addNews(News news, MultipartFile coverImage);
+	News addNews(News news, MultipartFile coverImage);
 
-    News addTag(String newsId, Set<String> tag);
+	News addTag(String newsId, Set<String> tag);
 
-    News removeTag(String newsId, Set<String> tag);
+	News removeTag(String newsId, Set<String> tag);
 
-    News findById(String id);
+	News findById(String id);
 
-    List<News> findByDate(String date);
+	List<News> findByDate(String date);
 
-    List<News> findByMMDD(String month, String day);
+	List<News> findByMMDD(String month, String day);
 
-    boolean deleteNews(String id);
+	boolean deleteNews(String id);
 
-    PageResult<News> find(boolean hasContent, int pageSize, String lastID);
+	PageResult<News> find(boolean hasContent, int pageSize, String lastID);
 
-    PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageSize, String lastID);
+	PageResult<News> findByTag(Set<String> tags, boolean hasContent, int pageSize, String lastID);
 }
