@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Lazy(false)
 @ConditionalOnProperty(value = "perf.enable", havingValue = "true")
-public class Profile {
+public class ProfileConfig {
 
     @Value("${perf.url}")
     public String perfUrl;
@@ -26,7 +26,7 @@ public class Profile {
     @Value("${perf.password}")
     public String perfPassword;
 
-    Logger logger = org.slf4j.LoggerFactory.getLogger(Profile.class);
+    Logger logger = org.slf4j.LoggerFactory.getLogger(ProfileConfig.class);
 
     @PostConstruct
     public void init() {

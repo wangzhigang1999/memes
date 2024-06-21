@@ -12,6 +12,7 @@ import com.bupt.memes.service.SysConfigService;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +29,7 @@ import static com.bupt.memes.util.TimeUtil.getCurrentHour;
 
 @Service
 @AllArgsConstructor
+@ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
 public class CronJob {
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(CronJob.class);

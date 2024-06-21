@@ -8,15 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class ExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
 
-    @ExceptionHandler(value = NullPointerException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = NullPointerException.class)
     @ResponseBody
     public ResultData<?> exceptionHandler(HttpServletRequest request, NullPointerException e) {
         String requestUrl = request.getRequestURL().toString();
@@ -25,7 +24,7 @@ public class GlobalExceptionHandler {
     }
 
     // IllegalArgumentException
-    @ExceptionHandler(value = IllegalArgumentException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = IllegalArgumentException.class)
     @ResponseBody
     public ResultData<?> exceptionHandler(HttpServletRequest request, IllegalArgumentException e) {
         String requestUrl = request.getRequestURL().toString();
@@ -34,7 +33,7 @@ public class GlobalExceptionHandler {
     }
 
     // ClassCastException
-    @ExceptionHandler(value = ClassCastException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = ClassCastException.class)
     @ResponseBody
     public ResultData<?> exceptionHandler(HttpServletRequest request, ClassCastException e) {
         String requestUrl = request.getRequestURL().toString();
@@ -43,7 +42,7 @@ public class GlobalExceptionHandler {
     }
 
     // HttpMediaTypeNotAcceptableException
-    @ExceptionHandler(value = HttpMediaTypeNotAcceptableException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = HttpMediaTypeNotAcceptableException.class)
     @ResponseBody
     public ResultData<?> exceptionHandler(HttpServletRequest request, HttpMediaTypeNotAcceptableException e) {
         String requestUrl = request.getRequestURL().toString();
@@ -51,7 +50,7 @@ public class GlobalExceptionHandler {
         return ResultData.fail(ReturnCode.RC500);
     }
 
-    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     @ResponseBody
     public ResultData<?> exceptionHandler(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
         String requestUrl = request.getRequestURL().toString();

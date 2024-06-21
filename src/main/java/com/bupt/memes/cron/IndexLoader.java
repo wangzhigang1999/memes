@@ -3,10 +3,12 @@ package com.bupt.memes.cron;
 import com.bupt.memes.model.Sys;
 import com.bupt.memes.service.AnnIndexService;
 import com.bupt.memes.service.SysConfigService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
 public class IndexLoader {
 
     private final AnnIndexService annIndexService;
