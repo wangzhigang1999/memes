@@ -5,39 +5,39 @@
 package com.bupt.memes.model.transport;
 
 public interface EmbeddingsOrBuilder extends
-		// @@protoc_insertion_point(interface_extends:Embeddings)
-		com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:Embeddings)
+        com.google.protobuf.MessageOrBuilder {
 
-	/**
-	 * <code>int32 count = 1;</code>
-	 * 
-	 * @return The count.
-	 */
-	int getCount();
+    /**
+     * <code>int32 count = 1;</code>
+     * 
+     * @return The count.
+     */
+    int getCount();
 
-	/**
-	 * <code>repeated .Embedding data = 2;</code>
-	 */
-	java.util.List<com.bupt.memes.model.transport.Embedding> getDataList();
+    /**
+     * <code>repeated .Embedding data = 2;</code>
+     */
+    java.util.List<com.bupt.memes.model.transport.Embedding> getDataList();
 
-	/**
-	 * <code>repeated .Embedding data = 2;</code>
-	 */
-	com.bupt.memes.model.transport.Embedding getData(int index);
+    /**
+     * <code>repeated .Embedding data = 2;</code>
+     */
+    com.bupt.memes.model.transport.Embedding getData(int index);
 
-	/**
-	 * <code>repeated .Embedding data = 2;</code>
-	 */
-	int getDataCount();
+    /**
+     * <code>repeated .Embedding data = 2;</code>
+     */
+    int getDataCount();
 
-	/**
-	 * <code>repeated .Embedding data = 2;</code>
-	 */
-	java.util.List<? extends com.bupt.memes.model.transport.EmbeddingOrBuilder> getDataOrBuilderList();
+    /**
+     * <code>repeated .Embedding data = 2;</code>
+     */
+    java.util.List<? extends com.bupt.memes.model.transport.EmbeddingOrBuilder> getDataOrBuilderList();
 
-	/**
-	 * <code>repeated .Embedding data = 2;</code>
-	 */
-	com.bupt.memes.model.transport.EmbeddingOrBuilder getDataOrBuilder(
-			int index);
+    /**
+     * <code>repeated .Embedding data = 2;</code>
+     */
+    com.bupt.memes.model.transport.EmbeddingOrBuilder getDataOrBuilder(
+            int index);
 }

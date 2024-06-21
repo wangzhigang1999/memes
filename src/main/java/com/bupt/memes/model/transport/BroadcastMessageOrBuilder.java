@@ -5,62 +5,62 @@
 package com.bupt.memes.model.transport;
 
 public interface BroadcastMessageOrBuilder extends
-		// @@protoc_insertion_point(interface_extends:BroadcastMessage)
-		com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:BroadcastMessage)
+        com.google.protobuf.MessageOrBuilder {
 
-	/**
-	 * <code>string id = 1;</code>
-	 * 
-	 * @return The id.
-	 */
-	java.lang.String getId();
+    /**
+     * <code>string id = 1;</code>
+     * 
+     * @return The id.
+     */
+    java.lang.String getId();
 
-	/**
-	 * <code>string id = 1;</code>
-	 * 
-	 * @return The bytes for id.
-	 */
-	com.google.protobuf.ByteString getIdBytes();
+    /**
+     * <code>string id = 1;</code>
+     * 
+     * @return The bytes for id.
+     */
+    com.google.protobuf.ByteString getIdBytes();
 
-	/**
-	 * <code>int64 timestamp = 2;</code>
-	 * 
-	 * @return The timestamp.
-	 */
-	long getTimestamp();
+    /**
+     * <code>int64 timestamp = 2;</code>
+     * 
+     * @return The timestamp.
+     */
+    long getTimestamp();
 
-	/**
-	 * <code>string sourceNode = 3;</code>
-	 * 
-	 * @return The sourceNode.
-	 */
-	java.lang.String getSourceNode();
+    /**
+     * <code>string sourceNode = 3;</code>
+     * 
+     * @return The sourceNode.
+     */
+    java.lang.String getSourceNode();
 
-	/**
-	 * <code>string sourceNode = 3;</code>
-	 * 
-	 * @return The bytes for sourceNode.
-	 */
-	com.google.protobuf.ByteString getSourceNodeBytes();
+    /**
+     * <code>string sourceNode = 3;</code>
+     * 
+     * @return The bytes for sourceNode.
+     */
+    com.google.protobuf.ByteString getSourceNodeBytes();
 
-	/**
-	 * <code>.OperationType operation = 4;</code>
-	 * 
-	 * @return The enum numeric value on the wire for operation.
-	 */
-	int getOperationValue();
+    /**
+     * <code>.OperationType operation = 4;</code>
+     * 
+     * @return The enum numeric value on the wire for operation.
+     */
+    int getOperationValue();
 
-	/**
-	 * <code>.OperationType operation = 4;</code>
-	 * 
-	 * @return The operation.
-	 */
-	com.bupt.memes.model.transport.OperationType getOperation();
+    /**
+     * <code>.OperationType operation = 4;</code>
+     * 
+     * @return The operation.
+     */
+    com.bupt.memes.model.transport.OperationType getOperation();
 
-	/**
-	 * <code>bytes data = 5;</code>
-	 * 
-	 * @return The data.
-	 */
-	com.google.protobuf.ByteString getData();
+    /**
+     * <code>bytes data = 5;</code>
+     * 
+     * @return The data.
+     */
+    com.google.protobuf.ByteString getData();
 }

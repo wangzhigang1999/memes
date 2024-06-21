@@ -14,19 +14,19 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class NewsAdmin {
 
-	final INews iNews;
+    final INews iNews;
 
-	@PostMapping("")
-	@AuthRequired
-	public ResultData<News> addNews(String data, @RequestParam(required = false) MultipartFile coverImage) {
-		News news = News.fromJson(data);
-		return ResultData.success(iNews.addNews(news, coverImage));
-	}
+    @PostMapping("")
+    @AuthRequired
+    public ResultData<News> addNews(String data, @RequestParam(required = false) MultipartFile coverImage) {
+        News news = News.fromJson(data);
+        return ResultData.success(iNews.addNews(news, coverImage));
+    }
 
-	@DeleteMapping("/{id}")
-	@AuthRequired
-	public Boolean deleteNews(@PathVariable String id) {
-		return iNews.deleteNews(id);
-	}
+    @DeleteMapping("/{id}")
+    @AuthRequired
+    public Boolean deleteNews(@PathVariable String id) {
+        return iNews.deleteNews(id);
+    }
 
 }

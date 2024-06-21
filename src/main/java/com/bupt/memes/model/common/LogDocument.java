@@ -14,13 +14,13 @@ import java.util.Map;
 @Accessors(chain = true)
 @Document("log")
 public class LogDocument {
-	private String url;
-	private String method;
-	private String ip;
-	private Map<String, String[]> parameterMap;
-	private String uuid;
-	private long timecost; // ms
-	private long timestamp;
-	private String instanceUUID;
+    private String url;
+    private String method;
+    private String ip;
+    private Map<String, String[]> parameterMap;
+    private String uuid;
+    private long timecost; // ms
+    private long timestamp;
+    private String instanceUUID;
 
 }

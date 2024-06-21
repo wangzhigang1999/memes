@@ -14,26 +14,26 @@ import lombok.experimental.Accessors;
 @Builder
 public class HNSWItem implements Item<String, float[]> {
 
-	String id;
-	float[] vector;
+    String id;
+    float[] vector;
 
-	@Override
-	public String id() {
-		return id;
-	}
+    @Override
+    public String id() {
+        return id;
+    }
 
-	@Override
-	public float[] vector() {
-		return vector;
-	}
+    @Override
+    public float[] vector() {
+        return vector;
+    }
 
-	@Override
-	public int dimensions() {
-		return vector.length;
-	}
+    @Override
+    public int dimensions() {
+        return vector.length;
+    }
 
-	@Override
-	public long version() {
-		return Item.super.version();
-	}
+    @Override
+    public long version() {
+        return Item.super.version();
+    }
 }

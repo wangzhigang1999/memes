@@ -26,50 +26,50 @@ import java.util.UUID;
 @Aspect
 @Lazy(false)
 public class Auth {
-	@Value("${token}")
-	String localToken = UUID.randomUUID().toString();
-	final Logger logger = LoggerFactory.getLogger(Auth.class);
+    @Value("${token}")
+    String localToken = UUID.randomUUID().toString();
+    final Logger logger = LoggerFactory.getLogger(Auth.class);
 
-	@Pointcut("@annotation(com.bupt.memes.anno.AuthRequired)")
-	public void auth() {
-	}
+    @Pointcut("@annotation(com.bupt.memes.anno.AuthRequired)")
+    public void auth() {
+    }
 
-	/**
-	 * 校验 token
-	 */
-	@Around("auth()")
-	public Object auth(ProceedingJoinPoint joinPoint) throws Throwable {
+    /**
+     * 校验 token
+     */
+    @Around("auth()")
+    public Object auth(ProceedingJoinPoint joinPoint) throws Throwable {
 
-		/*
-		 * 从请求头中获取 token，如果 token 不正确，返回 401
-		 * 进程内部的 token，只有在启动时才会生成，如果进程重启，token 会改变；也可以通过环境变量传入
-		 */
-		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		if (attributes == null) {
-			return ResultData.fail(ReturnCode.RC401);
-		}
+        /*
+         * 从请求头中获取 token，如果 token 不正确，返回 401
+         * 进程内部的 token，只有在启动时才会生成，如果进程重启，token 会改变；也可以通过环境变量传入
+         */
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            return ResultData.fail(ReturnCode.RC401);
+        }
 
-		var httpMethod = attributes.getRequest().getMethod();
-		var path = "%s %s".formatted(httpMethod, attributes.getRequest().getRequestURI());
+        var httpMethod = attributes.getRequest().getMethod();
+        var path = "%s %s".formatted(httpMethod, attributes.getRequest().getRequestURI());
 
-		var request = attributes.getRequest();
-		var token = request.getHeader("token");
-		if (token == null || !token.equals(localToken)) {
-			logger.warn("Unauthorized access: {},token is {}", path, token);
-			HttpServletResponse response = attributes.getResponse();
-			if (response != null) {
-				response.setStatus(401);
-			}
-			return ResultData.fail(ReturnCode.RC401);
-		}
-		logger.info("Authorized access: {}", path);
-		return joinPoint.proceed();
-	}
+        var request = attributes.getRequest();
+        var token = request.getHeader("token");
+        if (token == null || !token.equals(localToken)) {
+            logger.warn("Unauthorized access: {},token is {}", path, token);
+            HttpServletResponse response = attributes.getResponse();
+            if (response != null) {
+                response.setStatus(401);
+            }
+            return ResultData.fail(ReturnCode.RC401);
+        }
+        logger.info("Authorized access: {}", path);
+        return joinPoint.proceed();
+    }
 
-	@PostConstruct
-	public void init() {
-		String encodedToken = Base64.getEncoder().encodeToString(localToken.getBytes());
-		logger.warn("Token: {}", encodedToken);
-	}
+    @PostConstruct
+    public void init() {
+        String encodedToken = Base64.getEncoder().encodeToString(localToken.getBytes());
+        logger.warn("Token: {}", encodedToken);
+    }
 
 }

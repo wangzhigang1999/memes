@@ -9,18 +9,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class IndexLoader {
 
-	private final AnnIndexService annIndexService;
-	private final SysConfigService sysConfig;
+    private final AnnIndexService annIndexService;
+    private final SysConfigService sysConfig;
 
-	public IndexLoader(AnnIndexService annIndexService, SysConfigService sysConfig) {
-		this.annIndexService = annIndexService;
-		this.sysConfig = sysConfig;
-	}
+    public IndexLoader(AnnIndexService annIndexService, SysConfigService sysConfig) {
+        this.annIndexService = annIndexService;
+        this.sysConfig = sysConfig;
+    }
 
-	@Scheduled(fixedRate = 1000 * 60)
-	public void reload() {
-		Sys sys = sysConfig.getSys();
-		annIndexService.reloadIndex(sys.getIndexVersion(), sys.getIndexFile(), false);
-		annIndexService.initKafkaConsumer();
-	}
+    @Scheduled(fixedRate = 1000 * 60)
+    public void reload() {
+        Sys sys = sysConfig.getSys();
+        annIndexService.reloadIndex(sys.getIndexVersion(), sys.getIndexFile(), false);
+        annIndexService.initKafkaConsumer();
+    }
 }

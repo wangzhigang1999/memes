@@ -13,14 +13,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Document(collection = "rss_item")
 public class RSSItem {
-	private String title;
-	private String link;
-	private String author;
-	@JsonIgnore
-	private String description;
-	private String pubDate;
-	private String comments;
-	private String guid;
+    private String title;
+    private String link;
+    private String author;
+    @JsonIgnore
+    private String description;
+    private String pubDate;
+    private String comments;
+    private String guid;
 
-	private String board = "";
+    private String board = "";
 }
