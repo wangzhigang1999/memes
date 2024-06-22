@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController("newsController")
 @RequestMapping("/news")
 @CrossOrigin(origins = "*")
 @AllArgsConstructor

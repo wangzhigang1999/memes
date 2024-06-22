@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-@RestController
+@RestController("submissionController")
 @RequestMapping("/submission")
 @CrossOrigin(origins = "*")
 @AllArgsConstructor
