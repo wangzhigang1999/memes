@@ -257,13 +257,13 @@ public class AnnIndexService {
         }
         log.info("Persisting index to storage, current diff: {}, threshold: {}", diff, config.indexPersistThreshold);
         var now = System.currentTimeMillis();
-        var indexName = "%s.index".formatted(now);
+        var indexName = "%s-%s.index".formatted(INSTANCE_UUID, now);
         saveIndex(indexName);
         log.info("Saved index to local file: {}", indexName);
         byte[] bytes = FileUtils.readFileToByteArray(Path.of(indexName).toFile());
-        FileUploadResult resp = storage.store(bytes, "application/octet-stream", "embeddings/%s-%s".formatted(INSTANCE_UUID, indexName));
+        FileUploadResult resp = storage.store(bytes, "application/octet-stream", "embeddings/%s".formatted(indexName));
         log.info("Persisted index to storage, version: {}, url: {}", now, resp.url());
-        setIndex(resp.url(), now);
+        setIndex(indexName, now);
         return Pair.of(now, resp.url());
     }
 }
