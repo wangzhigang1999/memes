@@ -1,21 +1,23 @@
 package com.bupt.memes.service;
 
+import com.bupt.memes.config.AppConfig;
 import com.bupt.memes.exception.AppException;
 import com.bupt.memes.model.HNSWItem;
+import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.transport.Embedding;
+import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.util.KafkaUtil;
 import com.bupt.memes.util.Preconditions;
 import com.github.jelmerk.knn.DistanceFunctions;
 import com.github.jelmerk.knn.SearchResult;
 import com.github.jelmerk.knn.hnsw.HnswIndex;
 import com.google.protobuf.InvalidProtocolBufferException;
-import lombok.Data;
 import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -31,8 +33,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import static com.bupt.memes.aspect.Audit.INSTANCE_UUID;
 
 @Component
-@Data
-@Accessors(chain = true)
 @Slf4j
 public class AnnIndexService {
 
@@ -51,7 +51,8 @@ public class AnnIndexService {
     @Value("${hnsw.maxElements}")
     private int maxElements = 1000000;
 
-    private long indexVersion = 0;
+    private long initIndexVersion = 0;
+    private long initIndexSize = 0;
 
     private HnswIndex<String, float[], HNSWItem, Float> index;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -60,70 +61,13 @@ public class AnnIndexService {
 
     private final AtomicBoolean consumerHealthy = new AtomicBoolean(false);
 
-    private void setNewIndex(HnswIndex<String, float[], HNSWItem, Float> newIndex) {
-        writeLock.lock();
-        index = newIndex;
-        writeLock.unlock();
-    }
+    private final Storage storage;
 
-    public void initIndex(String indexFile) {
-        HnswIndex<String, float[], HNSWItem, Float> loadedFromLocal = loadFromLocal(indexFile);
-        if (loadedFromLocal != null) {
-            setNewIndex(loadedFromLocal);
-            log.info("Loaded index from local file: {}, size: {}", indexFile, index.size());
-            return;
-        }
+    private final AppConfig config;
 
-        HnswIndex<String, float[], HNSWItem, Float> loadFromNet = loadFromNet(indexFile);
-        if (loadFromNet != null) {
-            setNewIndex(loadFromNet);
-            log.info("Loaded index from network: {}, size: {}", indexFile, index.size());
-            return;
-        }
-
-        initIndex();
-    }
-
-    public void initIndex() {
-        HnswIndex<String, float[], HNSWItem, Float> newIndex = HnswIndex.newBuilder(dimension, DistanceFunctions.FLOAT_EUCLIDEAN_DISTANCE, maxElements)
-                .withM(m)
-                .withEf(efSearch)
-                .withEfConstruction(efConstruction)
-                .withRemoveEnabled()
-                .build();
-        writeLock.lock();
-        index = newIndex;
-        writeLock.unlock();
-        log.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}",
-                dimension, m, efSearch, efConstruction, maxElements);
-    }
-
-    @SneakyThrows
-    private HnswIndex<String, float[], HNSWItem, Float> loadFromNet(String url) {
-        try {
-            URI uri = new URI(url);
-            Path path = Path.of("%s.index".formatted(INSTANCE_UUID));
-            FileUtils.copyURLToFile(uri.toURL(), path.toFile());
-            return HnswIndex.load(path);
-        } catch (Exception e) {
-            log.error("Failed to load index from network: {}", url);
-            return null;
-        }
-    }
-
-    private HnswIndex<String, float[], HNSWItem, Float> loadFromLocal(String indexFile) {
-        try {
-            String[] split = indexFile.split("/");
-            indexFile = split[split.length - 1];
-            Path path = Path.of(indexFile);
-            if (!Files.exists(path)) {
-                return null;
-            }
-            return HnswIndex.load(path);
-        } catch (Exception e) {
-            log.error("Failed to load index from local file: {}", indexFile);
-            return null;
-        }
+    public AnnIndexService(Storage storage, AppConfig config) {
+        this.storage = storage;
+        this.config = config;
     }
 
     public List<SearchResult<HNSWItem, Float>> search(float[] vector, int topK) {
@@ -147,11 +91,10 @@ public class AnnIndexService {
     }
 
     public void reloadIndex(long targetVersion, String indexFile, boolean forceReload) {
-        if (forceReload || indexVersion < targetVersion) {
+        if (forceReload || initIndexVersion < targetVersion) {
             log.info("Reloading index from file: {}", indexFile);
-            initIndex(indexFile);
-            indexVersion = targetVersion;
-            log.info("Reloaded index with version: {}", indexVersion);
+            setIndex(indexFile, targetVersion);
+            log.info("Reloaded index with version: {}", initIndexVersion);
         }
     }
 
@@ -197,6 +140,77 @@ public class AnnIndexService {
         }
     }
 
+    private void setNewIndex(HnswIndex<String, float[], HNSWItem, Float> newIndex, Long indexVersion) {
+        writeLock.lock();
+        index = newIndex;
+        this.initIndexVersion = indexVersion;
+        this.initIndexSize = index.size();
+        writeLock.unlock();
+    }
+
+    private void setIndex(String indexFile, Long indexVersion) {
+        /*
+         * 从本地加载索引
+         */
+        HnswIndex<String, float[], HNSWItem, Float> loadedFromLocal = loadFromLocal(indexFile);
+        if (loadedFromLocal != null) {
+            setNewIndex(loadedFromLocal, indexVersion);
+            log.info("Loaded index from local file: {}, size: {}", indexFile, index.size());
+            return;
+        }
+
+        /*
+         * 从网络加载索引
+         */
+        HnswIndex<String, float[], HNSWItem, Float> loadFromNet = loadFromNet(indexFile);
+        if (loadFromNet != null) {
+            setNewIndex(loadFromNet, indexVersion);
+            log.info("Loaded index from network: {}, size: {}", indexFile, index.size());
+            return;
+        }
+
+        /*
+         * 初始化新的索引
+         */
+        HnswIndex<String, float[], HNSWItem, Float> newIndex = HnswIndex.newBuilder(dimension, DistanceFunctions.FLOAT_EUCLIDEAN_DISTANCE, maxElements)
+                .withM(m)
+                .withEf(efSearch)
+                .withEfConstruction(efConstruction)
+                .withRemoveEnabled()
+                .build();
+        setNewIndex(newIndex, 0L);
+        log.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}",
+                dimension, m, efSearch, efConstruction, maxElements);
+    }
+
+    @SneakyThrows
+    private HnswIndex<String, float[], HNSWItem, Float> loadFromNet(String url) {
+        try {
+            URI uri = new URI(url);
+            Path path = Path.of("%s.index".formatted(INSTANCE_UUID));
+            FileUtils.copyURLToFile(uri.toURL(), path.toFile());
+            return HnswIndex.load(path);
+        } catch (Exception e) {
+            log.error("Failed to load index from network: {}", url);
+            return null;
+        }
+    }
+
+    private HnswIndex<String, float[], HNSWItem, Float> loadFromLocal(String indexFile) {
+        try {
+            String[] split = indexFile.split("/");
+            indexFile = split[split.length - 1];
+            Path path = Path.of(indexFile);
+            if (!Files.exists(path)) {
+                return null;
+            }
+            return HnswIndex.load(path);
+        } catch (Exception e) {
+            log.error("Failed to load index from local file: {}", indexFile);
+            return null;
+        }
+    }
+
     private void listenKafka() {
         KafkaConsumer<String, byte[]> consumer;
         try {
@@ -228,5 +242,30 @@ public class AnnIndexService {
                 }
             }
         }
+    }
+
+    /**
+     * 把内存中的索引持久化到存储中
+     *
+     * @return 返回持久化后的索引地址
+     */
+    @SneakyThrows
+    public Pair<Long, String> persistIndex() {
+        Preconditions.checkNotNull(storage, AppException.databaseError("Storage is not initialized"));
+        long diff = index.size() - initIndexSize;
+        if (diff < config.indexPersistThreshold) {
+            log.info("Index size is less than threshold, current diff: {}, threshold: {}", diff, config.indexPersistThreshold);
+            return null;
+        }
+        log.info("Persisting index to storage, current diff: {}, threshold: {}", diff, config.indexPersistThreshold);
+        var now = System.currentTimeMillis();
+        var indexName = "%s.index".formatted(now);
+        saveIndex(indexName);
+        log.info("Saved index to local file: {}", indexName);
+        byte[] bytes = FileUtils.readFileToByteArray(Path.of(indexName).toFile());
+        FileUploadResult resp = storage.store(bytes, "application/octet-stream", "embeddings/%s-%s".formatted(INSTANCE_UUID, indexName));
+        log.info("Persisted index to storage, version: {}, url: {}", now, resp.url());
+        setIndex(resp.url(), now);
+        return Pair.of(now, resp.url());
     }
 }

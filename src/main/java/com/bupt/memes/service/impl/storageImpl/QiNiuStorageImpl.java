@@ -58,8 +58,16 @@ public class QiNiuStorageImpl implements Storage {
     @SneakyThrows
     public FileUploadResult store(byte[] bytes, String mime) {
         String type = getExtension(mime);
-        String fileName = putImg(bytes, type);
+        String fileName = putBytes(bytes, type);
         Preconditions.checkArgument(fileName != null, AppException.storageError("file upload failed,type:%s".formatted(type)));
+        var url = urlPrefix.concat(fileName);
+        return new FileUploadResult(url, fileName, mime);
+    }
+
+    @Override
+    public FileUploadResult store(byte[] bytes, String mime, String path) {
+        String fileName = putBytes(bytes, mime, path);
+        Preconditions.checkArgument(fileName != null, AppException.storageError("file upload failed,type:%s".formatted(mime)));
         var url = urlPrefix.concat(fileName);
         return new FileUploadResult(url, fileName, mime);
     }
@@ -90,23 +98,36 @@ public class QiNiuStorageImpl implements Storage {
     }
 
     /**
-     * 上传图片到七牛云
+     * 上传字节数据到七牛云
      *
-     * @param bytes
-     *            图片字节数组
-     * @param ext
-     *            图片后缀/扩展名
-     * @return 七牛云上的图片名 =文件路径 + 文件名
+     * @param bytes 字节数组
+     * @param ext   后缀/扩展名
+     * @return 七牛云上的文件名 =文件路径 + 文件名
      */
     @SneakyThrows
-    private String putImg(byte[] bytes, String ext) {
-        Auth auth = Auth.create(accessKey, secretKey);
-        String uploadToken = auth.uploadToken(bucket);
+    private String putBytes(byte[] bytes, String ext) {
         String uuid = UUID.randomUUID().toString();
         long timeMillis = System.currentTimeMillis();
         // timestamp-uuid.ext, time is used to sort the images
         var fileName = ossDirName.concat(String.valueOf(timeMillis)).concat("-").concat(uuid).concat(".").concat(ext);
-        Response response = manager.put(bytes, fileName, uploadToken);
+        return putBytes(bytes, ext, fileName);
+    }
+
+    @SneakyThrows
+    private String putBytes(byte[] bytes, String mime, String path) {
+        Preconditions.checkStringNotEmpty(path, AppException.invalidParam("path"));
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        String[] split = path.split("/");
+        String fileName = split[split.length - 1];
+        if(!fileName.contains(".")){
+            path = path.concat(".").concat(getExtension(mime));
+        }
+        Auth auth = Auth.create(accessKey, secretKey);
+        String uploadToken = auth.uploadToken(bucket);
+        path = ossDirName.concat(path);
+        Response response = manager.put(bytes, path, uploadToken);
         DefaultPutRet putRet = gson.fromJson(response.bodyString(), DefaultPutRet.class);
         return putRet.key;
     }

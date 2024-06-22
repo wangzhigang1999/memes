@@ -6,6 +6,9 @@ spring:
 storage:
   type: ${storage}
 
+local:
+  urlPrefix: ${urlPrefix:"localhost:8080"}
+
 qiniu:
   accessKey: ${ak}
   secretKey: ${sk}

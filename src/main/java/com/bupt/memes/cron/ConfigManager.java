@@ -43,9 +43,6 @@ public class ConfigManager {
             boolean notified = updater.notifyUpdate(configItem.getKey(), configItem.getValue());
             if (notified) {
                 this.config.put(configItem.getKey(), configItem.getValue());
-                log.info("Config updated: {}={}", configItem.getKey(), configItem.getValue());
-            } else {
-                log.warn("Config update failed: {}={}", configItem.getKey(), configItem.getValue());
             }
         }
     }

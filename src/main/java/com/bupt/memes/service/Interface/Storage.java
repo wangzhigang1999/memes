@@ -11,6 +11,8 @@ public interface Storage {
         return null;
     }
 
+    FileUploadResult store(byte[] bytes, String mime, String path);
+
     /**
      * 后端的存储可以理解为扁平化的存储，所以删除的时候需要只需要传入 key
      *

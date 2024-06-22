@@ -54,6 +54,18 @@ public class LocalStorageImpl implements Storage {
     }
 
     @Override
+    @SneakyThrows
+    public FileUploadResult store(byte[] bytes, String mime, String relativePath) {
+        if (relativePath.startsWith("/")) {
+            relativePath = relativePath.substring(1);
+        }
+        var path = "%s/%s".formatted(localDir, relativePath);
+        File file = new File(path);
+        FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), file);
+        return new FileUploadResult(urlPrefix + relativePath, relativePath, getExtension(mime));
+    }
+
+    @Override
     public Map<String, Boolean> delete(String[] keyList) {
         Map<String, Boolean> map = new HashMap<>();
         for (String key : keyList) {

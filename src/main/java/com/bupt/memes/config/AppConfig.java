@@ -34,6 +34,9 @@ public class AppConfig {
     @DynamicConfig(key = "index.file", desc = "索引的加载位置", defaultValue = "hnsw.index")
     public String indexFile = "hnsw.index";
 
+    @DynamicConfig(key = "index.persist.threshold", desc = "索引持久化的阈值", defaultValue = "50")
+    public Long indexPersistThreshold;
+
     public Set<Submission> topSubmissions = new HashSet<>();
 
     @DynamicConfig(key = "top.submission", desc = "置顶的投稿", defaultValue = "[]")
@@ -59,6 +62,16 @@ public class AppConfig {
     public void setTopSubmissions(Set<Submission> topSubmissions) {
         this.topSubmissions = topSubmissions;
         this.updateConfig("top.submission", new Gson().toJson(topSubmissions));
+    }
+
+    public void setIndexFile(String indexFile) {
+        this.indexFile = indexFile;
+        this.updateConfig("index.file", indexFile);
+    }
+
+    public void setIndexVersion(long indexVersion) {
+        this.indexVersion = indexVersion;
+        this.updateConfig("index.version", String.valueOf(indexVersion));
     }
 
     private void updateConfig(String key, String value) {

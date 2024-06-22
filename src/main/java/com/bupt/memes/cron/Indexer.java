@@ -2,18 +2,20 @@ package com.bupt.memes.cron;
 
 import com.bupt.memes.config.AppConfig;
 import com.bupt.memes.service.AnnIndexService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("indexerCron")
 @ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
-public class IndexLoader {
+@Slf4j
+public class Indexer {
 
     private final AnnIndexService annIndexService;
     private final AppConfig appConfig;
 
-    public IndexLoader(AnnIndexService annIndexService, AppConfig appConfig) {
+    public Indexer(AnnIndexService annIndexService, AppConfig appConfig) {
         this.annIndexService = annIndexService;
         this.appConfig = appConfig;
     }
@@ -22,5 +24,15 @@ public class IndexLoader {
     public void reload() {
         annIndexService.reloadIndex(appConfig.indexVersion, appConfig.indexFile, false);
         annIndexService.initKafkaConsumer();
+    }
+
+    @Scheduled(fixedRate = 1000 * 60 * 60)
+    public void persist() {
+        var pair = annIndexService.persistIndex();
+        if (pair != null) {
+            appConfig.setIndexFile(pair.getSecond());
+            appConfig.setIndexVersion(pair.getFirst());
+            log.info("Persist index to {}", pair.getSecond());
+        }
     }
 }
