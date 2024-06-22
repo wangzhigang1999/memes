@@ -222,8 +222,7 @@ public class AnnIndexService {
         }
 
         while (consumerHealthy.get()) {
-            // 离线批量索引构建+Kafka 实时增量索引
-            // 离线每天凌晨全量索引构建
+            // Kafka 实时增量索引
             var records = consumer.poll(Duration.ofSeconds(1));
             for (var record : records) {
                 try {
@@ -234,7 +233,6 @@ public class AnnIndexService {
                         vector[i] = dataList.get(i);
                     }
                     add(embedding.getId(), vector);
-                    log.info("Added embedding to index, key: {}", embedding.getId());
                 } catch (InvalidProtocolBufferException e) {
                     log.warn("Failed to parse embedding from kafka message,key:{}", record.key());
                 } catch (Exception e) {

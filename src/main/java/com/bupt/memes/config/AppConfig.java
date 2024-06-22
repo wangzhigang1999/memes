@@ -83,8 +83,6 @@ public class AppConfig {
                 ConfigItem.class);
         if (configItem == null) {
             log.warn("Config update failed, key not found: {}", key);
-        } else {
-            log.info("Config updated: {}={}", key, value);
         }
     }
 

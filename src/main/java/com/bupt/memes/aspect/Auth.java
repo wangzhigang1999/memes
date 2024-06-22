@@ -49,8 +49,7 @@ public class Auth {
         var request = attributes.getRequest();
         var token = request.getHeader("token");
         Preconditions.checkArgument(token != null && token.equals(localToken), AppException.unauthorized(path));
-
-        logger.info("Authorized access: {},token: {},localToken: {}", path, token, localToken);
+        logger.info("Authorized access: {}", path);
         return joinPoint.proceed();
     }
 
