@@ -1,5 +1,6 @@
 package com.bupt.memes.model.common;
 
+import com.bupt.memes.exception.AppException;
 import lombok.Data;
 
 @Data
@@ -18,16 +19,16 @@ public class ResultData<T> {
 
     public static <T> ResultData<T> success(T data) {
         ResultData<T> resultData = new ResultData<>();
-        resultData.setStatus(ReturnCode.RC100.getCode());
-        resultData.setMessage(ReturnCode.RC100.getMessage());
+        resultData.setStatus(200);
+        resultData.setMessage("success");
         resultData.setData(data);
         return resultData;
     }
 
-    public static <T> ResultData<T> fail(ReturnCode returnCode) {
+    public static <T> ResultData<T> fail(AppException exception) {
         ResultData<T> resultData = new ResultData<>();
-        resultData.setStatus(returnCode.getCode());
-        resultData.setMessage(returnCode.getMessage());
+        resultData.setStatus(exception.getErrorType().getCode());
+        resultData.setMessage(exception.getMessage());
         return resultData;
     }
 

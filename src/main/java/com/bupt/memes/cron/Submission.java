@@ -1,14 +1,12 @@
 package com.bupt.memes.cron;
 
-import com.bupt.memes.model.Sys;
+import com.bupt.memes.config.AppConfig;
 import com.bupt.memes.model.common.LogDocument;
 import com.bupt.memes.model.media.News;
-import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.model.rss.RSSItem;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Review;
 import com.bupt.memes.service.Interface.Storage;
-import com.bupt.memes.service.SysConfigService;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -30,9 +28,9 @@ import static com.bupt.memes.util.TimeUtil.getCurrentHour;
 @Service
 @AllArgsConstructor
 @ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
-public class CronJob {
+public class Submission {
 
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(CronJob.class);
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(Submission.class);
 
     final Review review;
 
@@ -40,7 +38,7 @@ public class CronJob {
 
     final ISubmission submissionService;
 
-    final SysConfigService sysConfig;
+    final AppConfig appConfig;
 
     final MongoTemplate mongoTemplate;
 
@@ -60,16 +58,15 @@ public class CronJob {
 
         long waitingNum = review.getWaitingNum();
         long passedNum = review.getPassedNum();
-        int targetNum = sysConfig.getSys().getMIN_SUBMISSIONS();
+        int targetNum = appConfig.minSubmissions;
 
         boolean notMeetsMinReq = notMeetsMinReq(passedNum, waitingNum, targetNum);
         int currentHour = getCurrentHour();
         if (notMeetsMinReq || (currentHour >= 21 || currentHour <= 8)) {
-            sysConfig.enableBot();
             logger.info("enable bot notMeetsMinReq: {}  currentHour: {}", notMeetsMinReq, currentHour);
             return;
         }
-        sysConfig.disableBot();
+        appConfig.setBotUp(false);
     }
 
     /**
@@ -78,12 +75,12 @@ public class CronJob {
     @Scheduled(cron = "0 0 0 * * ?")
     public void cleanDeletedSub() {
         logger.info("cleanDeletedSub start.");
-        List<Submission> deletedSubmission = submissionService.getDeletedSubmission();
-        Iterator<Submission> iterator = deletedSubmission.iterator();
+        List<com.bupt.memes.model.media.Submission> deletedSubmission = submissionService.getDeletedSubmission();
+        Iterator<com.bupt.memes.model.media.Submission> iterator = deletedSubmission.iterator();
         logger.info("cleanDeletedSub, deletedSubmission size: {}", deletedSubmission.size());
         // 删除 textFormat 的 submission
         while (iterator.hasNext()) {
-            Submission next = iterator.next();
+            com.bupt.memes.model.media.Submission next = iterator.next();
             if (next.textFormat()) {
                 submissionService.hardDeleteSubmission(next.getId());
                 iterator.remove();
@@ -98,7 +95,7 @@ public class CronJob {
 
         List<String> keyList = new ArrayList<>();
         Map<String, String> nameIdMap = new HashMap<>();
-        for (Submission sub : deletedSubmission) {
+        for (com.bupt.memes.model.media.Submission sub : deletedSubmission) {
             keyList.add(sub.getName());
             nameIdMap.put(sub.getName(), sub.getId());
         }
@@ -122,19 +119,16 @@ public class CronJob {
 
     }
 
-    @Scheduled(fixedRate = 1000 * 5)
-    public void syncSys() {
-        logger.debug("Periodic sync sys done.");
-        sysConfig.setSys(mongoTemplate.findById("sys", Sys.class));
-        logger.debug("Periodic sync top submission done.");
-    }
-
     // 每分钟同步一次 top submission
     @Scheduled(fixedRate = 1000 * 60)
     public void syncTopSubmission() {
-        logger.debug("Periodic sync top submission start.");
-        sysConfig.syncTopSubmission();
-        logger.debug("Periodic sync top submission done.");
+        Set<com.bupt.memes.model.media.Submission> oldSubmission = appConfig.topSubmissions;
+        Set<com.bupt.memes.model.media.Submission> newSubmission = new HashSet<>();
+        oldSubmission.forEach(oldFromTop -> {
+            com.bupt.memes.model.media.Submission newFromDB = mongoTemplate.findById(oldFromTop.getId(), com.bupt.memes.model.media.Submission.class);
+            newSubmission.add(newFromDB);
+        });
+        appConfig.setTopSubmissions(newSubmission);
     }
 
     /**

@@ -1,9 +1,8 @@
 package com.bupt.memes.aspect;
 
-import com.bupt.memes.model.common.ResultData;
-import com.bupt.memes.model.common.ReturnCode;
+import com.bupt.memes.exception.AppException;
+import com.bupt.memes.util.Preconditions;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -45,31 +43,20 @@ public class Auth {
          * 进程内部的 token，只有在启动时才会生成，如果进程重启，token 会改变；也可以通过环境变量传入
          */
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes == null) {
-            return ResultData.fail(ReturnCode.RC401);
-        }
-
+        Preconditions.checkNotNull(attributes, AppException.unauthorized("Request is null"));
         var httpMethod = attributes.getRequest().getMethod();
         var path = "%s %s".formatted(httpMethod, attributes.getRequest().getRequestURI());
-
         var request = attributes.getRequest();
         var token = request.getHeader("token");
-        if (token == null || !token.equals(localToken)) {
-            logger.warn("Unauthorized access: {},token is {}", path, token);
-            HttpServletResponse response = attributes.getResponse();
-            if (response != null) {
-                response.setStatus(401);
-            }
-            return ResultData.fail(ReturnCode.RC401);
-        }
-        logger.info("Authorized access: {}", path);
+        Preconditions.checkArgument(token != null && token.equals(localToken), AppException.unauthorized(path));
+
+        logger.info("Authorized access: {},token: {},localToken: {}", path, token, localToken);
         return joinPoint.proceed();
     }
 
     @PostConstruct
     public void init() {
-        String encodedToken = Base64.getEncoder().encodeToString(localToken.getBytes());
-        logger.warn("Token: {}", encodedToken);
+        logger.info("Local token: {}", localToken);
     }
 
 }

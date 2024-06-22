@@ -1,8 +1,6 @@
-package com.bupt.memes.controller.news;
+package com.bupt.memes.controller.manager;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.model.common.ResultData;
-import com.bupt.memes.model.media.News;
 import com.bupt.memes.service.Interface.INews;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,15 +10,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/admin/news")
 @CrossOrigin(origins = "*")
 @AllArgsConstructor
-public class NewsAdmin {
+public class News {
 
     final INews iNews;
 
     @PostMapping("")
     @AuthRequired
-    public ResultData<News> addNews(String data, @RequestParam(required = false) MultipartFile coverImage) {
-        News news = News.fromJson(data);
-        return ResultData.success(iNews.addNews(news, coverImage));
+    public com.bupt.memes.model.media.News addNews(String data, @RequestParam(required = false) MultipartFile coverImage) {
+        return iNews.addNews(com.bupt.memes.model.media.News.fromJson(data), coverImage);
     }
 
     @DeleteMapping("/{id}")

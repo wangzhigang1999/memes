@@ -1,10 +1,10 @@
 package com.bupt.memes.controller.submission;
 
 import com.bupt.memes.anno.AuthRequired;
-import com.bupt.memes.model.common.ResultData;
-import com.bupt.memes.model.common.ReturnCode;
+import com.bupt.memes.exception.AppException;
 import com.bupt.memes.model.media.SubmissionGroup;
 import com.bupt.memes.service.Interface.ISubGroup;
+import com.bupt.memes.util.Preconditions;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/admin/submission/group")
 @CrossOrigin(origins = "*")
 @AllArgsConstructor
-public class SubGroup {
+public class GroupSubmission {
 
     final ISubGroup subGroup;
 
@@ -30,9 +30,7 @@ public class SubGroup {
     @AuthRequired
     public Object update(@PathVariable("id") String id, @RequestBody List<String> submissionIds) {
         SubmissionGroup submissionGroup = subGroup.addToGroup(id, submissionIds);
-        if (submissionGroup == null) {
-            ResultData.fail(ReturnCode.RC400);
-        }
+        Preconditions.checkArgument(submissionGroup != null, AppException.internalError("update submission group failed"));
         return submissionGroup;
     }
 

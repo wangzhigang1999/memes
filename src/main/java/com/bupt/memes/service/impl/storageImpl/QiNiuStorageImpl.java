@@ -1,7 +1,9 @@
 package com.bupt.memes.service.impl.storageImpl;
 
+import com.bupt.memes.exception.AppException;
 import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.service.Interface.Storage;
+import com.bupt.memes.util.Preconditions;
 import com.google.gson.Gson;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
@@ -57,9 +59,7 @@ public class QiNiuStorageImpl implements Storage {
     public FileUploadResult store(byte[] bytes, String mime) {
         String type = getExtension(mime);
         String fileName = putImg(bytes, type);
-        if (fileName == null) {
-            return null;
-        }
+        Preconditions.checkArgument(fileName != null, AppException.storageError("file upload failed,type:%s".formatted(type)));
         var url = urlPrefix.concat(fileName);
         return new FileUploadResult(url, fileName, mime);
     }
@@ -68,7 +68,7 @@ public class QiNiuStorageImpl implements Storage {
     @SneakyThrows
     public HashMap<String, Boolean> delete(String[] keyList) {
         if (keyList == null || keyList.length == 0) {
-            return null;
+            return new HashMap<>();
         }
         Auth auth = Auth.create(accessKey, secretKey);
         Configuration cfg = new Configuration(Region.autoRegion());

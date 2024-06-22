@@ -1,6 +1,7 @@
 package com.bupt.memes.service.impl;
 
 import com.bupt.memes.aspect.Audit;
+import com.bupt.memes.config.AppConfig;
 import com.bupt.memes.model.HNSWItem;
 import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.common.PageResult;
@@ -9,7 +10,6 @@ import com.bupt.memes.service.AnnIndexService;
 import com.bupt.memes.service.Interface.ISubmission;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
-import com.bupt.memes.service.SysConfigService;
 import com.bupt.memes.util.KafkaUtil;
 import com.bupt.memes.util.TimeUtil;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -45,7 +45,7 @@ public class SubmissionServiceImpl implements ISubmission {
 
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
-    final SysConfigService sysConfigService;
+    final AppConfig appConfig;
     final AnnIndexService annIndexService;
 
     final Storage storage;
@@ -227,8 +227,8 @@ public class SubmissionServiceImpl implements ISubmission {
         if (submissionCache == null) {
             synchronized (SubmissionServiceImpl.class) {
                 if (submissionCache == null) {
-                    submissionCache = Caffeine.newBuilder().maximumSize(sysConfigService.getSubmissionCacheSize()).build();
-                    logger.info("init cache, submission cache size: {}", sysConfigService.getSubmissionCacheSize());
+                    submissionCache = Caffeine.newBuilder().maximumSize(appConfig.submissionCacheSize).build();
+                    logger.info("init cache, submission cache size: {}", appConfig.submissionCacheSize);
                 }
             }
         }
@@ -253,7 +253,7 @@ public class SubmissionServiceImpl implements ISubmission {
 
     @Override
     public List<Submission> getSimilarSubmission(String id, int size) {
-        size = Math.min(sysConfigService.getTopK(), size);
+        size = Math.min(appConfig.topK, size);
         List<SearchResult<HNSWItem, Float>> search = annIndexService.search(id, size);
         return getSubmissionsByHNSWItems(search);
     }
@@ -264,7 +264,7 @@ public class SubmissionServiceImpl implements ISubmission {
         for (int i = 0; i < 768; i++) {
             vector[i] = (float) Math.random();
         }
-        size = Math.min(sysConfigService.getTopK(), size);
+        size = Math.min(appConfig.topK, size);
         List<SearchResult<HNSWItem, Float>> search = annIndexService.search(vector, size);
         return getSubmissionsByHNSWItems(search);
     }

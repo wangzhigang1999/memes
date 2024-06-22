@@ -1,8 +1,7 @@
 package com.bupt.memes.cron;
 
-import com.bupt.memes.model.Sys;
+import com.bupt.memes.config.AppConfig;
 import com.bupt.memes.service.AnnIndexService;
-import com.bupt.memes.service.SysConfigService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,17 +11,16 @@ import org.springframework.stereotype.Component;
 public class IndexLoader {
 
     private final AnnIndexService annIndexService;
-    private final SysConfigService sysConfig;
+    private final AppConfig appConfig;
 
-    public IndexLoader(AnnIndexService annIndexService, SysConfigService sysConfig) {
+    public IndexLoader(AnnIndexService annIndexService, AppConfig appConfig) {
         this.annIndexService = annIndexService;
-        this.sysConfig = sysConfig;
+        this.appConfig = appConfig;
     }
 
     @Scheduled(fixedRate = 1000 * 60)
     public void reload() {
-        Sys sys = sysConfig.getSys();
-        annIndexService.reloadIndex(sys.getIndexVersion(), sys.getIndexFile(), false);
+        annIndexService.reloadIndex(appConfig.indexVersion, appConfig.indexFile, false);
         annIndexService.initKafkaConsumer();
     }
 }

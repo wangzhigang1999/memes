@@ -44,8 +44,7 @@ public class Audit {
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(Audit.class);
 
     // 用于标识当前实例
-    public final static String INSTANCE_UUID = "MEMES-" + System.currentTimeMillis() + "-"
-            + UUID.randomUUID().toString().substring(0, 8);
+    public final static String INSTANCE_UUID = "MEMES-%d-%s".formatted(System.currentTimeMillis(), UUID.randomUUID().toString().substring(0, 8));
 
     @Value("${spring.data.mongodb.database}")
     public String database;
@@ -70,7 +69,7 @@ public class Audit {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         var request = Objects.requireNonNull(attributes).getRequest();
         var uuid = request.getHeader("uuid");
-        var classMethod = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
+        var classMethod = "%s.%s".formatted(joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
         var url = request.getRequestURL().toString();
         var method = request.getMethod();
         var parameterMap = request.getParameterMap();
@@ -93,8 +92,7 @@ public class Audit {
         return proceed;
     }
 
-    private void audit(String classMethod, String url, String method, String uuid, long start, long end,
-            Map<String, String[]> map) {
+    private void audit(String classMethod, String url, String method, String uuid, long start, long end, Map<String, String[]> map) {
         try {
             LogDocument document = new LogDocument();
             document.setUrl(url)

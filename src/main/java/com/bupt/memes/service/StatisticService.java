@@ -43,7 +43,7 @@ public class StatisticService {
             Aggregation aggregation = Aggregation.newAggregation(
                     Aggregation.match(Criteria.where("timestamp").gte(start).lte(end)),
                     Aggregation.group().avg("timecost").as("avgTimecost"));
-            return (Double) template.aggregate(aggregation, LogDocument.class, Map.class).getMappedResults().get(0)
+            return (Double) template.aggregate(aggregation, LogDocument.class, Map.class).getMappedResults().getFirst()
                     .get("avgTimecost");
         });
 

@@ -1,8 +1,10 @@
 package com.bupt.memes.service;
 
+import com.bupt.memes.exception.AppException;
 import com.bupt.memes.model.HNSWItem;
 import com.bupt.memes.model.transport.Embedding;
 import com.bupt.memes.util.KafkaUtil;
+import com.bupt.memes.util.Preconditions;
 import com.github.jelmerk.knn.DistanceFunctions;
 import com.github.jelmerk.knn.SearchResult;
 import com.github.jelmerk.knn.hnsw.HnswIndex;
@@ -10,10 +12,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,7 @@ import static com.bupt.memes.aspect.Audit.INSTANCE_UUID;
 @Component
 @Data
 @Accessors(chain = true)
+@Slf4j
 public class AnnIndexService {
 
     @Value("${hnsw.dimension}")
@@ -48,10 +50,10 @@ public class AnnIndexService {
 
     @Value("${hnsw.maxElements}")
     private int maxElements = 1000000;
+
     private long indexVersion = 0;
 
     private HnswIndex<String, float[], HNSWItem, Float> index;
-    private final Logger logger = LoggerFactory.getLogger(AnnIndexService.class);
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock readLock = lock.readLock();
     private final Lock writeLock = lock.writeLock();
@@ -68,14 +70,14 @@ public class AnnIndexService {
         HnswIndex<String, float[], HNSWItem, Float> loadedFromLocal = loadFromLocal(indexFile);
         if (loadedFromLocal != null) {
             setNewIndex(loadedFromLocal);
-            logger.info("Loaded index from local file: {}, size: {}", indexFile, index.size());
+            log.info("Loaded index from local file: {}, size: {}", indexFile, index.size());
             return;
         }
 
         HnswIndex<String, float[], HNSWItem, Float> loadFromNet = loadFromNet(indexFile);
         if (loadFromNet != null) {
             setNewIndex(loadFromNet);
-            logger.info("Loaded index from network: {}, size: {}", indexFile, index.size());
+            log.info("Loaded index from network: {}, size: {}", indexFile, index.size());
             return;
         }
 
@@ -92,7 +94,7 @@ public class AnnIndexService {
         writeLock.lock();
         index = newIndex;
         writeLock.unlock();
-        logger.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}",
+        log.info("Initialized new index with dimension: {}, m: {}, efSearch: {}, efConstruction: {}, maxElements: {}",
                 dimension, m, efSearch, efConstruction, maxElements);
     }
 
@@ -100,11 +102,11 @@ public class AnnIndexService {
     private HnswIndex<String, float[], HNSWItem, Float> loadFromNet(String url) {
         try {
             URI uri = new URI(url);
-            Path path = Path.of(INSTANCE_UUID + ".index");
+            Path path = Path.of("%s.index".formatted(INSTANCE_UUID));
             FileUtils.copyURLToFile(uri.toURL(), path.toFile());
             return HnswIndex.load(path);
         } catch (Exception e) {
-            logger.error("Failed to load index from network: {}", url);
+            log.error("Failed to load index from network: {}", url);
             return null;
         }
     }
@@ -119,16 +121,13 @@ public class AnnIndexService {
             }
             return HnswIndex.load(path);
         } catch (Exception e) {
-            logger.error("Failed to load index from local file: {}", indexFile);
+            log.error("Failed to load index from local file: {}", indexFile);
             return null;
         }
     }
 
     public List<SearchResult<HNSWItem, Float>> search(float[] vector, int topK) {
-        if (index == null) {
-            logger.error("HNSWIndex is not initialized");
-            return List.of();
-        }
+        Preconditions.checkNotNull(index, AppException.databaseError("HNSWIndex is not initialized"));
         try {
             readLock.lock();
             return index.findNearest(vector, topK);
@@ -138,10 +137,7 @@ public class AnnIndexService {
     }
 
     public List<SearchResult<HNSWItem, Float>> search(String key, int topK) {
-        if (index == null) {
-            logger.error("HNSWIndex is not initialized");
-            return List.of();
-        }
+        Preconditions.checkNotNull(index, AppException.databaseError("HNSWIndex is not initialized"));
         try {
             readLock.lock();
             return index.findNeighbors(key, topK);
@@ -152,18 +148,15 @@ public class AnnIndexService {
 
     public void reloadIndex(long targetVersion, String indexFile, boolean forceReload) {
         if (forceReload || indexVersion < targetVersion) {
-            logger.info("Reloading index from file: {}", indexFile);
+            log.info("Reloading index from file: {}", indexFile);
             initIndex(indexFile);
             indexVersion = targetVersion;
-            logger.info("Reloaded index with version: {}", indexVersion);
+            log.info("Reloaded index with version: {}", indexVersion);
         }
     }
 
     public void add(String key, float[] vector) {
-        if (index == null) {
-            logger.error("Failed to add item to index, index is not initialized");
-            return;
-        }
+        Preconditions.checkNotNull(index, AppException.databaseError("HNSWIndex is not initialized"));
         HNSWItem hnswItem = new HNSWItem();
         hnswItem.setId(key);
         hnswItem.setVector(vector);
@@ -171,7 +164,7 @@ public class AnnIndexService {
             writeLock.lock();
             boolean added = index.add(hnswItem);
             if (!added) {
-                logger.warn("Failed to add item to index, key: {}, maybe the key already exists", key);
+                log.warn("Failed to add item to index, key: {}, maybe the key already exists", key);
             }
         } finally {
             writeLock.unlock();
@@ -181,10 +174,7 @@ public class AnnIndexService {
     @SneakyThrows
     @SuppressWarnings("unused")
     public void saveIndex(String indexFile) {
-        if (index == null) {
-            logger.error("HNSWIndex is not initialized");
-            return;
-        }
+        Preconditions.checkNotNull(index, AppException.databaseError("HNSWIndex is not initialized"));
         try {
             writeLock.lock();
             index.save(Path.of(indexFile));
@@ -195,7 +185,7 @@ public class AnnIndexService {
 
     public void initKafkaConsumer() {
         if (index == null) {
-            logger.error("Failed to init kafka consumer, index is not initialized,will retry later");
+            log.error("Failed to init kafka consumer, index is not initialized,will retry later");
             return;
         }
         if (consumerHealthy.get()) {
@@ -203,7 +193,7 @@ public class AnnIndexService {
         }
         if (consumerHealthy.compareAndSet(false, true)) {
             Thread.ofVirtual().start(this::listenKafka);
-            logger.info("Started kafka consumer for embedding");
+            log.info("Started kafka consumer for embedding");
         }
     }
 
@@ -212,7 +202,7 @@ public class AnnIndexService {
         try {
             consumer = KafkaUtil.getConsumer(KafkaUtil.EMBEDDING);
         } catch (Exception e) {
-            logger.error("Failed to init kafka consumer for embedding", e);
+            log.error("Failed to init kafka consumer for embedding", e);
             consumerHealthy.set(false);
             return;
         }
@@ -230,9 +220,9 @@ public class AnnIndexService {
                         vector[i] = dataList.get(i);
                     }
                     add(embedding.getId(), vector);
-                    logger.info("Added embedding to index, key: {}", embedding.getId());
+                    log.info("Added embedding to index, key: {}", embedding.getId());
                 } catch (InvalidProtocolBufferException e) {
-                    logger.warn("Failed to parse embedding from kafka message,key:{}", record.key());
+                    log.warn("Failed to parse embedding from kafka message,key:{}", record.key());
                 } catch (Exception e) {
                     consumerHealthy.compareAndSet(true, false);
                 }

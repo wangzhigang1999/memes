@@ -1,8 +1,11 @@
 package com.bupt.memes.service.impl;
 
+import com.bupt.memes.exception.AppException;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.Review;
+import com.bupt.memes.util.Preconditions;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -24,6 +27,7 @@ import static com.bupt.memes.util.TimeUtil.getTodayStartUnixEpochMilli;
  */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ReviewServiceImpl implements Review {
 
     final MongoTemplate template;
@@ -44,6 +48,7 @@ public class ReviewServiceImpl implements Review {
 
     @Override
     public List<Submission> getWaitingSubmissions(Integer limit) {
+        Preconditions.checkArgument(limit > 0, AppException.invalidParam("limit"));
         var query = new Query();
         query.limit(limit);
         query.with(Sort.by(Sort.Direction.ASC, "timestamp"));
@@ -85,6 +90,7 @@ public class ReviewServiceImpl implements Review {
      */
     @Override
     public int batchAcceptSubmission(List<String> ids) {
+        Preconditions.checkArgument(ids != null, AppException.invalidParam("ids"));
         ids.sort(String::compareTo);
         ids.forEach(this::acceptSubmission);
         return ids.size();
@@ -92,13 +98,14 @@ public class ReviewServiceImpl implements Review {
 
     /**
      * 批量拒绝
-     * 
+     *
      * @param ids
      *            submission 的 id 列表
      * @return 成功拒绝的数量
      */
     @Override
     public int batchRejectSubmission(List<String> ids) {
+        Preconditions.checkArgument(ids != null, AppException.invalidParam("ids"));
         ids.sort(String::compareTo);
         ids.forEach(this::rejectSubmission);
         return ids.size();
@@ -147,6 +154,7 @@ public class ReviewServiceImpl implements Review {
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean reviewSubmission(String id, boolean passed) {
+        Preconditions.checkArgument(id != null, AppException.invalidParam("id"));
         var query = new Query(Criteria.where("id").is(id));
         // 当一个投稿被审核通过或者不通过的时候，就从等待审核的表中删除，然后插入到对应的表中
         var one = template.findAndRemove(query, Submission.class, WAITING_SUBMISSION);

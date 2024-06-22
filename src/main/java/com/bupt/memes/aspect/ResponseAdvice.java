@@ -1,7 +1,6 @@
 package com.bupt.memes.aspect;
 
 import com.bupt.memes.model.common.ResultData;
-import com.bupt.memes.model.common.ReturnCode;
 import lombok.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -11,15 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @RestControllerAdvice
-public class Response implements ResponseBodyAdvice<Object> {
+public class ResponseAdvice implements ResponseBodyAdvice<Object> {
 
     @SuppressWarnings("null")
     @Override
-    public boolean supports(@NonNull MethodParameter returnType, @SuppressWarnings("rawtypes") @NonNull Class converterType) {
+    public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {
         return true;
     }
 
-    @SuppressWarnings({ "null", "rawtypes" })
+    @SuppressWarnings({ "null" })
     @Override
     public Object beforeBodyWrite(Object o,
             @NonNull MethodParameter returnType,
@@ -28,7 +27,7 @@ public class Response implements ResponseBodyAdvice<Object> {
             @NonNull ServerHttpRequest request,
             @NonNull ServerHttpResponse response) {
         if (o == null) {
-            return ResultData.fail(ReturnCode.RC400);
+            return ResultData.success(null);
         }
         if (o instanceof ResultData<?>) {
             return o;

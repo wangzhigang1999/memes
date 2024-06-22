@@ -1,8 +1,7 @@
-package com.bupt.memes.controller.review;
+package com.bupt.memes.controller.manager;
 
 import com.bupt.memes.anno.AuthRequired;
 import com.bupt.memes.model.media.Submission;
-import com.bupt.memes.service.Interface.Review;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,10 +10,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/review")
 @CrossOrigin(origins = "*")
-public class ReviewAdmin {
-    final Review service;
+public class Review {
+    final com.bupt.memes.service.Interface.Review service;
 
-    public ReviewAdmin(Review service) {
+    public Review(com.bupt.memes.service.Interface.Review service) {
         this.service = service;
     }
 

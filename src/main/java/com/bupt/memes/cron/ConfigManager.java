@@ -1,7 +1,7 @@
 package com.bupt.memes.cron;
 
-import com.bupt.memes.config.ConfigUpdater;
 import com.bupt.memes.model.ConfigItem;
+import com.bupt.memes.service.ConfigUpdater;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component()
+@Component
 @Slf4j
 public class ConfigManager {
 
@@ -24,9 +24,10 @@ public class ConfigManager {
     public ConfigManager(MongoTemplate template, ConfigUpdater updater) {
         this.template = template;
         this.updater = updater;
+        this.updateConfig();
     }
 
-    @Scheduled(fixedRate = 5 * 1000)
+    @Scheduled(fixedRate = 5000)
     public void updateConfig() {
         List<ConfigItem> configItems = template.findAll(ConfigItem.class);
         for (ConfigItem configItem : configItems) {

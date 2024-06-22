@@ -1,11 +1,10 @@
 package com.bupt.memes.controller.submission;
 
+import com.bupt.memes.config.AppConfig;
+import com.bupt.memes.exception.AppException;
 import com.bupt.memes.model.common.PageResult;
-import com.bupt.memes.model.common.ResultData;
-import com.bupt.memes.model.common.ReturnCode;
-import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.service.Interface.ISubmission;
-import com.bupt.memes.service.SysConfigService;
+import com.bupt.memes.util.Preconditions;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,11 +18,11 @@ import java.util.Set;
 @RequestMapping("/submission")
 @CrossOrigin(origins = "*")
 @AllArgsConstructor
-public class SubUser {
+public class Submission {
 
     final ISubmission service;
 
-    final SysConfigService sysConfig;
+    final AppConfig appConfig;
 
     /**
      * upload file
@@ -39,31 +38,25 @@ public class SubUser {
      *             IOException
      */
     @PostMapping("")
-    public ResultData<Submission> upload(MultipartFile file, String text, String mime) throws IOException {
-        if (mime == null || mime.isEmpty()) {
-            return ResultData.fail(ReturnCode.RC400);
-        }
-        // file is null and uri is null,bad request
-        if (file == null && text == null) {
-            return ResultData.fail(ReturnCode.RC400);
-        }
+    public com.bupt.memes.model.media.Submission upload(MultipartFile file, String text, String mime) throws IOException {
+        Preconditions.checkArgument(mime != null && !mime.isEmpty(), AppException.invalidParam("mime"));
+        Preconditions.checkArgument(text != null || file != null, AppException.invalidParam("file or text"));
         if (mime.startsWith("text")) {
-            return ResultData.success(service.storeTextFormatSubmission(text, mime));
+            return service.storeTextFormatSubmission(text, mime);
         }
-        if (file == null) {
-            return ResultData.fail(ReturnCode.RC400);
-        }
+        Preconditions.checkArgument(file != null, AppException.invalidParam("file"));
         InputStream inputStream = file.getInputStream();
         var store = service.storeStreamSubmission(inputStream, mime);
-        return store == null ? ResultData.fail(ReturnCode.RC500) : ResultData.success(store);
+        inputStream.close();
+        return store;
     }
 
     /**
      * 获取置顶
      */
     @GetMapping("/top")
-    public Set<Submission> getTop() {
-        return sysConfig.getTopSubmission();
+    public Set<com.bupt.memes.model.media.Submission> getTop() {
+        return appConfig.topSubmissions;
     }
 
     // 点赞
@@ -88,7 +81,7 @@ public class SubUser {
      * @return Page
      */
     @GetMapping("/page")
-    public PageResult<Submission> getSubmissionByPage(int pageSize, String lastID) {
+    public PageResult<com.bupt.memes.model.media.Submission> getSubmissionByPage(int pageSize, String lastID) {
         return service.getSubmissionByPage(pageSize, lastID);
     }
 
@@ -100,7 +93,7 @@ public class SubUser {
      * @return Submission
      */
     @GetMapping("/id/{id}")
-    public Submission getSubmissionById(@PathVariable("id") String id) {
+    public com.bupt.memes.model.media.Submission getSubmissionById(@PathVariable("id") String id) {
         return service.getSubmissionById(id);
     }
 
@@ -117,18 +110,18 @@ public class SubUser {
      * @return List
      */
     @GetMapping("/date/{date}")
-    public List<Submission> getSubmissionByDate(@PathVariable("date") String date) {
+    public List<com.bupt.memes.model.media.Submission> getSubmissionByDate(@PathVariable("date") String date) {
         return service.getSubmissionByDate(date);
     }
 
     @GetMapping("/similar/{id}")
-    public List<Submission> getSimilarSubmission(@PathVariable("id") String id, Integer size) {
+    public List<com.bupt.memes.model.media.Submission> getSimilarSubmission(@PathVariable("id") String id, Integer size) {
         size = size == null ? 10 : Math.min(size, 50);
         return service.getSimilarSubmission(id, size);
     }
 
     @GetMapping("/random")
-    public List<Submission> randomSubmission(Integer size) {
+    public List<com.bupt.memes.model.media.Submission> randomSubmission(Integer size) {
         size = size == null ? 10 : Math.min(size, 50);
         return service.randomSubmission(size);
     }

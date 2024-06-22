@@ -1,4 +1,4 @@
-package com.bupt.memes.config;
+package com.bupt.memes.service;
 
 import com.bupt.memes.anno.DynamicConfig;
 import com.bupt.memes.model.ConfigItem;
@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Lazy(false)
-@Component
+@Component("configUpdater")
 @Slf4j
 public class ConfigUpdater implements CommandLineRunner {
     private static ApplicationContext context;

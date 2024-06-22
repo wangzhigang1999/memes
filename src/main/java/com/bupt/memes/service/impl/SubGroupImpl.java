@@ -1,11 +1,13 @@
 package com.bupt.memes.service.impl;
 
+import com.bupt.memes.exception.AppException;
 import com.bupt.memes.model.media.Submission;
 import com.bupt.memes.model.media.SubmissionGroup;
 import com.bupt.memes.model.media.SubmissionType;
 import com.bupt.memes.service.Interface.ISubGroup;
+import com.bupt.memes.util.Preconditions;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -19,21 +21,16 @@ import static com.bupt.memes.model.common.SubmissionCollection.WAITING_SUBMISSIO
 
 @Service
 @AllArgsConstructor
-@SuppressWarnings("null")
+@Slf4j
 public class SubGroupImpl implements ISubGroup {
 
     final MongoTemplate template;
-
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(SubGroupImpl.class);
 
     @Override
     @Transactional
     public SubmissionGroup createGroup(List<String> submissionIds) {
         List<Submission> submissions = ensureSubmissionsExist(submissionIds);
-        if (submissions.size() != submissionIds.size()) {
-            logger.error("create image group failed,some submissions not exist");
-            return null;
-        }
+        Preconditions.checkArgument(submissions.size() == submissionIds.size(), AppException.invalidParam("submissionIds"));
         Optional<SubmissionGroup> group = SubmissionGroup.fromSubmission(submissions);
         assert group.isPresent();
         SubmissionGroup submissionGroup = group.get();
@@ -47,20 +44,16 @@ public class SubGroupImpl implements ISubGroup {
     @Transactional
     public SubmissionGroup addToGroup(String groupId, List<String> submissionIds) {
         SubmissionGroup submissionGroup = getById(groupId);
-        if (submissionGroup == null) {
-            logger.error("add image to group failed, group:{} not exist", groupId);
-            return null;
-        }
+        Preconditions.checkArgument(submissionGroup != null,
+                AppException.invalidParam("groupId"));
+
         List<Submission> submissions = ensureSubmissionsExist(submissionIds);
-        if (submissions.size() != submissionIds.size()) {
-            logger.error("add image to group:{} failed,some submissions not exist", groupId);
-            return null;
-        }
-        // 不能合并两个 group
-        if (submissions.stream().anyMatch(submission -> submission.getSubmissionType() == SubmissionType.BATCH)) {
-            logger.error("add image to group failed,can not add group to group:{}", groupId);
-            return null;
-        }
+        Preconditions.checkArgument(submissions.size() == submissionIds.size(),
+                AppException.invalidParam("submissionIds"));
+
+        Preconditions.checkArgument(submissions.stream().noneMatch(submission -> submission.getSubmissionType() == SubmissionType.BATCH),
+                AppException.invalidParam("submissionIds"));
+
         submissionGroup.addSubmissions(submissions);
         template.save(submissionGroup, WAITING_SUBMISSION);
         submissions.forEach(submission -> template.remove(submission, WAITING_SUBMISSION));
@@ -69,6 +62,7 @@ public class SubGroupImpl implements ISubGroup {
 
     @Override
     public SubmissionGroup getById(String id) {
+        Preconditions.checkArgument(id != null, AppException.invalidParam("id"));
         return template.findById(id, SubmissionGroup.class, WAITING_SUBMISSION);
     }
 
@@ -80,6 +74,7 @@ public class SubGroupImpl implements ISubGroup {
      * @return 存在的 submission 列表
      */
     private List<Submission> ensureSubmissionsExist(List<String> submissionsId) {
+        Preconditions.checkArgument(submissionsId != null, AppException.invalidParam("submissionsId"));
         return template.find(Query.query(Criteria.where("id").in(submissionsId)), Submission.class, WAITING_SUBMISSION);
     }
 }

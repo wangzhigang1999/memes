@@ -3,8 +3,8 @@ package com.bupt.memes.service.impl.storageImpl;
 import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.service.Interface.Storage;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
@@ -19,9 +19,8 @@ import java.util.UUID;
 @Service("local")
 @Primary
 @ConditionalOnProperty(prefix = "storage", name = "type", havingValue = "local")
+@Slf4j
 public class LocalStorageImpl implements Storage {
-
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(LocalStorageImpl.class);
 
     static final String localDir = "memes-img";
 
@@ -37,9 +36,8 @@ public class LocalStorageImpl implements Storage {
         if (!file.exists()) {
             boolean mkdir = file.mkdir();
             if (!mkdir) {
-                throw new RuntimeException("create local dir failed" + localDir);
-            } else {
-                logger.info("create local dir success");
+                log.error("create local dir failed:%s".formatted(localDir));
+                System.exit(1);
             }
         }
     }
@@ -48,14 +46,9 @@ public class LocalStorageImpl implements Storage {
     @SneakyThrows
     public FileUploadResult store(byte[] bytes, String mime) {
         String type = getExtension(mime);
-        String fileName = System.currentTimeMillis() + "-" + UUID.randomUUID() + "." + type;
-        var path = localDir + "/" + fileName;
-        try {
-            FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), new File(path));
-        } catch (Exception e) {
-            logger.error("store file failed,mime:{}", mime, e);
-            return null;
-        }
+        String fileName = "%d-%s.%s".formatted(System.currentTimeMillis(), UUID.randomUUID(), type);
+        var path = "%s/%s".formatted(localDir, fileName);
+        FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), new File(path));
         var url = urlPrefix + fileName;
         return new FileUploadResult(url, fileName, type);
     }
@@ -64,7 +57,7 @@ public class LocalStorageImpl implements Storage {
     public Map<String, Boolean> delete(String[] keyList) {
         Map<String, Boolean> map = new HashMap<>();
         for (String key : keyList) {
-            String path = localDir + "/" + key;
+            String path = "%s/%s".formatted(localDir, key);
             File file = new File(path);
             boolean delete = file.delete();
             map.put(key, delete);

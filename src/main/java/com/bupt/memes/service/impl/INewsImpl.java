@@ -1,5 +1,6 @@
 package com.bupt.memes.service.impl;
 
+import com.bupt.memes.exception.AppException;
 import com.bupt.memes.model.common.FileUploadResult;
 import com.bupt.memes.model.common.PageResult;
 import com.bupt.memes.model.media.News;
@@ -7,8 +8,9 @@ import com.bupt.memes.service.Interface.INews;
 import com.bupt.memes.service.Interface.Storage;
 import com.bupt.memes.service.MongoPageHelper;
 import com.bupt.memes.util.FileUploader;
+import com.bupt.memes.util.Preconditions;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -22,12 +24,11 @@ import java.util.Set;
 import static com.bupt.memes.util.TimeUtil.getYMD;
 
 @Service
+@Slf4j
 public class INewsImpl implements INews {
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
     final Storage storage;
-
-    final static Logger logger = org.slf4j.LoggerFactory.getLogger(INewsImpl.class);
 
     public INewsImpl(MongoTemplate mongoTemplate, MongoPageHelper mongoPageHelper, Storage storage) {
         this.mongoTemplate = mongoTemplate;
@@ -46,10 +47,7 @@ public class INewsImpl implements INews {
             FileUploadResult coverImg = new FileUploader(coverImage, storage).upload();
             news.setCoverImage(coverImg.url());
         }
-        if (!news.validate()) {
-            logger.warn("add news failed, news invalid, news: {}", news);
-            return null;
-        }
+        Preconditions.checkArgument(news != null && news.validate(), AppException.invalidParam("news"));
         if (news.getDate() == null) {
             news.setDate(getYMD());
         }
@@ -60,9 +58,7 @@ public class INewsImpl implements INews {
     @Override
     public News addTag(String newsId, Set<String> tag) {
         News news = findById(newsId);
-        if (news == null) {
-            return null;
-        }
+        Preconditions.checkArgument(news != null, AppException.resourceNotFound("news"));
         if (news.getTag() == null) {
             news.setTag(tag);
         } else {
@@ -74,9 +70,7 @@ public class INewsImpl implements INews {
     @Override
     public News removeTag(String newsId, Set<String> tag) {
         News news = findById(newsId);
-        if (news == null) {
-            return null;
-        }
+        Preconditions.checkArgument(news != null, AppException.resourceNotFound("news"));
         if (news.getTag() == null) {
             return news;
         } else {
@@ -87,6 +81,7 @@ public class INewsImpl implements INews {
 
     @Override
     public News findById(String id) {
+        Preconditions.checkArgument(id != null && !id.isEmpty(), AppException.invalidParam("id"));
         News news = mongoTemplate.findById(id, News.class);
         if (news == null || news.isDeleted()) {
             return null;
@@ -108,12 +103,12 @@ public class INewsImpl implements INews {
 
     @Override
     public List<News> findByMMDD(String month, String day) {
-
+        Preconditions.checkArgument(month != null && day != null, AppException.invalidParam("date"));
         month = String.format("%02d", Integer.parseInt(month));
         day = String.format("%02d", Integer.parseInt(day));
 
         // 确保匹配的是 YYYY-MM-DD 格式
-        String monthAndDay = ".*-" + month + "-" + day;
+        String monthAndDay = ".*-%s-%s".formatted(month, day);
 
         Query query = new Query();
         query.addCriteria(Criteria.where("date").regex(monthAndDay));
@@ -125,11 +120,7 @@ public class INewsImpl implements INews {
     @Override
     public boolean deleteNews(String id) {
         News news = findById(id);
-        if (news == null) {
-            logger.warn("delete news failed, news not found, id: {}", id);
-            return false;
-        }
-        // logic delete
+        Preconditions.checkArgument(news != null, AppException.resourceNotFound("news"));
         news.setDeleted(true);
         mongoTemplate.save(news);
         return true;
@@ -138,7 +129,6 @@ public class INewsImpl implements INews {
     @Override
     public PageResult<News> find(boolean hasContent, int pageSize, String lastID) {
         Query query = new Query();
-        // if hasContent is true, then return news with content
         if (!hasContent) {
             query.fields().exclude("content");
         }
