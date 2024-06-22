@@ -35,7 +35,7 @@ public class AppConfig {
     public String indexFile = "hnsw.index";
 
     @DynamicConfig(key = "index.persist.threshold", desc = "索引持久化的阈值", defaultValue = "50")
-    public Long indexPersistThreshold;
+    public Long indexPersistThreshold = 50L;
 
     public Set<Submission> topSubmissions = new HashSet<>();
 
