@@ -2,10 +2,12 @@ package com.bupt.memes.controller.manager;
 
 import com.bupt.memes.anno.AuthRequired;
 import com.bupt.memes.config.AppConfig;
+import com.bupt.memes.model.ConfigItem;
 import com.bupt.memes.service.StatisticService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -48,7 +50,7 @@ public class Common {
 
     @GetMapping("/config")
     @AuthRequired
-    public Map<String, String> getAppConfig() {
+    public List<ConfigItem> getAppConfig() {
         return appConfig.getSys();
     }
 

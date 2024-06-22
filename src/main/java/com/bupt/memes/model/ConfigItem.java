@@ -12,8 +12,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @Document("config")
 public class ConfigItem {
+
+    public enum Type {
+        STRING,
+        INTEGER,
+        BOOLEAN,
+        DOUBLE,
+        JSON
+    }
+
     String id;
     String key;
     String value;
     String description;
+    boolean visible;
+    String visibleName;
+    Type type;
 }

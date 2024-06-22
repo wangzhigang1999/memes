@@ -21,7 +21,7 @@ import java.util.*;
 @Slf4j
 @Component("appConfig")
 public class AppConfig {
-    @DynamicConfig(key = "bot.up", desc = "机器人是否开启", defaultValue = "true")
+    @DynamicConfig(key = "bot.up", desc = "机器人是否开启", defaultValue = "true", type = ConfigItem.Type.BOOLEAN)
     public boolean botUp;
     @DynamicConfig(key = "submission.num.min", desc = "每天的最少投稿数", defaultValue = "50")
     public int minSubmissions = 50;
@@ -29,9 +29,9 @@ public class AppConfig {
     public int topK = 10;
     @DynamicConfig(key = "cache.size", desc = "缓存的大小", defaultValue = "1000")
     public int submissionCacheSize = 1000;
-    @DynamicConfig(key = "index.version", desc = "索引的版本", defaultValue = "0")
+    @DynamicConfig(key = "index.version", desc = "索引的版本", defaultValue = "0", visible = false)
     public long indexVersion = 0;
-    @DynamicConfig(key = "index.file", desc = "索引的加载位置", defaultValue = "hnsw.index")
+    @DynamicConfig(key = "index.file", desc = "索引的加载位置", defaultValue = "hnsw.index", type = ConfigItem.Type.STRING, visible = false)
     public String indexFile = "hnsw.index";
 
     @DynamicConfig(key = "index.persist.threshold", desc = "索引持久化的阈值", defaultValue = "50")
@@ -39,7 +39,7 @@ public class AppConfig {
 
     public Set<Submission> topSubmissions = new HashSet<>();
 
-    @DynamicConfig(key = "top.submission", desc = "置顶的投稿", defaultValue = "[]")
+    @DynamicConfig(key = "top.submission", desc = "置顶的投稿", defaultValue = "[]", type = ConfigItem.Type.JSON, visible = false)
     public void setTopSubmissions(String topSubmissions) {
         if (topSubmissions == null || topSubmissions.isEmpty()) {
             return;
@@ -86,10 +86,8 @@ public class AppConfig {
         }
     }
 
-    public Map<String, String> getSys() {
-        HashMap<String, String> map = new HashMap<>();
-        mongoTemplate.findAll(ConfigItem.class).forEach(item -> map.put(item.getKey(), item.getValue()));
-        return map;
+    public List<ConfigItem> getSys() {
+        return mongoTemplate.findAll(ConfigItem.class).stream().filter(ConfigItem::isVisible).toList();
     }
 
     public Boolean addTop(String id) {
@@ -113,6 +111,7 @@ public class AppConfig {
     }
 
     public Boolean updateConfig(Map<String, String> config) {
+        log.info("Admin update config: {}", config);
         config.forEach(this::updateConfig);
         return true;
     }

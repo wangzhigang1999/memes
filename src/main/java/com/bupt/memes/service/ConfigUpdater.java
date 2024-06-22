@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,9 +81,10 @@ public class ConfigUpdater implements CommandLineRunner {
             for (Method method : clazz.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(DynamicConfig.class)) {
                     DynamicConfig annotation = method.getAnnotation(DynamicConfig.class);
-                    addConfigItem(annotation);
                     method.setAccessible(true);
                     String key = annotation.key().isEmpty() ? method.getName() : annotation.key();
+                    addConfigItem(key, annotation);
+
                     methodMap.put(key, method);
                 }
             }
@@ -90,9 +92,9 @@ public class ConfigUpdater implements CommandLineRunner {
             for (Field field : clazz.getDeclaredFields()) {
                 if (field.isAnnotationPresent(DynamicConfig.class)) {
                     DynamicConfig annotation = field.getAnnotation(DynamicConfig.class);
-                    addConfigItem(annotation);
                     field.setAccessible(true);
                     String key = annotation.key().isEmpty() ? field.getName() : annotation.key();
+                    addConfigItem(key, annotation);
                     fieldMap.put(key, field);
                 }
             }
@@ -101,15 +103,26 @@ public class ConfigUpdater implements CommandLineRunner {
         log.info("ConfigUpdater initialized");
     }
 
-    private static void addConfigItem(DynamicConfig dynamicConfig) {
-        String key = dynamicConfig.key();
+    private static void addConfigItem(String key, DynamicConfig dynamicConfig) {
         String desc = dynamicConfig.desc();
         String defaultValue = dynamicConfig.defaultValue();
+        ConfigItem.Type type = dynamicConfig.type();
+        boolean visible = dynamicConfig.visible();
+
+        String name = dynamicConfig.visibleName();
+        if (name.isEmpty()) {
+            name = key.toUpperCase(Locale.ROOT);
+        }
+
         ConfigItem build = ConfigItem.builder()
                 .key(key)
                 .description(desc)
                 .value(defaultValue)
+                .type(type)
+                .visible(visible)
+                .visibleName(name)
                 .build();
+        log.info("Add config item: {}", build);
         configItemSet.add(build);
     }
 
