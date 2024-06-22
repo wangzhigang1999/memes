@@ -25,7 +25,7 @@ import static com.bupt.memes.util.TimeUtil.getCurrentHour;
  * 定时任务
  */
 
-@Service
+@Service("submissionCron")
 @AllArgsConstructor
 @ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
 public class Submission {
