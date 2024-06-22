@@ -14,11 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ConfigItem {
 
     public enum Type {
-        STRING,
-        INTEGER,
-        BOOLEAN,
-        DOUBLE,
-        JSON
+        STRING, INTEGER, BOOLEAN, DOUBLE, JSON
     }
 
     String id;

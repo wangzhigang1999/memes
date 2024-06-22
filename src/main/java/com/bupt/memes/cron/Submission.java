@@ -64,6 +64,7 @@ public class Submission {
         int currentHour = getCurrentHour();
         if (notMeetsMinReq || (currentHour >= 21 || currentHour <= 8)) {
             logger.info("enable bot notMeetsMinReq: {}  currentHour: {}", notMeetsMinReq, currentHour);
+            appConfig.setBotUp(true);
             return;
         }
         appConfig.setBotUp(false);

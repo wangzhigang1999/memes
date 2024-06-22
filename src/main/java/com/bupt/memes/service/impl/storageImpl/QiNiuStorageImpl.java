@@ -100,8 +100,10 @@ public class QiNiuStorageImpl implements Storage {
     /**
      * 上传字节数据到七牛云
      *
-     * @param bytes 字节数组
-     * @param ext   后缀/扩展名
+     * @param bytes
+     *            字节数组
+     * @param ext
+     *            后缀/扩展名
      * @return 七牛云上的文件名 =文件路径 + 文件名
      */
     @SneakyThrows
@@ -121,7 +123,7 @@ public class QiNiuStorageImpl implements Storage {
         }
         String[] split = path.split("/");
         String fileName = split[split.length - 1];
-        if(!fileName.contains(".")){
+        if (!fileName.contains(".")) {
             path = path.concat(".").concat(getExtension(mime));
         }
         Auth auth = Auth.create(accessKey, secretKey);
