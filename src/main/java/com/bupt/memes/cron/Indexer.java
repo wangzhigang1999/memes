@@ -26,7 +26,7 @@ public class Indexer {
         annIndexService.initKafkaConsumer();
     }
 
-    @Scheduled(fixedRate = 1000 * 30 * 60)
+    @Scheduled(cron = "0 30 * * * ?")
     public void persist() {
         var pair = annIndexService.persistIndex();
         if (pair != null) {

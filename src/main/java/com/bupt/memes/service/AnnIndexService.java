@@ -249,7 +249,7 @@ public class AnnIndexService {
      */
     @SneakyThrows
     public Pair<Long, String> persistIndex() {
-        Preconditions.checkNotNull(storage, AppException.databaseError("Storage is not initialized"));
+        Preconditions.checkNotNull(index, AppException.databaseError("The index is not initialize"));
         long diff = index.size() - initIndexSize;
         if (diff < config.indexPersistThreshold) {
             log.info("Index size is less than threshold, current diff: {}, threshold: {}", diff, config.indexPersistThreshold);
