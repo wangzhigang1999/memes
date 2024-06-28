@@ -10,7 +10,7 @@ spring:
       max-request-size: 10MB
   web:
     resources:
-      static-locations: ["classpath:/static/", "file:./memes-img/"]
+      static-locations: ["classpath:/static/", "file:./memes/"]
   webflux:
     static-path-pattern: /static/**
 

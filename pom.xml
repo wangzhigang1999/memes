@@ -9,7 +9,7 @@
 		<version>3.2.4</version>
 		<relativePath/>
 	</parent>
-	<groupId>com.bupt</groupId>
+	<groupId>com.memes</groupId>
 	<artifactId>memes</artifactId>
 	<version>2.0</version>
 	<name>memes</name>
@@ -199,6 +199,8 @@
 								<include>.gitattributes</include>
 								<include>.gitignore</include>
 								<include>*.xml</include>
+								<include>${project.basedir}/src/main/java/**/*.java</include>
+								<include>${project.basedir}/src/test/java/**/*.java</include>
 							</includes>
 							<trimTrailingWhitespace/>
 							<endWithNewline/>
