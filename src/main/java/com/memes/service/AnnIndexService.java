@@ -191,7 +191,7 @@ public class AnnIndexService {
             FileUtils.copyURLToFile(uri.toURL(), path.toFile());
             return HnswIndex.load(path);
         } catch (Exception e) {
-            log.error("Failed to load index from network: {}", url);
+            log.error("Failed to load index from network: {}", url, e);
             return null;
         }
     }
@@ -206,7 +206,7 @@ public class AnnIndexService {
             }
             return HnswIndex.load(path);
         } catch (Exception e) {
-            log.error("Failed to load index from local file: {}", indexFile);
+            log.error("Failed to load index from local file: {}", indexFile, e);
             return null;
         }
     }

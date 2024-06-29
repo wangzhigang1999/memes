@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 @Slf4j
@@ -25,14 +26,35 @@ public class ExceptionHandler {
         return ResultData.fail(e);
     }
 
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = NoResourceFoundException.class)
+    @ResponseBody
+    public ResultData<?> exceptionHandler(HttpServletRequest request, HttpServletResponse response, NoResourceFoundException e) {
+        String requestUrl = request.getRequestURL().toString();
+        String method = request.getMethod();
+        String message = e.getMessage();
+        response.setStatus(404);
+        log.warn("Request Method:{}  URL:{}, Message:{}", method, requestUrl, message);
+        return ResultData.fail(AppException.resourceNotFound(requestUrl));
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = IllegalArgumentException.class)
+    @ResponseBody
+    public ResultData<?> exceptionHandler(HttpServletRequest request, HttpServletResponse response, IllegalArgumentException e) {
+        String requestUrl = request.getRequestURL().toString();
+        String method = request.getMethod();
+        String message = e.getMessage();
+        response.setStatus(400);
+        log.error("Request Method:{}  URL:{}, Message:{}", method, requestUrl, message);
+        return ResultData.fail(AppException.invalidParam(message));
+    }
+
     @org.springframework.web.bind.annotation.ExceptionHandler(value = Exception.class)
     @ResponseBody
     public ResultData<?> exceptionHandler(HttpServletRequest request, Exception e) {
         String requestUrl = request.getRequestURL().toString();
         String method = request.getMethod();
         String message = e.getMessage();
-        log.error("Request Method:{}  URL:{}, Message:{}", method, requestUrl, message);
-        e.printStackTrace();
+        log.error("Request Method:{}  URL:{}, Message:{}", method, requestUrl, message, e);
         return ResultData.fail(AppException.internalError(message));
     }
 
