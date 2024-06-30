@@ -3,6 +3,7 @@ package com.memes.aspect;
 import com.google.gson.Gson;
 import com.memes.model.common.LogDocument;
 import com.mongodb.client.MongoClient;
+import io.micrometer.common.util.StringUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
@@ -95,7 +96,7 @@ public class Audit {
             document.setUrl(url)
                     .setMethod(method)
                     .setParameterMap(map)
-                    .setUuid(uuid)
+                    .setUuid(StringUtils.isEmpty(uuid) ? "anonymous" : uuid)
                     .setTimecost(end - start)
                     .setTimestamp(start)
                     .setInstanceUUID(INSTANCE_UUID);
