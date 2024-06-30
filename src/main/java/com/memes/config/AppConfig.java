@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 应用配置，动态更新
@@ -43,8 +44,10 @@ public class AppConfig {
     public int newsFetchLimit = 20;
     @DynamicConfig(key = "submission.fetch.limit", desc = "每次获取的最大投稿数", defaultValue = "20")
     public int subFetchLimit = 20;
+    @DynamicConfig(key = "server.down", desc = "服务器是否停止服务", defaultValue = "false", type = ConfigItem.Type.BOOLEAN)
+    public boolean serverDown = false;
 
-    public Set<Submission> topSubmissions = new HashSet<>();
+    public Set<Submission> topSubmissions = new CopyOnWriteArraySet<>();
 
     @DynamicConfig(key = "top.submission", desc = "置顶的投稿", defaultValue = "[]", type = ConfigItem.Type.JSON, visible = false)
     public void setTopSubmissions(String topSubmissions) {
@@ -53,6 +56,18 @@ public class AppConfig {
         }
         Submission[] submissions = new Gson().fromJson(topSubmissions, Submission[].class);
         this.topSubmissions = new HashSet<>(Arrays.asList(submissions));
+    }
+
+    public Set<String> uidBlacklist = new CopyOnWriteArraySet<>();
+
+    @DynamicConfig(key = "blacklist", desc = "黑名单", defaultValue = "[]", type = ConfigItem.Type.JSON, visible = false)
+    public void setUidBlacklist(String uidBlacklist) {
+        if (uidBlacklist == null || uidBlacklist.isEmpty()) {
+            return;
+        }
+        String[] uuids = new Gson().fromJson(uidBlacklist, String[].class);
+        this.uidBlacklist.clear();
+        this.uidBlacklist.addAll(Arrays.asList(uuids));
     }
 
     final MongoTemplate mongoTemplate;
@@ -111,6 +126,23 @@ public class AppConfig {
         topSubmissions.remove(submission);
         this.setTopSubmissions(topSubmissions);
         return true;
+    }
+
+    public Boolean addBlacklist(String uid) {
+        uidBlacklist.add(uid);
+        this.setUidBlacklist(uidBlacklist);
+        return true;
+    }
+
+    public Boolean removeBlacklist(String uid) {
+        uidBlacklist.remove(uid);
+        this.setUidBlacklist(uidBlacklist);
+        return true;
+    }
+
+    private void setUidBlacklist(Set<String> uidBlacklist) {
+        this.uidBlacklist = uidBlacklist;
+        this.updateConfig("blacklist", new Gson().toJson(uidBlacklist));
     }
 
     public Boolean updateConfig(Map<String, String> config) {

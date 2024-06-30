@@ -73,11 +73,6 @@ public class Audit {
         var url = request.getRequestURL().toString();
         var method = request.getMethod();
         var parameterMap = request.getParameterMap();
-
-        if (uuid == null || uuid.isEmpty()) {
-            uuid = "anonymous";
-        }
-
         if ("dev".equals(env)) {
             log.info("audit: classMethod: {}, url: {}, method: {},parameterMap: {}", classMethod, url, method, new Gson().toJson(parameterMap));
         }
@@ -90,8 +85,7 @@ public class Audit {
         long end = System.currentTimeMillis();
         threadLocalUUID.remove();
 
-        String finalUuid = uuid;
-        CompletableFuture.runAsync(() -> audit(classMethod, url, method, finalUuid, start, end, parameterMap), pool);
+        CompletableFuture.runAsync(() -> audit(classMethod, url, method, uuid, start, end, parameterMap), pool);
         return proceed;
     }
 

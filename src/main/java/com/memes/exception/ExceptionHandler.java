@@ -21,9 +21,7 @@ public class ExceptionHandler {
         String message = e.getMessage();
         AppException.ErrorType errorType = e.getErrorType();
         log.error("Request Method:{}  URL:{}, ErrorType:{}, Message:{}", method, requestUrl, errorType, message);
-        if (errorType == AppException.ErrorType.UNAUTHORIZED) {
-            response.setStatus(401);
-        }
+        response.setStatus(e.getErrorType().getCode());
         return ResultData.fail(e);
     }
 
@@ -32,8 +30,7 @@ public class ExceptionHandler {
     public Object exceptionHandler(HttpServletRequest request, HttpServletResponse response, NoResourceFoundException e) {
         String requestUrl = request.getRequestURL().toString();
         log.error("Request URL:{}, Message:{}", requestUrl, e.getMessage());
-        response.setStatus(302);
-        response.sendRedirect("https://memes.bupt.site");
+        response.setStatus(e.getStatusCode().value());
         return null;
     }
 
@@ -50,11 +47,12 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public ResultData<?> exceptionHandler(HttpServletRequest request, Exception e) {
+    public ResultData<?> exceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception e) {
         String requestUrl = request.getRequestURL().toString();
         String method = request.getMethod();
         String message = e.getMessage();
         log.error("Request Method:{}  URL:{}, Message:{}", method, requestUrl, message, e);
+        response.setStatus(500);
         return ResultData.fail(AppException.internalError(message));
     }
 

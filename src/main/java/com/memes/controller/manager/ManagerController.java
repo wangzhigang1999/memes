@@ -2,8 +2,10 @@ package com.memes.controller.manager;
 
 import com.memes.annotation.AuthRequired;
 import com.memes.config.AppConfig;
+import com.memes.exception.AppException;
 import com.memes.model.ConfigItem;
 import com.memes.service.StatisticService;
+import com.memes.util.Preconditions;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,6 +60,20 @@ public class ManagerController {
     @AuthRequired
     public Boolean setAppConfig(@RequestBody Map<String, String> config) {
         return appConfig.updateConfig(config);
+    }
+
+    @PostMapping("/blacklist/{uuid}")
+    @AuthRequired
+    public Boolean blacklist(@PathVariable String uuid) {
+        Preconditions.checkStringNotEmpty(uuid, AppException.invalidParam("uuid"));
+        return appConfig.addBlacklist(uuid);
+    }
+
+    @DeleteMapping("/blacklist/{uuid}")
+    @AuthRequired
+    public Boolean unblacklist(@PathVariable String uuid) {
+        Preconditions.checkStringNotEmpty(uuid, AppException.invalidParam("uuid"));
+        return appConfig.removeBlacklist(uuid);
     }
 
 }
