@@ -3,6 +3,7 @@ package com.memes.exception;
 import com.memes.model.common.ResultData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,14 +28,13 @@ public class ExceptionHandler {
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = NoResourceFoundException.class)
-    @ResponseBody
-    public ResultData<?> exceptionHandler(HttpServletRequest request, HttpServletResponse response, NoResourceFoundException e) {
+    @SneakyThrows
+    public Object exceptionHandler(HttpServletRequest request, HttpServletResponse response, NoResourceFoundException e) {
         String requestUrl = request.getRequestURL().toString();
-        String method = request.getMethod();
-        String message = e.getMessage();
-        response.setStatus(404);
-        log.warn("Request Method:{}  URL:{}, Message:{}", method, requestUrl, message);
-        return ResultData.fail(AppException.resourceNotFound(requestUrl));
+        log.error("Request URL:{}, Message:{}", requestUrl, e.getMessage());
+        response.setStatus(302);
+        response.sendRedirect("https://memes.bupt.site");
+        return null;
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = IllegalArgumentException.class)
