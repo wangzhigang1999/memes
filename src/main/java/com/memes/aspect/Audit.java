@@ -74,9 +74,7 @@ public class Audit {
         var url = request.getRequestURL().toString();
         var method = request.getMethod();
         var parameterMap = request.getParameterMap();
-        if ("dev".equals(env)) {
-            log.info("audit: classMethod: {}, url: {}, method: {},parameterMap: {}", classMethod, url, method, new Gson().toJson(parameterMap));
-        }
+        log.debug("audit: classMethod: {}, url: {}, method: {},parameterMap: {}", classMethod, url, method, new Gson().toJson(parameterMap));
         /*
          * 这里使用 ThreadLocal 传递 uuid，在向数据库中插入数据时，可能会使用这个 uuid
          */

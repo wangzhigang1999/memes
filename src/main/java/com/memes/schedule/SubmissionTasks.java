@@ -5,6 +5,8 @@ import com.memes.model.common.LogDocument;
 import com.memes.model.news.News;
 import com.memes.model.rss.RSSItem;
 import com.memes.model.submission.Submission;
+import com.memes.model.submission.SubmissionGroup;
+import com.memes.model.submission.SubmissionType;
 import com.memes.service.review.ReviewService;
 import com.memes.service.storage.StorageService;
 import com.memes.service.submission.SubmissionService;
@@ -99,8 +101,15 @@ public class SubmissionTasks {
         List<String> keyList = new ArrayList<>();
         Map<String, String> nameIdMap = new HashMap<>();
         for (Submission sub : deletedSubmission) {
-            keyList.add(sub.getName());
-            nameIdMap.put(sub.getName(), sub.getId());
+            if (Objects.requireNonNull(sub.getSubmissionType()) == SubmissionType.BATCH) {
+                for (Submission child : ((SubmissionGroup) sub).getChildren()) {
+                    keyList.add(child.getName());
+                    nameIdMap.put(child.getName(), child.getId());
+                }
+            } else {
+                keyList.add(sub.getName());
+                nameIdMap.put(sub.getName(), sub.getId());
+            }
         }
 
         String[] array = keyList.toArray(new String[0]);

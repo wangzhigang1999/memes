@@ -50,11 +50,6 @@ public interface SubmissionService {
     List<Submission> getSimilarSubmission(String id, int size);
 
     /**
-     * 随机获取投稿
-     */
-    List<Submission> randomSubmission(int size);
-
-    /**
      * 反馈
      */
     boolean feedback(String id, String feedback);

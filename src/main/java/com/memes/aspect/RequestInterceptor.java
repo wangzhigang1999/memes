@@ -3,6 +3,7 @@ package com.memes.aspect;
 import com.memes.config.AppConfig;
 import com.memes.exception.AppException;
 import com.memes.util.Preconditions;
+import com.memes.util.ResourceChecker;
 import io.pyroscope.org.jetbrains.annotations.NotNull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +25,7 @@ public class RequestInterceptor implements HandlerInterceptor {
         String url = request.getRequestURI();
         String method = request.getMethod();
         String token = request.getHeader("token");
-        if (url.startsWith("/admin") || "OPTIONS".equals(method) || localToken.equals(token)) {
+        if (url.startsWith("/admin") || "OPTIONS".equals(method) || localToken.equals(token) || ResourceChecker.isStaticResource(url)) {
             return HandlerInterceptor.super.preHandle(request, response, handler);
         }
         if (config.serverDown) {

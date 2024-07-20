@@ -1,5 +1,6 @@
 package com.memes.controller.submission;
 
+import com.memes.annotation.AuthRequired;
 import com.memes.config.AppConfig;
 import com.memes.exception.AppException;
 import com.memes.model.common.PageResult;
@@ -77,6 +78,7 @@ public class SubmissionController {
     }
 
     @DeleteMapping("/id/{id}")
+    @AuthRequired
     public Boolean deleteSubmissionById(@PathVariable("id") String id) {
         return service.markDelete(id);
     }
@@ -85,11 +87,4 @@ public class SubmissionController {
     public List<Submission> getSimilarSubmission(@PathVariable("id") String id, Integer size) {
         return service.getSimilarSubmission(id, size);
     }
-
-    @GetMapping("/random")
-    public List<Submission> randomSubmission(Integer size) {
-        size = size == null ? 10 : Math.min(size, 50);
-        return service.randomSubmission(size);
-    }
-
 }

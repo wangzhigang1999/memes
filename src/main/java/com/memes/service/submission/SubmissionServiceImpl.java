@@ -11,7 +11,6 @@ import com.memes.model.common.FileUploadResult;
 import com.memes.model.common.PageResult;
 import com.memes.model.param.ListSubmissionsRequest;
 import com.memes.model.submission.Submission;
-import com.memes.service.AnnIndexService;
 import com.memes.service.MongoPageHelper;
 import com.memes.service.storage.StorageService;
 import com.memes.util.KafkaUtil;
@@ -50,7 +49,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
     final AppConfig appConfig;
-    final AnnIndexService annIndexService;
+    // final AnnIndexService annIndexService;
 
     final StorageService storageService;
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
@@ -200,21 +199,12 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public List<Submission> getSimilarSubmission(String id, int size) {
-        Preconditions.checkArgument(size > 0, AppException.invalidParam("size"));
-        size = Math.min(appConfig.topK, size);
-        List<SearchResult<HNSWItem, Float>> search = annIndexService.search(id, size);
-        return getSubmissionsByHNSWItems(search);
-    }
-
-    @Override
-    public List<Submission> randomSubmission(int size) {
-        float[] vector = new float[768];
-        for (int i = 0; i < 768; i++) {
-            vector[i] = (float) Math.random();
-        }
-        size = Math.min(appConfig.topK, size);
-        List<SearchResult<HNSWItem, Float>> search = annIndexService.search(vector, size);
-        return getSubmissionsByHNSWItems(search);
+        return List.of();
+        // Preconditions.checkArgument(size > 0, AppException.invalidParam("size"));
+        // size = Math.min(appConfig.topK, size);
+        // List<SearchResult<HNSWItem, Float>> search = annIndexService.search(id,
+        // size);
+        // return getSubmissionsByHNSWItems(search);
     }
 
     @Override

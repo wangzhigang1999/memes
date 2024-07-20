@@ -20,7 +20,8 @@ public class AppException extends RuntimeException {
                 401), METHOD_NOT_ALLOWED("Method not allowed.", 405), INTERNAL_ERROR("The server encountered an internal error. %s",
                         500), DATABASE_ERROR("The server encountered an database error. %s",
                                 500), STORAGE_ERROR("The server encountered an storage error. %s",
-                                        500), SERVER_DOWN("Web server is Down.", 521), FORBIDDEN("Disallowed", 403);
+                                        500), SERVER_DOWN("Web server is Down.",
+                                                521), FORBIDDEN("Disallowed", 403), TOO_MANY_REQUESTS("Too many requests.", 429);
 
         private final String message;
         @Getter
@@ -70,12 +71,16 @@ public class AppException extends RuntimeException {
         return new AppException(ErrorType.RESOURCE_NOT_FOUND, param);
     }
 
-    public static Exception serverDown() {
+    public static AppException serverDown() {
         return new AppException(ErrorType.SERVER_DOWN);
     }
 
-    public static Exception forbidden() {
+    public static AppException forbidden() {
         return new AppException(ErrorType.FORBIDDEN);
+    }
+
+    public static AppException tooManyRequests(String tooManyRequests) {
+        return new AppException(ErrorType.TOO_MANY_REQUESTS);
     }
 
     public static void main(String[] args) {

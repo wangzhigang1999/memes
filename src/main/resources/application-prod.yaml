@@ -3,6 +3,9 @@ spring:
     mongodb:
       database: memes
       uri: ${mongoUri}
+  threads:
+    virtual:
+      enabled: true
 storage:
   type: ${storage}
 
