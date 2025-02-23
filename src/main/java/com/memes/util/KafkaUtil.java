@@ -25,8 +25,6 @@ public class KafkaUtil {
 
     // 用户直接的投稿
     public final static String ORIGINAL = "original";
-    // embedding后的向量
-    public final static String EMBEDDING = "embedding";
     // 控制信令
     public final static String CONTROL = "control";
 

@@ -2,11 +2,9 @@ package com.memes.service.submission;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.jelmerk.knn.SearchResult;
 import com.memes.aspect.Audit;
 import com.memes.config.AppConfig;
 import com.memes.exception.AppException;
-import com.memes.model.HNSWItem;
 import com.memes.model.common.FileUploadResult;
 import com.memes.model.common.PageResult;
 import com.memes.model.param.ListSubmissionsRequest;
@@ -62,10 +60,8 @@ public class SubmissionServiceImpl implements SubmissionService {
     /**
      * 存储文本类型的投稿
      *
-     * @param text
-     *            url text
-     * @param mime
-     *            mime
+     * @param text url text
+     * @param mime mime
      * @return 存储后的投稿
      */
     @Override
@@ -111,10 +107,8 @@ public class SubmissionServiceImpl implements SubmissionService {
     /**
      * 存储二进制类型的投稿
      *
-     * @param stream
-     *            输入流
-     * @param mime
-     *            mime
+     * @param stream 输入流
+     * @param mime   mime
      * @return 存储后的投稿
      */
     @Override
@@ -159,8 +153,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     /**
      * 标记删除，只有通过审核的投稿才能被标记删除，所以不用考虑 WAITING_SUBMISSION
      *
-     * @param id
-     *            投稿 id
+     * @param id 投稿 id
      * @return 是否成功
      */
     @Transactional
@@ -239,8 +232,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     /**
      * 插入投稿
      *
-     * @param submission
-     *            投稿
+     * @param submission 投稿
      * @return 插入后的投稿
      */
     private Submission insertSubmission(Submission submission) {
@@ -259,7 +251,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     @SneakyThrows
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     private Submission getSubmission(Integer hash) {
         CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
                 .map(collection -> CompletableFuture
@@ -276,18 +268,6 @@ public class SubmissionServiceImpl implements SubmissionService {
                         .orElse(null))
                 .get();
 
-    }
-
-    private List<Submission> getSubmissionsByHNSWItems(List<SearchResult<HNSWItem, Float>> search) {
-        List<CompletableFuture<Submission>> list = search.stream()
-                .map(SearchResult::item)
-                .map(HNSWItem::getId)
-                .map(k -> CompletableFuture.supplyAsync(() -> getSubmissionById(k), executor))
-                .toList();
-        return list.stream().map(CompletableFuture::join)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
     }
 
 }

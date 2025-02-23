@@ -2,8 +2,6 @@ package com.memes.schedule;
 
 import com.memes.config.AppConfig;
 import com.memes.model.common.LogDocument;
-import com.memes.model.news.News;
-import com.memes.model.rss.RSSItem;
 import com.memes.model.submission.Submission;
 import com.memes.model.submission.SubmissionGroup;
 import com.memes.model.submission.SubmissionType;
@@ -155,15 +153,7 @@ public class SubmissionTasks {
         long logCount = mongoTemplate.count(new Query(), LogDocument.class);
         Objects.requireNonNull(map.computeIfAbsent("log.count", k -> registry.gauge(k, new AtomicLong(logCount))))
                 .set(logCount);
-        long rssCount = mongoTemplate.count(new Query(), RSSItem.class);
-        Objects.requireNonNull(map.computeIfAbsent("rss.count", k -> registry.gauge(k, new AtomicLong(rssCount))))
-                .set(rssCount);
-        long newsCount = mongoTemplate.count(new Query(), News.class);
-        Objects.requireNonNull(map.computeIfAbsent("news.count", k -> registry.gauge(k, new AtomicLong(newsCount))))
-                .set(newsCount);
-        log.debug("ScanDBStatus done, submissionCount: {}, logCount: {}, rssCount: {}, newsCount: {}",
-                submissionCount, logCount, rssCount, newsCount);
-
+        log.debug("ScanDBStatus done, submissionCount: {}, logCount: {}", submissionCount, logCount);
     }
 
     private static boolean notMeetsMinReq(long passedNum, long waitingNum, int targetNum) {
