@@ -1,0 +1,25 @@
+syntax = "proto3";
+import "media.proto";
+
+
+option java_package = "com.memes.model.transport";
+
+option java_multiple_files = true;
+
+enum ReviewOutcome {
+  PASS = 0;
+  FAIL = 1;
+  UNDECIDED = 2;
+}
+
+
+message LLMReviewResult {
+  string mediaId = 1;
+  string inputPrompt = 2;
+  MediaType mediaType = 3;
+  string mediaDescription = 4;
+  ReviewOutcome outcome = 5;
+  string failureReason = 6;
+  int64 reviewTimestamp = 7;
+  string reviewerModel = 8;
+}

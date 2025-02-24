@@ -12,13 +12,6 @@ local:
 
 token: ${token:hello}
 
-hnsw:
-  dimension: 128
-  m: 16
-  efConstruction: 200
-  efSearch: 200
-  maxElements: 1000000
-
 management:
   influx:
     metrics:

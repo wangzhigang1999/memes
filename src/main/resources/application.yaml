@@ -10,18 +10,13 @@ spring:
       max-request-size: 10MB
   web:
     resources:
-      static-locations: ["classpath:/static/", "file:./memes/"]
+      static-locations: [ "classpath:/static/", "file:./memes/" ]
   webflux:
     static-path-pattern: /static/**
-
   main:
     lazy-initialization: true
 
+dashscope:
+  apiKey: ${dashscopeApiKey}
 server:
   port: 8080
-
-perf:
-  enabled: false
-  url: ${perfUrl}
-  username: ${perfUsername}
-  password: ${perfPassword}

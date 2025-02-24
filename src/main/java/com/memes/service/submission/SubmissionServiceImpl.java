@@ -1,7 +1,5 @@
 package com.memes.service.submission;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.memes.aspect.Audit;
 import com.memes.config.AppConfig;
 import com.memes.exception.AppException;
@@ -9,9 +7,9 @@ import com.memes.model.common.FileUploadResult;
 import com.memes.model.common.PageResult;
 import com.memes.model.param.ListSubmissionsRequest;
 import com.memes.model.submission.Submission;
+import com.memes.service.MessageQueueService;
 import com.memes.service.MongoPageHelper;
 import com.memes.service.storage.StorageService;
-import com.memes.util.KafkaUtil;
 import com.memes.util.Preconditions;
 import com.memes.util.TimeUtil;
 import com.mongodb.DuplicateKeyException;
@@ -47,21 +45,21 @@ public class SubmissionServiceImpl implements SubmissionService {
     final MongoTemplate mongoTemplate;
     final MongoPageHelper mongoPageHelper;
     final AppConfig appConfig;
-    // final AnnIndexService annIndexService;
 
+    final MessageQueueService mqService;
     final StorageService storageService;
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     final static Logger logger = LogManager.getLogger(SubmissionServiceImpl.class);
-
-    private static volatile Cache<String, Submission> submissionCache;
 
     private final Set<String> feedbacks = Set.of("like", "dislike");
 
     /**
      * 存储文本类型的投稿
      *
-     * @param text url text
-     * @param mime mime
+     * @param text
+     *            url text
+     * @param mime
+     *            mime
      * @return 存储后的投稿
      */
     @Override
@@ -74,7 +72,8 @@ public class SubmissionServiceImpl implements SubmissionService {
         Preconditions.checkArgument(formatDetected(text, submission), AppException.invalidParam("format"));
         Submission inserted = insertSubmission(submission);
         Preconditions.checkNotNull(inserted, AppException.internalError("insert submission failed"));
-        executor.submit(() -> KafkaUtil.sendTextSubmission(inserted.getId(), text));
+        Long memes = mqService.sendMessage("memes", submission);
+        Preconditions.checkNotNull(memes, AppException.internalError("send message to mq failed"));
         return inserted;
     }
 
@@ -107,8 +106,10 @@ public class SubmissionServiceImpl implements SubmissionService {
     /**
      * 存储二进制类型的投稿
      *
-     * @param stream 输入流
-     * @param mime   mime
+     * @param stream
+     *            输入流
+     * @param mime
+     *            mime
      * @return 存储后的投稿
      */
     @Override
@@ -138,7 +139,8 @@ public class SubmissionServiceImpl implements SubmissionService {
         submission.setHash(code).setSubmissionType(mime).setUrl(result.url()).setName(result.fileName());
         Submission inserted = insertSubmission(submission);
         Preconditions.checkNotNull(inserted, AppException.databaseError(""));
-        executor.submit(() -> KafkaUtil.sendBinarySubmission(inserted.getId(), bytes));
+        Long memes = mqService.sendMessage("memes", submission);
+        Preconditions.checkNotNull(memes, AppException.internalError("send message to mq failed"));
         return inserted;
     }
 
@@ -153,7 +155,8 @@ public class SubmissionServiceImpl implements SubmissionService {
     /**
      * 标记删除，只有通过审核的投稿才能被标记删除，所以不用考虑 WAITING_SUBMISSION
      *
-     * @param id 投稿 id
+     * @param id
+     *            投稿 id
      * @return 是否成功
      */
     @Transactional
@@ -163,8 +166,6 @@ public class SubmissionServiceImpl implements SubmissionService {
         Preconditions.checkNotNull(submission, AppException.resourceNotFound("submission"));
         mongoTemplate.save(submission, DELETED_SUBMISSION);
         mongoTemplate.remove(submission, PASSED_SUBMISSION);
-        submissionCache.invalidate(id);
-        // todo 广播出去
         return true;
     }
 
@@ -178,16 +179,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public Submission getSubmissionById(String id) {
-        if (submissionCache == null) {
-            synchronized (SubmissionServiceImpl.class) {
-                if (submissionCache == null) {
-                    submissionCache = Caffeine.newBuilder().maximumSize(appConfig.submissionCacheSize).build();
-                    logger.info("init cache, submission cache size: {}", appConfig.submissionCacheSize);
-                }
-            }
-        }
-        // 在 submission 这个 collection 中的 id 是唯一的，并且每一个记录是不可变且不会被删除的
-        return submissionCache.get(id, k -> mongoTemplate.findById(k, Submission.class));
+        return mongoTemplate.findById(id, Submission.class);
     }
 
     @Override
@@ -232,7 +224,8 @@ public class SubmissionServiceImpl implements SubmissionService {
     /**
      * 插入投稿
      *
-     * @param submission 投稿
+     * @param submission
+     *            投稿
      * @return 插入后的投稿
      */
     private Submission insertSubmission(Submission submission) {
@@ -251,7 +244,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     @SneakyThrows
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     private Submission getSubmission(Integer hash) {
         CompletableFuture<Submission>[] futures = COLLECTIONS.stream()
                 .map(collection -> CompletableFuture

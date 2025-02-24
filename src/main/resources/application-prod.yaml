@@ -3,6 +3,10 @@ spring:
     mongodb:
       database: memes
       uri: ${mongoUri}
+    redis:
+      host: ${redisHost}
+      username: ${redisUser}
+      password: ${redisPassword}
   threads:
     virtual:
       enabled: true
@@ -21,12 +25,6 @@ qiniu:
 
 token: ${token}
 
-hnsw:
-  dimension: 128
-  m: 16
-  efConstruction: 200
-  efSearch: 200
-  maxElements: 1000000
 
 management:
   endpoints:

@@ -4,26 +4,6 @@
       "name": "storage.type",
       "type": "java.lang.String",
       "description": "The type of storage used by the application."
-    },
-    {
-      "name": "perf.url",
-      "type": "java.lang.String",
-      "description": "url of grafana perf."
-    },
-    {
-      "name": "perf.username",
-      "type": "java.lang.String",
-      "description": "Description for perf.username."
-    },
-    {
-      "name": "perf.password",
-      "type": "java.lang.String",
-      "description": "Description for perf.password."
-    },
-    {
-      "name": "perf.enabled",
-      "type": "java.lang.Boolean",
-      "description": "Description for perf.enabled."
     }
   ]
 }

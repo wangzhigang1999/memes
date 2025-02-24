@@ -4,14 +4,13 @@ import com.memes.config.AppConfig;
 import com.memes.exception.AppException;
 import com.memes.util.Preconditions;
 import com.memes.util.ResourceChecker;
-import io.pyroscope.org.jetbrains.annotations.NotNull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-@SuppressWarnings("NullableProblems")
 @Slf4j
 @AllArgsConstructor
 public class RequestInterceptor implements HandlerInterceptor {
