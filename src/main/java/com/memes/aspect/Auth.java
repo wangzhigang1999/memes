@@ -1,64 +1,60 @@
 package com.memes.aspect;
 
+import com.memes.annotation.AuthRequired;
 import com.memes.exception.AppException;
 import com.memes.util.Preconditions;
-import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.UUID;
-
-/**
- * 用来做权限校验，有一些接口只有管理员才能访问
- */
 @Component
 @Aspect
-@Lazy(false)
 @Slf4j
 public class Auth {
-    @Value("${token}")
-    String localToken = UUID.randomUUID().toString();
-    @Value("${spring.profiles.active}")
-    String activeProfile;
 
-    @Pointcut("@annotation(com.memes.annotation.AuthRequired)")
-    public void auth() {
+    private final String localToken;
+    private final String activeProfile;
+
+    public Auth(@Value("${token:#{T(java.util.UUID).randomUUID().toString()}}") String localToken, @Value("${spring.profiles.active}") String activeProfile) {
+        this.localToken = localToken;
+        this.activeProfile = activeProfile;
+        log.info("Auth aspect initialized. Local token is masked. Active profile: {}", activeProfile);
     }
 
-    /**
-     * 校验 token
-     */
-    @Around("auth()")
-    public Object auth(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Pointcut("@annotation(authenticationRequired)")
+    public void authenticationPointcut(AuthRequired authenticationRequired) {
+        // Pointcut definition for methods annotated with @AuthRequired
+    }
+
+    @Around(value = "authenticationPointcut(authenticationRequired)", argNames = "joinPoint,authenticationRequired")
+    public Object authenticate(ProceedingJoinPoint joinPoint, AuthRequired authenticationRequired) throws Throwable {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        Preconditions.checkNotNull(attributes, AppException.unauthorized("Request context is not available."));
+        HttpServletRequest request = attributes.getRequest();
+        String httpMethod = request.getMethod();
+        String path = String.format("%s %s", httpMethod, request.getRequestURI());
+        String token = request.getHeader("token");
+        String clientIp = request.getRemoteAddr();
+
         if ("dev".equals(activeProfile)) {
+            log.debug("Skipping authentication in 'dev' profile for path: {}", path);
             return joinPoint.proceed();
         }
-        /*
-         * 从请求头中获取 token，如果 token 不正确，返回 401
-         * 进程内部的 token，只有在启动时才会生成，如果进程重启，token 会改变；也可以通过环境变量传入
-         */
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        Preconditions.checkNotNull(attributes, AppException.unauthorized("Request is null"));
-        var httpMethod = attributes.getRequest().getMethod();
-        var path = "%s %s".formatted(httpMethod, attributes.getRequest().getRequestURI());
-        var request = attributes.getRequest();
-        var token = request.getHeader("token");
-        Preconditions.checkArgument(token != null && token.equals(localToken), AppException.unauthorized(path));
-        log.info("Authorized access: {}", path);
+
+        if (token == null || !token.equals(localToken)) {
+            log.warn("Unauthorized access attempt from IP: {} to path: {}", clientIp, path);
+            log.trace("Unauthorized access attempt token: {}", token);
+            throw AppException.unauthorized(String.format("Invalid token for: %s ", path));
+        }
+
+        log.info("Authorized access to path: {}", path);
         return joinPoint.proceed();
     }
-
-    @PostConstruct
-    public void init() {
-        log.info("Local token: {}", localToken);
-    }
-
 }
