@@ -169,8 +169,8 @@ public class Reviewer {
         try {
             if (submission.getSubmissionType() == SubmissionType.IMAGE) {
                 LLMReviewResult reviewResult = reviewImageSubmission(submission);
-                redisTemplate.opsForHash().put("submission", submission.getId(), submission);
-                redisTemplate.opsForHash().put("review_result", submission.getId(), reviewResult);
+                redisTemplate.opsForHash().put("submission", submission.getId(), gson.toJson(submission));
+                redisTemplate.opsForHash().put("review_result", submission.getId(), gson.toJson(reviewResult));
                 handleReviewOutcome(submission.getId(), reviewResult.getOutcome());
             } else {
                 log.warn("Unsupported submission type: {}.  Skipping review.", submission.getSubmissionType());
