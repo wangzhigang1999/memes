@@ -75,7 +75,6 @@ public class SubmissionTasks {
     /**
      * 每天一次，清理一次存储，删除已经删除的 submission
      */
-    @Scheduled(cron = "0 0 0 * * ?")
     public void cleanDeletedSub() {
         log.info("cleanDeletedSub start.");
         var deletedSubmission = submissionService.getDeletedSubmission();

@@ -21,6 +21,7 @@ public class Submission implements Comparable<Submission> {
     String uploader;
     Integer hash;
     String name;
+    String llmDescription;
 
     long timestamp;
     long like;

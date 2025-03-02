@@ -23,6 +23,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.alibaba.dashscope.utils.JsonUtils.gson;
 import static com.memes.model.common.SubmissionCollection.*;
 
 @Service
@@ -48,6 +50,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     final MessageQueueService mqService;
     final StorageService storageService;
+    final RedisTemplate<String, String> redisTemplate;
     final static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     final static Logger logger = LogManager.getLogger(SubmissionServiceImpl.class);
 
@@ -179,7 +182,11 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public Submission getSubmissionById(String id) {
-        return mongoTemplate.findById(id, Submission.class);
+        String submission = (String) redisTemplate.opsForHash().get("submission", id);
+        if (submission == null || submission.isEmpty()) {
+            return mongoTemplate.findById(id, Submission.class);
+        }
+        return gson.fromJson(submission, Submission.class);
     }
 
     @Override

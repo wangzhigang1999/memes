@@ -169,6 +169,7 @@ public class Reviewer {
         try {
             if (submission.getSubmissionType() == SubmissionType.IMAGE) {
                 LLMReviewResult reviewResult = reviewImageSubmission(submission);
+                submission.setLlmDescription(reviewResult.getMediaDescription());
                 redisTemplate.opsForHash().put("submission", submission.getId(), gson.toJson(submission));
                 redisTemplate.opsForHash().put("review_result", submission.getId(), gson.toJson(reviewResult));
                 handleReviewOutcome(submission.getId(), reviewResult.getOutcome());
