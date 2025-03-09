@@ -2,19 +2,14 @@ package com.memes.config;
 
 import com.google.gson.Gson;
 import com.memes.annotation.DynamicConfig;
-import com.memes.exception.AppException;
-import com.memes.model.ConfigItem;
-import com.memes.model.submission.Submission;
-import com.memes.util.Preconditions;
+import com.memes.model.pojo.ConfigItem;
+import com.memes.model.pojo.Submission;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -28,20 +23,6 @@ public class AppConfig {
     public boolean botUp;
     @DynamicConfig(key = "submission.num.min", desc = "每天的最少投稿数", defaultValue = "50")
     public int minSubmissions = 50;
-    @DynamicConfig(key = "topk", desc = "相似检索时的最大返回数", defaultValue = "10")
-    public int topK = 10;
-    @DynamicConfig(key = "cache.size", desc = "缓存的大小", defaultValue = "1000")
-    public int submissionCacheSize = 1000;
-    @DynamicConfig(key = "index.version", desc = "索引的版本", defaultValue = "0", visible = false)
-    public long indexVersion = 0;
-    @DynamicConfig(key = "index.file", desc = "索引的加载位置", defaultValue = "hnsw.index", type = ConfigItem.Type.STRING, visible = false)
-    public String indexFile = "hnsw.index";
-    @DynamicConfig(key = "index.persist.threshold", desc = "索引持久化的阈值", defaultValue = "50")
-    public Long indexPersistThreshold = 50L;
-    @DynamicConfig(key = "rss.fetch.limit", desc = "RSS 获取的最大数量", defaultValue = "20")
-    public int rssFetchLimit = 20;
-    @DynamicConfig(key = "news.fetch.limit", desc = "新闻获取的最大数量", defaultValue = "20")
-    public int newsFetchLimit = 20;
     @DynamicConfig(key = "submission.fetch.limit", desc = "每次获取的最大投稿数", defaultValue = "20")
     public int subFetchLimit = 20;
     @DynamicConfig(key = "server.down", desc = "服务器是否停止服务", defaultValue = "false", type = ConfigItem.Type.BOOLEAN)
@@ -68,86 +49,5 @@ public class AppConfig {
         String[] uuids = new Gson().fromJson(uidBlacklist, String[].class);
         this.uidBlacklist.clear();
         this.uidBlacklist.addAll(Arrays.asList(uuids));
-    }
-
-    final MongoTemplate mongoTemplate;
-
-    public AppConfig(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
-
-    public void setBotUp(boolean botUp) {
-        this.botUp = botUp;
-        this.updateConfig("bot.up", String.valueOf(botUp));
-    }
-
-    public void setTopSubmissions(Set<Submission> topSubmissions) {
-        this.topSubmissions = topSubmissions;
-        this.updateConfig("top.submission", new Gson().toJson(topSubmissions));
-    }
-
-    public void setIndexFile(String indexFile) {
-        this.indexFile = indexFile;
-        this.updateConfig("index.file", indexFile);
-    }
-
-    public void setIndexVersion(long indexVersion) {
-        this.indexVersion = indexVersion;
-        this.updateConfig("index.version", String.valueOf(indexVersion));
-    }
-
-    private void updateConfig(String key, String value) {
-        Criteria criteria = Criteria.where("key").is(key);
-        ConfigItem configItem = mongoTemplate.findAndModify(
-                Query.query(criteria),
-                new Update().set("value", value),
-                FindAndModifyOptions.options().returnNew(true),
-                ConfigItem.class);
-        if (configItem == null) {
-            log.warn("Config update failed, key not found: {}", key);
-        }
-    }
-
-    public List<ConfigItem> getSys() {
-        return mongoTemplate.findAll(ConfigItem.class).stream().filter(ConfigItem::isVisible).toList();
-    }
-
-    public Boolean addTop(String id) {
-        Submission submission = mongoTemplate.findById(id, Submission.class);
-        Preconditions.checkNotNull(submission, AppException.resourceNotFound("submission"));
-        topSubmissions.add(submission);
-        this.setTopSubmissions(topSubmissions);
-        return true;
-    }
-
-    public Boolean removeTop(String id) {
-        Submission submission = mongoTemplate.findById(id, Submission.class);
-        Preconditions.checkNotNull(submission, AppException.resourceNotFound("submission"));
-        topSubmissions.remove(submission);
-        this.setTopSubmissions(topSubmissions);
-        return true;
-    }
-
-    public Boolean addBlacklist(String uid) {
-        uidBlacklist.add(uid);
-        this.setUidBlacklist(uidBlacklist);
-        return true;
-    }
-
-    public Boolean removeBlacklist(String uid) {
-        uidBlacklist.remove(uid);
-        this.setUidBlacklist(uidBlacklist);
-        return true;
-    }
-
-    private void setUidBlacklist(Set<String> uidBlacklist) {
-        this.uidBlacklist = uidBlacklist;
-        this.updateConfig("blacklist", new Gson().toJson(uidBlacklist));
-    }
-
-    public Boolean updateConfig(Map<String, String> config) {
-        log.info("Admin update config: {}", config);
-        config.forEach(this::updateConfig);
-        return true;
     }
 }

@@ -1,6 +1,6 @@
 package com.memes.annotation;
 
-import com.memes.model.ConfigItem;
+import com.memes.model.pojo.ConfigItem;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

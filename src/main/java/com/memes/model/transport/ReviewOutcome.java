@@ -8,116 +8,125 @@ package com.memes.model.transport;
  * Protobuf enum {@code ReviewOutcome}
  */
 public enum ReviewOutcome
-        implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>PASS = 0;</code>
-     */
-    PASS(0),
-    /**
-     * <code>FAIL = 1;</code>
-     */
-    FAIL(1),
-    /**
-     * <code>UNDECIDED = 2;</code>
-     */
-    UNDECIDED(2), UNRECOGNIZED(-1),
-    ;
+    implements com.google.protobuf.ProtocolMessageEnum {
+  /**
+   * <code>PENDING = 0;</code>
+   */
+  PENDING(0),
+  /**
+   * <code>APPROVED = 1;</code>
+   */
+  APPROVED(1),
+  /**
+   * <code>REJECTED = 2;</code>
+   */
+  REJECTED(2),
+  /**
+   * <code>FLAGGED = 3;</code>
+   */
+  FLAGGED(3),
+  UNRECOGNIZED(-1),
+  ;
 
-    /**
-     * <code>PASS = 0;</code>
-     */
-    public static final int PASS_VALUE = 0;
-    /**
-     * <code>FAIL = 1;</code>
-     */
-    public static final int FAIL_VALUE = 1;
-    /**
-     * <code>UNDECIDED = 2;</code>
-     */
-    public static final int UNDECIDED_VALUE = 2;
+  /**
+   * <code>PENDING = 0;</code>
+   */
+  public static final int PENDING_VALUE = 0;
+  /**
+   * <code>APPROVED = 1;</code>
+   */
+  public static final int APPROVED_VALUE = 1;
+  /**
+   * <code>REJECTED = 2;</code>
+   */
+  public static final int REJECTED_VALUE = 2;
+  /**
+   * <code>FLAGGED = 3;</code>
+   */
+  public static final int FLAGGED_VALUE = 3;
 
-    public final int getNumber() {
-        if (this == UNRECOGNIZED) {
-            throw new java.lang.IllegalArgumentException(
-                    "Can't get the number of an unknown enum value.");
-        }
-        return value;
+
+  public final int getNumber() {
+    if (this == UNRECOGNIZED) {
+      throw new java.lang.IllegalArgumentException(
+          "Can't get the number of an unknown enum value.");
     }
+    return value;
+  }
 
-    /**
-     * @param value
-     *            The numeric wire value of the corresponding enum entry.
-     * @return The enum associated with the given numeric wire value.
-     * @deprecated Use {@link #forNumber(int)} instead.
-     */
-    @java.lang.Deprecated
-    public static ReviewOutcome valueOf(int value) {
-        return forNumber(value);
+  /**
+   * @param value The numeric wire value of the corresponding enum entry.
+   * @return The enum associated with the given numeric wire value.
+   * @deprecated Use {@link #forNumber(int)} instead.
+   */
+  @java.lang.Deprecated
+  public static ReviewOutcome valueOf(int value) {
+    return forNumber(value);
+  }
+
+  /**
+   * @param value The numeric wire value of the corresponding enum entry.
+   * @return The enum associated with the given numeric wire value.
+   */
+  public static ReviewOutcome forNumber(int value) {
+    switch (value) {
+      case 0: return PENDING;
+      case 1: return APPROVED;
+      case 2: return REJECTED;
+      case 3: return FLAGGED;
+      default: return null;
     }
+  }
 
-    /**
-     * @param value
-     *            The numeric wire value of the corresponding enum entry.
-     * @return The enum associated with the given numeric wire value.
-     */
-    public static ReviewOutcome forNumber(int value) {
-        switch (value) {
-            case 0:
-                return PASS;
-            case 1:
-                return FAIL;
-            case 2:
-                return UNDECIDED;
-            default:
-                return null;
-        }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<ReviewOutcome> internalGetValueMap() {
-        return internalValueMap;
-    }
-
-    private static final com.google.protobuf.Internal.EnumLiteMap<ReviewOutcome> internalValueMap = new com.google.protobuf.Internal.EnumLiteMap<ReviewOutcome>() {
-        public ReviewOutcome findValueByNumber(int number) {
+  public static com.google.protobuf.Internal.EnumLiteMap<ReviewOutcome>
+      internalGetValueMap() {
+    return internalValueMap;
+  }
+  private static final com.google.protobuf.Internal.EnumLiteMap<
+      ReviewOutcome> internalValueMap =
+        new com.google.protobuf.Internal.EnumLiteMap<ReviewOutcome>() {
+          public ReviewOutcome findValueByNumber(int number) {
             return ReviewOutcome.forNumber(number);
-        }
-    };
+          }
+        };
 
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor getValueDescriptor() {
-        if (this == UNRECOGNIZED) {
-            throw new java.lang.IllegalStateException(
-                    "Can't get the descriptor of an unrecognized enum value.");
-        }
-        return getDescriptor().getValues().get(ordinal());
+  public final com.google.protobuf.Descriptors.EnumValueDescriptor
+      getValueDescriptor() {
+    if (this == UNRECOGNIZED) {
+      throw new java.lang.IllegalStateException(
+          "Can't get the descriptor of an unrecognized enum value.");
     }
+    return getDescriptor().getValues().get(ordinal());
+  }
+  public final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptorForType() {
+    return getDescriptor();
+  }
+  public static final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptor() {
+    return com.memes.model.transport.LlmReview.getDescriptor().getEnumTypes().get(0);
+  }
 
-    public final com.google.protobuf.Descriptors.EnumDescriptor getDescriptorForType() {
-        return getDescriptor();
+  private static final ReviewOutcome[] VALUES = values();
+
+  public static ReviewOutcome valueOf(
+      com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+    if (desc.getType() != getDescriptor()) {
+      throw new java.lang.IllegalArgumentException(
+        "EnumValueDescriptor is not for this type.");
     }
-
-    public static final com.google.protobuf.Descriptors.EnumDescriptor getDescriptor() {
-        return com.memes.model.transport.LlmReview.getDescriptor().getEnumTypes().get(0);
+    if (desc.getIndex() == -1) {
+      return UNRECOGNIZED;
     }
+    return VALUES[desc.getIndex()];
+  }
 
-    private static final ReviewOutcome[] VALUES = values();
+  private final int value;
 
-    public static ReviewOutcome valueOf(
-            com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-            throw new java.lang.IllegalArgumentException(
-                    "EnumValueDescriptor is not for this type.");
-        }
-        if (desc.getIndex() == -1) {
-            return UNRECOGNIZED;
-        }
-        return VALUES[desc.getIndex()];
-    }
+  private ReviewOutcome(int value) {
+    this.value = value;
+  }
 
-    private final int value;
-
-    private ReviewOutcome(int value) {
-        this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:ReviewOutcome)
+  // @@protoc_insertion_point(enum_scope:ReviewOutcome)
 }
+

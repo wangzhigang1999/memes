@@ -1,9 +1,3 @@
-spring:
-  data:
-    mongodb:
-      database: memes-dev
-      uri: ${mongoUri}
-
 storage:
   type: ${storage:local}
 
@@ -20,3 +14,7 @@ management:
 logging:
   level:
     root: info
+spring:
+  datasource:
+    driver-class-name: org.apache.ibatis.datasource.unpooled.UnpooledDataSource.DriverProxy
+

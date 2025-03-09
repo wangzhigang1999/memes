@@ -1,8 +1,5 @@
 spring:
   data:
-    mongodb:
-      database: memes
-      uri: ${mongoUri}
     redis:
       host: ${redisHost}
       username: ${redisUser}

@@ -1,7 +1,7 @@
 package com.memes.util;
 
 import com.memes.model.common.FileUploadResult;
-import com.memes.service.storage.StorageService;
+import com.memes.service.StorageService;
 import org.slf4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 

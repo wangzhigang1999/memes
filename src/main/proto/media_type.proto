@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+
+option java_package = "com.memes.model.transport";
+
+option java_multiple_files = true;
+
+enum MediaType{
+  IMAGE = 0;
+  TEXT = 1;
+}
