@@ -29,3 +29,25 @@ create table submission
     tags                  json null
 );
 
+drop table if exists request_log;
+CREATE TABLE if not exists request_log
+(
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,                                                                                      -- 使用 BIGINT 扩展 ID 以支持更大数据量
+    url             VARCHAR(2048)                                                     DEFAULT NULL,                                         -- URL 请求
+    method          ENUM ('GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD') DEFAULT NULL,                                         -- 约束 HTTP 方法
+    ip              VARBINARY(16)                                                     DEFAULT NULL,                                         -- 存储 IPv4/IPv6 地址，减少存储空间 (INET_ATON()/INET_NTOA())
+    user_agent      VARCHAR(512)                                                      DEFAULT NULL,                                         -- 记录 User-Agent 以分析客户端来源
+    refer           VARCHAR(512)                                                      DEFAULT NULL,                                         -- 记录 User-Agent 以分析客户端来源
+    headers         TEXT                                                              DEFAULT NULL,                                         -- 存储请求头（JSON 格式更合理）
+    parameter_map   JSON                                                              DEFAULT NULL,                                         -- 变更为 JSON，方便解析与查询
+    uuid            CHAR(36)                                                          DEFAULT NULL,                                         -- 使用 CHAR(36) 以提高查询效率
+    response_status SMALLINT                                                          DEFAULT NULL,                                         -- 记录 HTTP 响应状态码
+    response_size   BIGINT                                                            DEFAULT NULL,                                         -- 记录返回的数据大小
+    timecost        INT                                                               DEFAULT NULL,                                         -- 记录耗时（单位：毫秒），INT 足够
+    timestamp       BIGINT                                                            DEFAULT NULL,                                         -- 记录时间戳 (UNIX 时间)
+    instance_uuid   CHAR(36)                                                          DEFAULT NULL,                                         -- 关联实例唯一标识
+    created_at      TIMESTAMP                                                         DEFAULT CURRENT_TIMESTAMP,                            -- 默认创建时间
+    updated_at      TIMESTAMP                                                         DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 记录更新时间
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
