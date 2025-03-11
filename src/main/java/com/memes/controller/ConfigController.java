@@ -3,7 +3,7 @@ package com.memes.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.memes.annotation.AuthRequired;
-import com.memes.model.pojo.ConfigItem;
+import com.memes.model.pojo.Config;
 import com.memes.service.ConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,33 +17,33 @@ public class ConfigController {
 
     @AuthRequired
     @GetMapping("/{id}")
-    public ConfigItem getById(@PathVariable String id) {
+    public Config getById(@PathVariable String id) {
         return configService.getById(id);
     }
 
     @AuthRequired
     @GetMapping
-    public Page<ConfigItem> list(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(required = false) Boolean visibleOnly) {
-        LambdaQueryWrapper<ConfigItem> queryWrapper = new LambdaQueryWrapper<>();
+    public Page<Config> list(@RequestParam(defaultValue = "1") Integer page,
+        @RequestParam(defaultValue = "10") Integer size, @RequestParam(required = false) Boolean visibleOnly) {
+        LambdaQueryWrapper<Config> queryWrapper = new LambdaQueryWrapper<>();
         if (Boolean.TRUE.equals(visibleOnly)) {
-            queryWrapper.eq(ConfigItem::isVisible, true);
+            queryWrapper.eq(Config::getVisible, true);
         }
         return configService.page(new Page<>(page, size), queryWrapper);
     }
 
     @AuthRequired
     @PutMapping("/{id}")
-    public ConfigItem update(@PathVariable String id, @RequestBody ConfigItem configItem) {
-        configItem.setId(id);
-        configService.updateById(configItem);
-        return configItem;
+    public Config update(@PathVariable Integer id, @RequestBody Config config) {
+        config.setId(id);
+        configService.updateById(config);
+        return config;
     }
-
 
     @AuthRequired
     @GetMapping("/value/{key}")
-    public String getConfigValue(@PathVariable String key) {
-        return configService.getConfigValue(key);
+    public Config getConfig(@PathVariable String key) {
+        return configService.getConfig(key);
     }
 
     @AuthRequired
@@ -51,4 +51,4 @@ public class ConfigController {
     public boolean updateConfigValue(@PathVariable String key, @RequestBody String value) {
         return configService.updateConfigValue(key, value);
     }
-} 
+}

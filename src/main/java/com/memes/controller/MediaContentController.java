@@ -14,15 +14,14 @@ public class MediaContentController {
 
     private final MediaContentService mediaContentService;
 
-
-
     @GetMapping("/{id}")
     public MediaContent getById(@PathVariable Integer id) {
         return mediaContentService.getById(id);
     }
 
     @GetMapping
-    public Page<MediaContent> list(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+    public Page<MediaContent> list(@RequestParam(defaultValue = "1") Integer page,
+        @RequestParam(defaultValue = "10") Integer size) {
         return mediaContentService.page(new Page<>(page, size));
     }
 
@@ -39,7 +38,9 @@ public class MediaContentController {
     }
 
     @GetMapping("/search")
-    public Page<MediaContent> search(@RequestParam(required = false) String userId, @RequestParam(required = false) MediaContent.DataType dataType, @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+    public Page<MediaContent> search(@RequestParam(required = false) String userId,
+        @RequestParam(required = false) MediaContent.DataType dataType, @RequestParam(defaultValue = "1") Integer page,
+        @RequestParam(defaultValue = "10") Integer size) {
 
         LambdaQueryWrapper<MediaContent> queryWrapper = new LambdaQueryWrapper<>();
 
@@ -53,4 +54,4 @@ public class MediaContentController {
 
         return mediaContentService.page(new Page<>(page, size), queryWrapper);
     }
-} 
+}

@@ -25,7 +25,8 @@ public class SubmissionController {
     }
 
     @GetMapping
-    public Page<Submission> list(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+    public Page<Submission> list(@RequestParam(defaultValue = "1") Integer page,
+        @RequestParam(defaultValue = "10") Integer size) {
         return submissionService.page(new Page<>(page, size));
     }
 
@@ -40,4 +41,4 @@ public class SubmissionController {
     public void delete(@PathVariable Integer id) {
         submissionService.removeById(id);
     }
-} 
+}
