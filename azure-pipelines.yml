@@ -5,9 +5,10 @@ trigger:
       - LICENSE
       - .gitignore
       - deployments/*
-#  branches:
-#    exclude:
-#      - dev
+  branches:
+    exclude:
+      - dev
+      - master
 
 resources:
   - repo: self
