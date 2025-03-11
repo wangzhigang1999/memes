@@ -51,3 +51,19 @@ CREATE TABLE if not exists request_log
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
+
+drop table if exists config_item;
+CREATE TABLE if not exists config
+(
+    id           INT                                                     NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    config_key   VARCHAR(255)                                            NOT NULL UNIQUE COMMENT '配置项的唯一键',
+    value        TEXT                                                    NULL COMMENT '配置的具体值',
+    description  TEXT                                                    NULL COMMENT '配置项的说明',
+    visible      BOOLEAN                                                 NOT NULL DEFAULT 1 COMMENT '是否可见（1: 可见, 0: 隐藏）',
+    visible_name VARCHAR(255)                                            NOT NULL DEFAULT '' COMMENT '用于 UI 显示的名称',
+    type         ENUM ('STRING', 'INTEGER', 'BOOLEAN', 'DOUBLE', 'JSON') NOT NULL COMMENT '配置项的数据类型 (STRING, INTEGER, BOOLEAN, DOUBLE, JSON等)',
+    constraints  JSON                                                    NULL COMMENT '存储 min/max 或其他约束，如 {"min": 1, "max": 100} 或 {"minLength": 3, "maxLength": 10}',
+    created_at   TIMESTAMP                                                        DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at   TIMESTAMP                                                        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后更新时间'
+);
