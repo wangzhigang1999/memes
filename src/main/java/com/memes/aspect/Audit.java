@@ -1,112 +1,106 @@
-//package com.memes.aspect;
-//
-//import com.google.gson.Gson;
-//import com.memes.model.common.LogDocument;
-//import com.mongodb.client.MongoClient;
-//import io.micrometer.common.util.StringUtils;
-//import io.micrometer.core.instrument.MeterRegistry;
-//import io.micrometer.core.instrument.Tags;
-//import io.micrometer.core.instrument.Timer;
-//import lombok.extern.slf4j.Slf4j;
-//import org.aspectj.lang.ProceedingJoinPoint;
-//import org.aspectj.lang.annotation.Around;
-//import org.aspectj.lang.annotation.Aspect;
-//import org.aspectj.lang.annotation.Pointcut;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.data.mongodb.core.MongoTemplate;
-//import org.springframework.stereotype.Component;
-//import org.springframework.web.context.request.RequestContextHolder;
-//import org.springframework.web.context.request.ServletRequestAttributes;
-//
-//import java.util.Map;
-//import java.util.Objects;
-//import java.util.UUID;
-//import java.util.concurrent.*;
-//
-///**
-// * 记录请求日志
-// * 将网关的信息保存到 mongodb 中，一方面统计调用，另一方面也可以用于排查问题
-// */
-//@Component
-//@Aspect
-//@Slf4j
-//public class Audit {
-//    final MongoClient client;
-//
-//    final MongoTemplate template;
-//
-//    final MeterRegistry registry;
-//
-//    /**
-//     * 用于在线程之内传递变量 UUID，是一个用户的标识
-//     */
-//    public final static ThreadLocal<String> threadLocalUUID = ThreadLocal.withInitial(() -> "anonymous");
-//
-//    public final static ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
-//
-//    // 用于标识当前实例
-//    public final static String INSTANCE_UUID = "MEMES-%d-%s".formatted(System.currentTimeMillis(), UUID.randomUUID().toString().substring(0, 8));
-//
-//    @Value("${spring.data.mongodb.database}")
-//    public String database;
-//
-//    @Value("${spring.profiles.active}")
-//    public String env;
-//
-//    private final ConcurrentHashMap<String, Timer> timerMap = new ConcurrentHashMap<>();
-//
-//    public Audit(MongoTemplate template, MongoClient client, MeterRegistry registry) {
-//        this.client = client;
-//        this.template = template;
-//        this.registry = registry;
-//    }
-//
-//    @Pointcut("execution(* com.memes.controller.*.*.*(..))")
-//    public void controller() {
-//    }
-//
-//    @Around(value = "controller()")
-//    public Object audit(ProceedingJoinPoint joinPoint) throws Throwable {
-//        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-//        var request = Objects.requireNonNull(attributes).getRequest();
-//        var uuid = request.getHeader("uuid");
-//        var classMethod = "%s.%s".formatted(joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
-//        var url = request.getRequestURL().toString();
-//        var method = request.getMethod();
-//        var parameterMap = request.getParameterMap();
-//        log.debug("audit: classMethod: {}, url: {}, method: {},parameterMap: {}", classMethod, url, method, new Gson().toJson(parameterMap));
-//        /*
-//         * 这里使用 ThreadLocal 传递 uuid，在向数据库中插入数据时，可能会使用这个 uuid
-//         */
-//        threadLocalUUID.set(uuid);
-//        long start = System.currentTimeMillis();
-//        Object proceed = joinPoint.proceed();
-//        long end = System.currentTimeMillis();
-//        threadLocalUUID.remove();
-//
-//        CompletableFuture.runAsync(() -> audit(classMethod, url, method, uuid, start, end, parameterMap), pool);
-//        return proceed;
-//    }
-//
-//    private void audit(String classMethod, String url, String method, String uuid, long start, long end, Map<String, String[]> map) {
-//        try {
-//            LogDocument document = new LogDocument();
-//            document.setUrl(url)
-//                    .setMethod(method)
-//                    .setParameterMap(map)
-//                    .setUuid(StringUtils.isEmpty(uuid) ? "anonymous" : uuid)
-//                    .setTimecost(end - start)
-//                    .setTimestamp(start)
-//                    .setInstanceUUID(INSTANCE_UUID);
-//            template.save(document);
-//        } catch (Exception e) {
-//            log.error("audit error", e);
-//        } finally {
-//            timerMap.computeIfAbsent(classMethod, _ -> Timer.builder("http_request_time")
-//                    .description("http request time")
-//                    .tags(Tags.of("class_method", classMethod))
-//                    .register(registry))
-//                    .record(end - start, TimeUnit.MILLISECONDS);
-//        }
-//    }
-//}
+package com.memes.aspect;
+
+import com.memes.mapper.RequestLogMapper;
+import com.memes.model.pojo.RequestLog;
+import com.memes.util.GsonUtil;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.Timer;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.*;
+
+@Slf4j
+@Aspect
+@Component
+public class Audit {
+    private final MeterRegistry registry;
+    private final RequestLogMapper requestLogMapper;
+    private static final ThreadLocal<String> threadLocalUUID = ThreadLocal.withInitial(() -> "anonymous");
+    private static final ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
+    private static final ConcurrentHashMap<String, Timer> timerMap = new ConcurrentHashMap<>();
+    private static final String instanceUuid = UUID.randomUUID().toString();
+
+    public Audit(MeterRegistry registry, RequestLogMapper requestLogMapper) {
+        this.registry = registry;
+        this.requestLogMapper = requestLogMapper;
+    }
+
+    @Pointcut("execution(* com.memes.controller..*.*(..))")
+    public void controller() {
+    }
+
+    @Around("controller()")
+    public Object audit(ProceedingJoinPoint joinPoint) throws Throwable {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            return joinPoint.proceed();
+        }
+
+        HttpServletRequest request = attributes.getRequest();
+        String uuid = request.getHeader("uuid");
+        String classMethod = "%s.%s".formatted(joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
+        String url = request.getRequestURL().toString();
+        String method = request.getMethod();
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        String clientIp = request.getRemoteAddr();
+        String userAgent = request.getHeader("User-Agent");
+        String referer = request.getHeader("Referer");
+
+        log.debug("Audit: classMethod={}, url={}, method={}, parameters={}", classMethod, url, method, GsonUtil.toJson(parameterMap));
+
+        threadLocalUUID.set(uuid);
+        long start = System.currentTimeMillis();
+        Object result = joinPoint.proceed();
+        long end = System.currentTimeMillis();
+        threadLocalUUID.remove();
+
+        CompletableFuture.runAsync(() -> saveRequestLog(classMethod, url, method, uuid, clientIp, userAgent, referer, start, end, parameterMap), pool);
+        return result;
+    }
+
+    private void saveRequestLog(String classMethod, String url, String method, String uuid, String clientIp, String userAgent, String referer, long start,
+        long end, Map<String, String[]> parameterMap) {
+        try {
+            RequestLog logEntry = RequestLog
+                .builder()
+                .url(url)
+                .method(RequestLog.HttpMethod.valueOf(method.toUpperCase()))
+                .ip(clientIp)
+                .userAgent(userAgent)
+                .refer(referer)
+                .parameterMap(GsonUtil.toJson(parameterMap))
+                .uuid(uuid)
+                .timecost((int) (end - start))
+                .timestamp(System.currentTimeMillis())
+                .instanceUuid(instanceUuid)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+            requestLogMapper.insert(logEntry);
+        } catch (Exception e) {
+            log.error("Failed to save request log", e);
+        } finally {
+            timerMap
+                .computeIfAbsent(
+                    classMethod,
+                    key -> Timer
+                        .builder("http_request_time")
+                        .description("HTTP request duration")
+                        .tags(Tags.of("class_method", key))
+                        .register(registry))
+                .record(end - start, TimeUnit.MILLISECONDS);
+        }
+    }
+}

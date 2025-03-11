@@ -22,7 +22,8 @@ public class Auth {
     private final String localToken;
     private final String activeProfile;
 
-    public Auth(@Value("${token:#{T(java.util.UUID).randomUUID().toString()}}") String localToken, @Value("${spring.profiles.active}") String activeProfile) {
+    public Auth(@Value("${token:#{T(java.util.UUID).randomUUID().toString()}}") String localToken,
+        @Value("${spring.profiles.active}") String activeProfile) {
         this.localToken = localToken;
         this.activeProfile = activeProfile;
         log.info("Auth aspect initialized. Local token is masked. Active profile: {}", activeProfile);
@@ -30,7 +31,6 @@ public class Auth {
 
     @Pointcut("@annotation(authenticationRequired)")
     public void authenticationPointcut(AuthRequired authenticationRequired) {
-        // Pointcut definition for methods annotated with @AuthRequired
     }
 
     @Around(value = "authenticationPointcut(authenticationRequired)", argNames = "joinPoint,authenticationRequired")

@@ -18,14 +18,14 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
         return true;
     }
 
-    @SuppressWarnings({ "null" })
+    @SuppressWarnings({"null"})
     @Override
     public Object beforeBodyWrite(Object o,
-            @NonNull MethodParameter returnType,
-            @NonNull MediaType selectedContentType,
-            @NonNull Class selectedConverterType,
-            @NonNull ServerHttpRequest request,
-            @NonNull ServerHttpResponse response) {
+        @NonNull MethodParameter returnType,
+        @NonNull MediaType selectedContentType,
+        @NonNull Class selectedConverterType,
+        @NonNull ServerHttpRequest request,
+        @NonNull ServerHttpResponse response) {
         if (o == null) {
             return ResultData.success(null);
         }

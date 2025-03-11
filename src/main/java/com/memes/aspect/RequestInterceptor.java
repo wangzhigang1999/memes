@@ -20,11 +20,13 @@ public class RequestInterceptor implements HandlerInterceptor {
     String localToken;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler)
+        throws Exception {
         String url = request.getRequestURI();
         String method = request.getMethod();
         String token = request.getHeader("token");
-        if (url.startsWith("/admin") || "OPTIONS".equals(method) || localToken.equals(token) || ResourceChecker.isStaticResource(url)) {
+        if (url.startsWith("/admin") || "OPTIONS".equals(method) || localToken.equals(token)
+            || ResourceChecker.isStaticResource(url)) {
             return HandlerInterceptor.super.preHandle(request, response, handler);
         }
         if (config.serverDown) {
@@ -41,8 +43,9 @@ public class RequestInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex)
-            throws Exception {
+    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
+        @NotNull Object handler, Exception ex)
+        throws Exception {
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
     }
 }
