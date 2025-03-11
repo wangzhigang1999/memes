@@ -27,7 +27,8 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = NoResourceFoundException.class)
     @SneakyThrows
-    public Object exceptionHandler(HttpServletRequest request, HttpServletResponse response, NoResourceFoundException e) {
+    public Object exceptionHandler(HttpServletRequest request, HttpServletResponse response,
+        NoResourceFoundException e) {
         String requestUrl = request.getRequestURL().toString();
         log.error("Request URL:{}, Message:{}", requestUrl, e.getMessage());
         response.setStatus(e.getStatusCode().value());
@@ -36,7 +37,8 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = IllegalArgumentException.class)
     @ResponseBody
-    public ResultData<?> exceptionHandler(HttpServletRequest request, HttpServletResponse response, IllegalArgumentException e) {
+    public ResultData<?> exceptionHandler(HttpServletRequest request, HttpServletResponse response,
+        IllegalArgumentException e) {
         String requestUrl = request.getRequestURL().toString();
         String method = request.getMethod();
         String message = e.getMessage();

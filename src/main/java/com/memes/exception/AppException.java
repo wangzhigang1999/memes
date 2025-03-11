@@ -16,12 +16,14 @@ public class AppException extends RuntimeException {
     }
 
     public enum ErrorType {
-        INVALID_PARAM("The param %s is invalid.", 400), RESOURCE_NOT_FOUND("The resource %s was not found.", 404), UNAUTHORIZED("Unauthorized access. %s",
-                401), METHOD_NOT_ALLOWED("Method not allowed.", 405), INTERNAL_ERROR("The server encountered an internal error. %s",
-                        500), DATABASE_ERROR("The server encountered an database error. %s",
-                                500), STORAGE_ERROR("The server encountered an storage error. %s",
-                                        500), SERVER_DOWN("Web server is Down.",
-                                                521), FORBIDDEN("Disallowed", 403), TOO_MANY_REQUESTS("Too many requests.", 429);
+        INVALID_PARAM("The param %s is invalid.", 400), RESOURCE_NOT_FOUND("The resource %s was not found.",
+            404), UNAUTHORIZED("Unauthorized access. %s",
+                401), METHOD_NOT_ALLOWED("Method not allowed.", 405), INTERNAL_ERROR(
+                    "The server encountered an internal error. %s",
+                    500), DATABASE_ERROR("The server encountered an database error. %s",
+                        500), STORAGE_ERROR("The server encountered an storage error. %s",
+                            500), SERVER_DOWN("Web server is Down.",
+                                521), FORBIDDEN("Disallowed", 403), TOO_MANY_REQUESTS("Too many requests.", 429);
 
         private final String message;
         @Getter
