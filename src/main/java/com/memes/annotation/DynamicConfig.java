@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * 用来标记动态配置的注解
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface DynamicConfig {
     String key() default "";
 
