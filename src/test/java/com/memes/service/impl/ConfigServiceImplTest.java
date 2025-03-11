@@ -21,15 +21,18 @@ class ConfigServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        configMapper.insert(Config.builder()
-                .id(id)
-                .configKey("test")
-                .value("test")
-                .description("test")
-                .visible(false)
-                .visibleName("test")
-                .type(Config.Type.STRING)
-                .build());
+        configMapper
+            .insert(
+                Config
+                    .builder()
+                    .id(id)
+                    .configKey("test")
+                    .value("test")
+                    .description("test")
+                    .visible(false)
+                    .visibleName("test")
+                    .type(Config.Type.STRING)
+                    .build());
 
     }
 
