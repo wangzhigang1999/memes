@@ -22,4 +22,4 @@ public class Submission {
     private Integer dislikesCount;
 
     private Set<String> tags;
-} 
+}
