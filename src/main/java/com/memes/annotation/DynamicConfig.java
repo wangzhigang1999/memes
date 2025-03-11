@@ -1,6 +1,6 @@
 package com.memes.annotation;
 
-import com.memes.model.pojo.ConfigItem;
+import com.memes.model.pojo.Config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,5 +23,5 @@ public @interface DynamicConfig {
 
     String visibleName() default "";
 
-    ConfigItem.Type type() default ConfigItem.Type.INTEGER;
+    Config.Type type() default Config.Type.INTEGER;
 }
