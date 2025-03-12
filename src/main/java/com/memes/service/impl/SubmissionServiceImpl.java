@@ -8,4 +8,4 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submission> implements SubmissionService {
-} 
+}

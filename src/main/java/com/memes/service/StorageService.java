@@ -33,7 +33,8 @@ public interface StorageService {
      * @return extension eg: jpeg
      */
     default String getExtension(String mime) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(mime), AppException.invalidParam("mime type is null or empty"));
+        Preconditions
+            .checkArgument(StringUtils.isNotBlank(mime), AppException.invalidParam("mime type is null or empty"));
         String[] split = mime.split("/");
         return split[split.length - 1].toLowerCase();
     }

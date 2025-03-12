@@ -21,7 +21,6 @@ public class ReviewServiceImpl implements ReviewService {
     final MediaMapper mediaMapper;
     final SubmissionMapper submissionMapper;
 
-
     @Override
     public List<MediaContent> listPendingMediaContent(Integer limit) {
         QueryWrapper<MediaContent> queryWrapper = new QueryWrapper<>();
@@ -49,7 +48,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public int batchMarkMediaStatus(List<Integer> ids, MediaContent.ContentStatus status) {
-        int update = mediaMapper.update(MediaContent.builder().status(status).build(), new QueryWrapper<MediaContent>().in("id", ids));
+        int update = mediaMapper
+            .update(MediaContent.builder().status(status).build(), new QueryWrapper<MediaContent>().in("id", ids));
         // if approved, insert into submission table
         if (update > 0 && status == MediaContent.ContentStatus.APPROVED) {
             for (Integer id : ids) {

@@ -43,15 +43,16 @@ public class MessageQueueService {
 
     // 泛型化接收消息
     public <T> Optional<T> receiveMessage(String queue, Class<T> clazz) {
-        return Optional.ofNullable(receiveMessage(queue))
-                .map(message -> {
-                    try {
-                        return gson.fromJson(message, clazz);
-                    } catch (Exception e) {
-                        log.error("Failed to deserialize message: {}", message, e);
-                        return null;
-                    }
-                });
+        return Optional
+            .ofNullable(receiveMessage(queue))
+            .map(message -> {
+                try {
+                    return gson.fromJson(message, clazz);
+                } catch (Exception e) {
+                    log.error("Failed to deserialize message: {}", message, e);
+                    return null;
+                }
+            });
     }
 
     // 批量接收消息（String 类型）
@@ -69,9 +70,10 @@ public class MessageQueueService {
         if (messages.isEmpty()) {
             return Collections.emptyList();
         }
-        return messages.stream()
-                .map(message -> deserializeMessage(message, clazz))
-                .collect(Collectors.toList());
+        return messages
+            .stream()
+            .map(message -> deserializeMessage(message, clazz))
+            .collect(Collectors.toList());
     }
 
     // 反序列化消息

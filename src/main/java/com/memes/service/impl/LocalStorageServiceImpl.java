@@ -25,8 +25,7 @@ public class LocalStorageServiceImpl implements StorageService {
     static final String localDir = "memes";
 
     /**
-     * 在配置文件中配置的 url 前缀
-     * 这个 url 会被拼接到文件名前面然后写入数据库
+     * 在配置文件中配置的 url 前缀 这个 url 会被拼接到文件名前面然后写入数据库
      */
     @Value("${local.urlPrefix}")
     String urlPrefix;

@@ -4,89 +4,106 @@
 // Protobuf Java Version: 3.25.1
 package com.memes.model.transport;
 
-public interface LLMReviewResultOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:LLMReviewResult)
-    com.google.protobuf.MessageOrBuilder {
+public interface LLMReviewResultOrBuilder
+    extends
+        // @@protoc_insertion_point(interface_extends:LLMReviewResult)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>int64 mediaId = 1;</code>
-   * @return The mediaId.
-   */
-  long getMediaId();
+    /**
+     * <code>int64 mediaId = 1;</code>
+     * 
+     * @return The mediaId.
+     */
+    long getMediaId();
 
-  /**
-   * <code>string inputPrompt = 2;</code>
-   * @return The inputPrompt.
-   */
-  java.lang.String getInputPrompt();
-  /**
-   * <code>string inputPrompt = 2;</code>
-   * @return The bytes for inputPrompt.
-   */
-  com.google.protobuf.ByteString
-      getInputPromptBytes();
+    /**
+     * <code>string inputPrompt = 2;</code>
+     * 
+     * @return The inputPrompt.
+     */
+    java.lang.String getInputPrompt();
 
-  /**
-   * <code>.MediaType mediaType = 3;</code>
-   * @return The enum numeric value on the wire for mediaType.
-   */
-  int getMediaTypeValue();
-  /**
-   * <code>.MediaType mediaType = 3;</code>
-   * @return The mediaType.
-   */
-  com.memes.model.transport.MediaType getMediaType();
+    /**
+     * <code>string inputPrompt = 2;</code>
+     * 
+     * @return The bytes for inputPrompt.
+     */
+    com.google.protobuf.ByteString getInputPromptBytes();
 
-  /**
-   * <code>string mediaDescription = 4;</code>
-   * @return The mediaDescription.
-   */
-  java.lang.String getMediaDescription();
-  /**
-   * <code>string mediaDescription = 4;</code>
-   * @return The bytes for mediaDescription.
-   */
-  com.google.protobuf.ByteString
-      getMediaDescriptionBytes();
+    /**
+     * <code>.MediaType mediaType = 3;</code>
+     * 
+     * @return The enum numeric value on the wire for mediaType.
+     */
+    int getMediaTypeValue();
 
-  /**
-   * <code>.ReviewOutcome outcome = 5;</code>
-   * @return The enum numeric value on the wire for outcome.
-   */
-  int getOutcomeValue();
-  /**
-   * <code>.ReviewOutcome outcome = 5;</code>
-   * @return The outcome.
-   */
-  com.memes.model.transport.ReviewOutcome getOutcome();
+    /**
+     * <code>.MediaType mediaType = 3;</code>
+     * 
+     * @return The mediaType.
+     */
+    com.memes.model.transport.MediaType getMediaType();
 
-  /**
-   * <code>string failureReason = 6;</code>
-   * @return The failureReason.
-   */
-  java.lang.String getFailureReason();
-  /**
-   * <code>string failureReason = 6;</code>
-   * @return The bytes for failureReason.
-   */
-  com.google.protobuf.ByteString
-      getFailureReasonBytes();
+    /**
+     * <code>string mediaDescription = 4;</code>
+     * 
+     * @return The mediaDescription.
+     */
+    java.lang.String getMediaDescription();
 
-  /**
-   * <code>int64 reviewTimestamp = 7;</code>
-   * @return The reviewTimestamp.
-   */
-  long getReviewTimestamp();
+    /**
+     * <code>string mediaDescription = 4;</code>
+     * 
+     * @return The bytes for mediaDescription.
+     */
+    com.google.protobuf.ByteString getMediaDescriptionBytes();
 
-  /**
-   * <code>string reviewerModel = 8;</code>
-   * @return The reviewerModel.
-   */
-  java.lang.String getReviewerModel();
-  /**
-   * <code>string reviewerModel = 8;</code>
-   * @return The bytes for reviewerModel.
-   */
-  com.google.protobuf.ByteString
-      getReviewerModelBytes();
+    /**
+     * <code>.ReviewOutcome outcome = 5;</code>
+     * 
+     * @return The enum numeric value on the wire for outcome.
+     */
+    int getOutcomeValue();
+
+    /**
+     * <code>.ReviewOutcome outcome = 5;</code>
+     * 
+     * @return The outcome.
+     */
+    com.memes.model.transport.ReviewOutcome getOutcome();
+
+    /**
+     * <code>string failureReason = 6;</code>
+     * 
+     * @return The failureReason.
+     */
+    java.lang.String getFailureReason();
+
+    /**
+     * <code>string failureReason = 6;</code>
+     * 
+     * @return The bytes for failureReason.
+     */
+    com.google.protobuf.ByteString getFailureReasonBytes();
+
+    /**
+     * <code>int64 reviewTimestamp = 7;</code>
+     * 
+     * @return The reviewTimestamp.
+     */
+    long getReviewTimestamp();
+
+    /**
+     * <code>string reviewerModel = 8;</code>
+     * 
+     * @return The reviewerModel.
+     */
+    java.lang.String getReviewerModel();
+
+    /**
+     * <code>string reviewerModel = 8;</code>
+     * 
+     * @return The bytes for reviewerModel.
+     */
+    com.google.protobuf.ByteString getReviewerModelBytes();
 }

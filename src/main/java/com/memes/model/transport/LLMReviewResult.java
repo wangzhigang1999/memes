@@ -7,1266 +7,1428 @@ package com.memes.model.transport;
 /**
  * Protobuf type {@code LLMReviewResult}
  */
-public final class LLMReviewResult extends
-    com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:LLMReviewResult)
-    LLMReviewResultOrBuilder {
-private static final long serialVersionUID = 0L;
-  // Use LLMReviewResult.newBuilder() to construct.
-  private LLMReviewResult(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-    super(builder);
-  }
-  private LLMReviewResult() {
-    inputPrompt_ = "";
-    mediaType_ = 0;
-    mediaDescription_ = "";
-    outcome_ = 0;
-    failureReason_ = "";
-    reviewerModel_ = "";
-  }
+public final class LLMReviewResult
+    extends
+        com.google.protobuf.GeneratedMessageV3
+    implements
+        // @@protoc_insertion_point(message_implements:LLMReviewResult)
+        LLMReviewResultOrBuilder {
+    private static final long serialVersionUID = 0L;
 
-  @java.lang.Override
-  @SuppressWarnings({"unused"})
-  protected java.lang.Object newInstance(
-      UnusedPrivateParameter unused) {
-    return new LLMReviewResult();
-  }
+    // Use LLMReviewResult.newBuilder() to construct.
+    private LLMReviewResult(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+        super(builder);
+    }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-      getDescriptor() {
-    return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_descriptor;
-  }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internalGetFieldAccessorTable() {
-    return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_fieldAccessorTable
-        .ensureFieldAccessorsInitialized(
-            com.memes.model.transport.LLMReviewResult.class, com.memes.model.transport.LLMReviewResult.Builder.class);
-  }
-
-  public static final int MEDIAID_FIELD_NUMBER = 1;
-  private long mediaId_ = 0L;
-  /**
-   * <code>int64 mediaId = 1;</code>
-   * @return The mediaId.
-   */
-  @java.lang.Override
-  public long getMediaId() {
-    return mediaId_;
-  }
-
-  public static final int INPUTPROMPT_FIELD_NUMBER = 2;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object inputPrompt_ = "";
-  /**
-   * <code>string inputPrompt = 2;</code>
-   * @return The inputPrompt.
-   */
-  @java.lang.Override
-  public java.lang.String getInputPrompt() {
-    java.lang.Object ref = inputPrompt_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      inputPrompt_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string inputPrompt = 2;</code>
-   * @return The bytes for inputPrompt.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getInputPromptBytes() {
-    java.lang.Object ref = inputPrompt_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      inputPrompt_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int MEDIATYPE_FIELD_NUMBER = 3;
-  private int mediaType_ = 0;
-  /**
-   * <code>.MediaType mediaType = 3;</code>
-   * @return The enum numeric value on the wire for mediaType.
-   */
-  @java.lang.Override public int getMediaTypeValue() {
-    return mediaType_;
-  }
-  /**
-   * <code>.MediaType mediaType = 3;</code>
-   * @return The mediaType.
-   */
-  @java.lang.Override public com.memes.model.transport.MediaType getMediaType() {
-    com.memes.model.transport.MediaType result = com.memes.model.transport.MediaType.forNumber(mediaType_);
-    return result == null ? com.memes.model.transport.MediaType.UNRECOGNIZED : result;
-  }
-
-  public static final int MEDIADESCRIPTION_FIELD_NUMBER = 4;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object mediaDescription_ = "";
-  /**
-   * <code>string mediaDescription = 4;</code>
-   * @return The mediaDescription.
-   */
-  @java.lang.Override
-  public java.lang.String getMediaDescription() {
-    java.lang.Object ref = mediaDescription_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      mediaDescription_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string mediaDescription = 4;</code>
-   * @return The bytes for mediaDescription.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getMediaDescriptionBytes() {
-    java.lang.Object ref = mediaDescription_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      mediaDescription_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int OUTCOME_FIELD_NUMBER = 5;
-  private int outcome_ = 0;
-  /**
-   * <code>.ReviewOutcome outcome = 5;</code>
-   * @return The enum numeric value on the wire for outcome.
-   */
-  @java.lang.Override public int getOutcomeValue() {
-    return outcome_;
-  }
-  /**
-   * <code>.ReviewOutcome outcome = 5;</code>
-   * @return The outcome.
-   */
-  @java.lang.Override public com.memes.model.transport.ReviewOutcome getOutcome() {
-    com.memes.model.transport.ReviewOutcome result = com.memes.model.transport.ReviewOutcome.forNumber(outcome_);
-    return result == null ? com.memes.model.transport.ReviewOutcome.UNRECOGNIZED : result;
-  }
-
-  public static final int FAILUREREASON_FIELD_NUMBER = 6;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object failureReason_ = "";
-  /**
-   * <code>string failureReason = 6;</code>
-   * @return The failureReason.
-   */
-  @java.lang.Override
-  public java.lang.String getFailureReason() {
-    java.lang.Object ref = failureReason_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      failureReason_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string failureReason = 6;</code>
-   * @return The bytes for failureReason.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getFailureReasonBytes() {
-    java.lang.Object ref = failureReason_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      failureReason_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int REVIEWTIMESTAMP_FIELD_NUMBER = 7;
-  private long reviewTimestamp_ = 0L;
-  /**
-   * <code>int64 reviewTimestamp = 7;</code>
-   * @return The reviewTimestamp.
-   */
-  @java.lang.Override
-  public long getReviewTimestamp() {
-    return reviewTimestamp_;
-  }
-
-  public static final int REVIEWERMODEL_FIELD_NUMBER = 8;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object reviewerModel_ = "";
-  /**
-   * <code>string reviewerModel = 8;</code>
-   * @return The reviewerModel.
-   */
-  @java.lang.Override
-  public java.lang.String getReviewerModel() {
-    java.lang.Object ref = reviewerModel_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      reviewerModel_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string reviewerModel = 8;</code>
-   * @return The bytes for reviewerModel.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getReviewerModelBytes() {
-    java.lang.Object ref = reviewerModel_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      reviewerModel_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  private byte memoizedIsInitialized = -1;
-  @java.lang.Override
-  public final boolean isInitialized() {
-    byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
-
-    memoizedIsInitialized = 1;
-    return true;
-  }
-
-  @java.lang.Override
-  public void writeTo(com.google.protobuf.CodedOutputStream output)
-                      throws java.io.IOException {
-    if (mediaId_ != 0L) {
-      output.writeInt64(1, mediaId_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(inputPrompt_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, inputPrompt_);
-    }
-    if (mediaType_ != com.memes.model.transport.MediaType.IMAGE.getNumber()) {
-      output.writeEnum(3, mediaType_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(mediaDescription_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, mediaDescription_);
-    }
-    if (outcome_ != com.memes.model.transport.ReviewOutcome.PENDING.getNumber()) {
-      output.writeEnum(5, outcome_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(failureReason_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 6, failureReason_);
-    }
-    if (reviewTimestamp_ != 0L) {
-      output.writeInt64(7, reviewTimestamp_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(reviewerModel_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 8, reviewerModel_);
-    }
-    getUnknownFields().writeTo(output);
-  }
-
-  @java.lang.Override
-  public int getSerializedSize() {
-    int size = memoizedSize;
-    if (size != -1) return size;
-
-    size = 0;
-    if (mediaId_ != 0L) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(1, mediaId_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(inputPrompt_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, inputPrompt_);
-    }
-    if (mediaType_ != com.memes.model.transport.MediaType.IMAGE.getNumber()) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(3, mediaType_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(mediaDescription_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, mediaDescription_);
-    }
-    if (outcome_ != com.memes.model.transport.ReviewOutcome.PENDING.getNumber()) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(5, outcome_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(failureReason_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, failureReason_);
-    }
-    if (reviewTimestamp_ != 0L) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(7, reviewTimestamp_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(reviewerModel_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, reviewerModel_);
-    }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSize = size;
-    return size;
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-     return true;
-    }
-    if (!(obj instanceof com.memes.model.transport.LLMReviewResult)) {
-      return super.equals(obj);
-    }
-    com.memes.model.transport.LLMReviewResult other = (com.memes.model.transport.LLMReviewResult) obj;
-
-    if (getMediaId()
-        != other.getMediaId()) return false;
-    if (!getInputPrompt()
-        .equals(other.getInputPrompt())) return false;
-    if (mediaType_ != other.mediaType_) return false;
-    if (!getMediaDescription()
-        .equals(other.getMediaDescription())) return false;
-    if (outcome_ != other.outcome_) return false;
-    if (!getFailureReason()
-        .equals(other.getFailureReason())) return false;
-    if (getReviewTimestamp()
-        != other.getReviewTimestamp()) return false;
-    if (!getReviewerModel()
-        .equals(other.getReviewerModel())) return false;
-    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-    return true;
-  }
-
-  @java.lang.Override
-  public int hashCode() {
-    if (memoizedHashCode != 0) {
-      return memoizedHashCode;
-    }
-    int hash = 41;
-    hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + MEDIAID_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-        getMediaId());
-    hash = (37 * hash) + INPUTPROMPT_FIELD_NUMBER;
-    hash = (53 * hash) + getInputPrompt().hashCode();
-    hash = (37 * hash) + MEDIATYPE_FIELD_NUMBER;
-    hash = (53 * hash) + mediaType_;
-    hash = (37 * hash) + MEDIADESCRIPTION_FIELD_NUMBER;
-    hash = (53 * hash) + getMediaDescription().hashCode();
-    hash = (37 * hash) + OUTCOME_FIELD_NUMBER;
-    hash = (53 * hash) + outcome_;
-    hash = (37 * hash) + FAILUREREASON_FIELD_NUMBER;
-    hash = (53 * hash) + getFailureReason().hashCode();
-    hash = (37 * hash) + REVIEWTIMESTAMP_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-        getReviewTimestamp());
-    hash = (37 * hash) + REVIEWERMODEL_FIELD_NUMBER;
-    hash = (53 * hash) + getReviewerModel().hashCode();
-    hash = (29 * hash) + getUnknownFields().hashCode();
-    memoizedHashCode = hash;
-    return hash;
-  }
-
-  public static com.memes.model.transport.LLMReviewResult parseFrom(
-      java.nio.ByteBuffer data)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(
-      java.nio.ByteBuffer data,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(
-      com.google.protobuf.ByteString data)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(
-      com.google.protobuf.ByteString data,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(byte[] data)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(
-      byte[] data,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(java.io.InputStream input)
-      throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-        .parseWithIOException(PARSER, input);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(
-      java.io.InputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-        .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static com.memes.model.transport.LLMReviewResult parseDelimitedFrom(java.io.InputStream input)
-      throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-        .parseDelimitedWithIOException(PARSER, input);
-  }
-
-  public static com.memes.model.transport.LLMReviewResult parseDelimitedFrom(
-      java.io.InputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(
-      com.google.protobuf.CodedInputStream input)
-      throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-        .parseWithIOException(PARSER, input);
-  }
-  public static com.memes.model.transport.LLMReviewResult parseFrom(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-        .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
-  public static Builder newBuilder(com.memes.model.transport.LLMReviewResult prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-  }
-  @java.lang.Override
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
-
-  @java.lang.Override
-  protected Builder newBuilderForType(
-      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-    Builder builder = new Builder(parent);
-    return builder;
-  }
-  /**
-   * Protobuf type {@code LLMReviewResult}
-   */
-  public static final class Builder extends
-      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:LLMReviewResult)
-      com.memes.model.transport.LLMReviewResultOrBuilder {
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_descriptor;
+    private LLMReviewResult() {
+        inputPrompt_ = "";
+        mediaType_ = 0;
+        mediaDescription_ = "";
+        outcome_ = 0;
+        failureReason_ = "";
+        reviewerModel_ = "";
     }
 
     @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.memes.model.transport.LLMReviewResult.class, com.memes.model.transport.LLMReviewResult.Builder.class);
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+        return new LLMReviewResult();
     }
 
-    // Construct using com.memes.model.transport.LLMReviewResult.newBuilder()
-    private Builder() {
-
-    }
-
-    private Builder(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      super(parent);
-
-    }
-    @java.lang.Override
-    public Builder clear() {
-      super.clear();
-      bitField0_ = 0;
-      mediaId_ = 0L;
-      inputPrompt_ = "";
-      mediaType_ = 0;
-      mediaDescription_ = "";
-      outcome_ = 0;
-      failureReason_ = "";
-      reviewTimestamp_ = 0L;
-      reviewerModel_ = "";
-      return this;
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+        return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_descriptor;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Descriptors.Descriptor
-        getDescriptorForType() {
-      return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_descriptor;
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable internalGetFieldAccessorTable() {
+        return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.memes.model.transport.LLMReviewResult.class,
+                com.memes.model.transport.LLMReviewResult.Builder.class);
     }
 
-    @java.lang.Override
-    public com.memes.model.transport.LLMReviewResult getDefaultInstanceForType() {
-      return com.memes.model.transport.LLMReviewResult.getDefaultInstance();
-    }
+    public static final int MEDIAID_FIELD_NUMBER = 1;
+    private long mediaId_ = 0L;
 
-    @java.lang.Override
-    public com.memes.model.transport.LLMReviewResult build() {
-      com.memes.model.transport.LLMReviewResult result = buildPartial();
-      if (!result.isInitialized()) {
-        throw newUninitializedMessageException(result);
-      }
-      return result;
-    }
-
-    @java.lang.Override
-    public com.memes.model.transport.LLMReviewResult buildPartial() {
-      com.memes.model.transport.LLMReviewResult result = new com.memes.model.transport.LLMReviewResult(this);
-      if (bitField0_ != 0) { buildPartial0(result); }
-      onBuilt();
-      return result;
-    }
-
-    private void buildPartial0(com.memes.model.transport.LLMReviewResult result) {
-      int from_bitField0_ = bitField0_;
-      if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.mediaId_ = mediaId_;
-      }
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.inputPrompt_ = inputPrompt_;
-      }
-      if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.mediaType_ = mediaType_;
-      }
-      if (((from_bitField0_ & 0x00000008) != 0)) {
-        result.mediaDescription_ = mediaDescription_;
-      }
-      if (((from_bitField0_ & 0x00000010) != 0)) {
-        result.outcome_ = outcome_;
-      }
-      if (((from_bitField0_ & 0x00000020) != 0)) {
-        result.failureReason_ = failureReason_;
-      }
-      if (((from_bitField0_ & 0x00000040) != 0)) {
-        result.reviewTimestamp_ = reviewTimestamp_;
-      }
-      if (((from_bitField0_ & 0x00000080) != 0)) {
-        result.reviewerModel_ = reviewerModel_;
-      }
-    }
-
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
-    }
-    @java.lang.Override
-    public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.setField(field, value);
-    }
-    @java.lang.Override
-    public Builder clearField(
-        com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-    @java.lang.Override
-    public Builder clearOneof(
-        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-    @java.lang.Override
-    public Builder setRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-    @java.lang.Override
-    public Builder addRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.addRepeatedField(field, value);
-    }
-    @java.lang.Override
-    public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof com.memes.model.transport.LLMReviewResult) {
-        return mergeFrom((com.memes.model.transport.LLMReviewResult)other);
-      } else {
-        super.mergeFrom(other);
-        return this;
-      }
-    }
-
-    public Builder mergeFrom(com.memes.model.transport.LLMReviewResult other) {
-      if (other == com.memes.model.transport.LLMReviewResult.getDefaultInstance()) return this;
-      if (other.getMediaId() != 0L) {
-        setMediaId(other.getMediaId());
-      }
-      if (!other.getInputPrompt().isEmpty()) {
-        inputPrompt_ = other.inputPrompt_;
-        bitField0_ |= 0x00000002;
-        onChanged();
-      }
-      if (other.mediaType_ != 0) {
-        setMediaTypeValue(other.getMediaTypeValue());
-      }
-      if (!other.getMediaDescription().isEmpty()) {
-        mediaDescription_ = other.mediaDescription_;
-        bitField0_ |= 0x00000008;
-        onChanged();
-      }
-      if (other.outcome_ != 0) {
-        setOutcomeValue(other.getOutcomeValue());
-      }
-      if (!other.getFailureReason().isEmpty()) {
-        failureReason_ = other.failureReason_;
-        bitField0_ |= 0x00000020;
-        onChanged();
-      }
-      if (other.getReviewTimestamp() != 0L) {
-        setReviewTimestamp(other.getReviewTimestamp());
-      }
-      if (!other.getReviewerModel().isEmpty()) {
-        reviewerModel_ = other.reviewerModel_;
-        bitField0_ |= 0x00000080;
-        onChanged();
-      }
-      this.mergeUnknownFields(other.getUnknownFields());
-      onChanged();
-      return this;
-    }
-
-    @java.lang.Override
-    public final boolean isInitialized() {
-      return true;
-    }
-
-    @java.lang.Override
-    public Builder mergeFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8: {
-              mediaId_ = input.readInt64();
-              bitField0_ |= 0x00000001;
-              break;
-            } // case 8
-            case 18: {
-              inputPrompt_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000002;
-              break;
-            } // case 18
-            case 24: {
-              mediaType_ = input.readEnum();
-              bitField0_ |= 0x00000004;
-              break;
-            } // case 24
-            case 34: {
-              mediaDescription_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000008;
-              break;
-            } // case 34
-            case 40: {
-              outcome_ = input.readEnum();
-              bitField0_ |= 0x00000010;
-              break;
-            } // case 40
-            case 50: {
-              failureReason_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000020;
-              break;
-            } // case 50
-            case 56: {
-              reviewTimestamp_ = input.readInt64();
-              bitField0_ |= 0x00000040;
-              break;
-            } // case 56
-            case 66: {
-              reviewerModel_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000080;
-              break;
-            } // case 66
-            default: {
-              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                done = true; // was an endgroup tag
-              }
-              break;
-            } // default:
-          } // switch (tag)
-        } // while (!done)
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.unwrapIOException();
-      } finally {
-        onChanged();
-      } // finally
-      return this;
-    }
-    private int bitField0_;
-
-    private long mediaId_ ;
     /**
      * <code>int64 mediaId = 1;</code>
+     * 
      * @return The mediaId.
      */
     @java.lang.Override
     public long getMediaId() {
-      return mediaId_;
-    }
-    /**
-     * <code>int64 mediaId = 1;</code>
-     * @param value The mediaId to set.
-     * @return This builder for chaining.
-     */
-    public Builder setMediaId(long value) {
-
-      mediaId_ = value;
-      bitField0_ |= 0x00000001;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>int64 mediaId = 1;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearMediaId() {
-      bitField0_ = (bitField0_ & ~0x00000001);
-      mediaId_ = 0L;
-      onChanged();
-      return this;
+        return mediaId_;
     }
 
-    private java.lang.Object inputPrompt_ = "";
+    public static final int INPUTPROMPT_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object inputPrompt_ = "";
+
     /**
      * <code>string inputPrompt = 2;</code>
+     * 
      * @return The inputPrompt.
      */
+    @java.lang.Override
     public java.lang.String getInputPrompt() {
-      java.lang.Object ref = inputPrompt_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        inputPrompt_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string inputPrompt = 2;</code>
-     * @return The bytes for inputPrompt.
-     */
-    public com.google.protobuf.ByteString
-        getInputPromptBytes() {
-      java.lang.Object ref = inputPrompt_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        inputPrompt_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string inputPrompt = 2;</code>
-     * @param value The inputPrompt to set.
-     * @return This builder for chaining.
-     */
-    public Builder setInputPrompt(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      inputPrompt_ = value;
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string inputPrompt = 2;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearInputPrompt() {
-      inputPrompt_ = getDefaultInstance().getInputPrompt();
-      bitField0_ = (bitField0_ & ~0x00000002);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string inputPrompt = 2;</code>
-     * @param value The bytes for inputPrompt to set.
-     * @return This builder for chaining.
-     */
-    public Builder setInputPromptBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      inputPrompt_ = value;
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
+        java.lang.Object ref = inputPrompt_;
+        if (ref instanceof java.lang.String) {
+            return (java.lang.String) ref;
+        } else {
+            com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            inputPrompt_ = s;
+            return s;
+        }
     }
 
+    /**
+     * <code>string inputPrompt = 2;</code>
+     * 
+     * @return The bytes for inputPrompt.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getInputPromptBytes() {
+        java.lang.Object ref = inputPrompt_;
+        if (ref instanceof java.lang.String) {
+            com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                .copyFromUtf8(
+                    (java.lang.String) ref);
+            inputPrompt_ = b;
+            return b;
+        } else {
+            return (com.google.protobuf.ByteString) ref;
+        }
+    }
+
+    public static final int MEDIATYPE_FIELD_NUMBER = 3;
     private int mediaType_ = 0;
+
     /**
      * <code>.MediaType mediaType = 3;</code>
+     * 
      * @return The enum numeric value on the wire for mediaType.
      */
-    @java.lang.Override public int getMediaTypeValue() {
-      return mediaType_;
+    @java.lang.Override
+    public int getMediaTypeValue() {
+        return mediaType_;
     }
+
     /**
      * <code>.MediaType mediaType = 3;</code>
-     * @param value The enum numeric value on the wire for mediaType to set.
-     * @return This builder for chaining.
-     */
-    public Builder setMediaTypeValue(int value) {
-      mediaType_ = value;
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.MediaType mediaType = 3;</code>
+     * 
      * @return The mediaType.
      */
     @java.lang.Override
     public com.memes.model.transport.MediaType getMediaType() {
-      com.memes.model.transport.MediaType result = com.memes.model.transport.MediaType.forNumber(mediaType_);
-      return result == null ? com.memes.model.transport.MediaType.UNRECOGNIZED : result;
-    }
-    /**
-     * <code>.MediaType mediaType = 3;</code>
-     * @param value The mediaType to set.
-     * @return This builder for chaining.
-     */
-    public Builder setMediaType(com.memes.model.transport.MediaType value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      bitField0_ |= 0x00000004;
-      mediaType_ = value.getNumber();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.MediaType mediaType = 3;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearMediaType() {
-      bitField0_ = (bitField0_ & ~0x00000004);
-      mediaType_ = 0;
-      onChanged();
-      return this;
+        com.memes.model.transport.MediaType result = com.memes.model.transport.MediaType.forNumber(mediaType_);
+        return result == null ? com.memes.model.transport.MediaType.UNRECOGNIZED : result;
     }
 
-    private java.lang.Object mediaDescription_ = "";
+    public static final int MEDIADESCRIPTION_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object mediaDescription_ = "";
+
     /**
      * <code>string mediaDescription = 4;</code>
+     * 
      * @return The mediaDescription.
      */
+    @java.lang.Override
     public java.lang.String getMediaDescription() {
-      java.lang.Object ref = mediaDescription_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        mediaDescription_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string mediaDescription = 4;</code>
-     * @return The bytes for mediaDescription.
-     */
-    public com.google.protobuf.ByteString
-        getMediaDescriptionBytes() {
-      java.lang.Object ref = mediaDescription_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        mediaDescription_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string mediaDescription = 4;</code>
-     * @param value The mediaDescription to set.
-     * @return This builder for chaining.
-     */
-    public Builder setMediaDescription(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      mediaDescription_ = value;
-      bitField0_ |= 0x00000008;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string mediaDescription = 4;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearMediaDescription() {
-      mediaDescription_ = getDefaultInstance().getMediaDescription();
-      bitField0_ = (bitField0_ & ~0x00000008);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string mediaDescription = 4;</code>
-     * @param value The bytes for mediaDescription to set.
-     * @return This builder for chaining.
-     */
-    public Builder setMediaDescriptionBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      mediaDescription_ = value;
-      bitField0_ |= 0x00000008;
-      onChanged();
-      return this;
+        java.lang.Object ref = mediaDescription_;
+        if (ref instanceof java.lang.String) {
+            return (java.lang.String) ref;
+        } else {
+            com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            mediaDescription_ = s;
+            return s;
+        }
     }
 
+    /**
+     * <code>string mediaDescription = 4;</code>
+     * 
+     * @return The bytes for mediaDescription.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getMediaDescriptionBytes() {
+        java.lang.Object ref = mediaDescription_;
+        if (ref instanceof java.lang.String) {
+            com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                .copyFromUtf8(
+                    (java.lang.String) ref);
+            mediaDescription_ = b;
+            return b;
+        } else {
+            return (com.google.protobuf.ByteString) ref;
+        }
+    }
+
+    public static final int OUTCOME_FIELD_NUMBER = 5;
     private int outcome_ = 0;
+
     /**
      * <code>.ReviewOutcome outcome = 5;</code>
+     * 
      * @return The enum numeric value on the wire for outcome.
      */
-    @java.lang.Override public int getOutcomeValue() {
-      return outcome_;
+    @java.lang.Override
+    public int getOutcomeValue() {
+        return outcome_;
     }
+
     /**
      * <code>.ReviewOutcome outcome = 5;</code>
-     * @param value The enum numeric value on the wire for outcome to set.
-     * @return This builder for chaining.
-     */
-    public Builder setOutcomeValue(int value) {
-      outcome_ = value;
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.ReviewOutcome outcome = 5;</code>
+     * 
      * @return The outcome.
      */
     @java.lang.Override
     public com.memes.model.transport.ReviewOutcome getOutcome() {
-      com.memes.model.transport.ReviewOutcome result = com.memes.model.transport.ReviewOutcome.forNumber(outcome_);
-      return result == null ? com.memes.model.transport.ReviewOutcome.UNRECOGNIZED : result;
-    }
-    /**
-     * <code>.ReviewOutcome outcome = 5;</code>
-     * @param value The outcome to set.
-     * @return This builder for chaining.
-     */
-    public Builder setOutcome(com.memes.model.transport.ReviewOutcome value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      bitField0_ |= 0x00000010;
-      outcome_ = value.getNumber();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.ReviewOutcome outcome = 5;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearOutcome() {
-      bitField0_ = (bitField0_ & ~0x00000010);
-      outcome_ = 0;
-      onChanged();
-      return this;
+        com.memes.model.transport.ReviewOutcome result = com.memes.model.transport.ReviewOutcome.forNumber(outcome_);
+        return result == null ? com.memes.model.transport.ReviewOutcome.UNRECOGNIZED : result;
     }
 
-    private java.lang.Object failureReason_ = "";
+    public static final int FAILUREREASON_FIELD_NUMBER = 6;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object failureReason_ = "";
+
     /**
      * <code>string failureReason = 6;</code>
+     * 
      * @return The failureReason.
      */
+    @java.lang.Override
     public java.lang.String getFailureReason() {
-      java.lang.Object ref = failureReason_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        failureReason_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string failureReason = 6;</code>
-     * @return The bytes for failureReason.
-     */
-    public com.google.protobuf.ByteString
-        getFailureReasonBytes() {
-      java.lang.Object ref = failureReason_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        failureReason_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string failureReason = 6;</code>
-     * @param value The failureReason to set.
-     * @return This builder for chaining.
-     */
-    public Builder setFailureReason(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      failureReason_ = value;
-      bitField0_ |= 0x00000020;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string failureReason = 6;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearFailureReason() {
-      failureReason_ = getDefaultInstance().getFailureReason();
-      bitField0_ = (bitField0_ & ~0x00000020);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string failureReason = 6;</code>
-     * @param value The bytes for failureReason to set.
-     * @return This builder for chaining.
-     */
-    public Builder setFailureReasonBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      failureReason_ = value;
-      bitField0_ |= 0x00000020;
-      onChanged();
-      return this;
+        java.lang.Object ref = failureReason_;
+        if (ref instanceof java.lang.String) {
+            return (java.lang.String) ref;
+        } else {
+            com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            failureReason_ = s;
+            return s;
+        }
     }
 
-    private long reviewTimestamp_ ;
+    /**
+     * <code>string failureReason = 6;</code>
+     * 
+     * @return The bytes for failureReason.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getFailureReasonBytes() {
+        java.lang.Object ref = failureReason_;
+        if (ref instanceof java.lang.String) {
+            com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                .copyFromUtf8(
+                    (java.lang.String) ref);
+            failureReason_ = b;
+            return b;
+        } else {
+            return (com.google.protobuf.ByteString) ref;
+        }
+    }
+
+    public static final int REVIEWTIMESTAMP_FIELD_NUMBER = 7;
+    private long reviewTimestamp_ = 0L;
+
     /**
      * <code>int64 reviewTimestamp = 7;</code>
+     * 
      * @return The reviewTimestamp.
      */
     @java.lang.Override
     public long getReviewTimestamp() {
-      return reviewTimestamp_;
-    }
-    /**
-     * <code>int64 reviewTimestamp = 7;</code>
-     * @param value The reviewTimestamp to set.
-     * @return This builder for chaining.
-     */
-    public Builder setReviewTimestamp(long value) {
-
-      reviewTimestamp_ = value;
-      bitField0_ |= 0x00000040;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>int64 reviewTimestamp = 7;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearReviewTimestamp() {
-      bitField0_ = (bitField0_ & ~0x00000040);
-      reviewTimestamp_ = 0L;
-      onChanged();
-      return this;
+        return reviewTimestamp_;
     }
 
-    private java.lang.Object reviewerModel_ = "";
+    public static final int REVIEWERMODEL_FIELD_NUMBER = 8;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object reviewerModel_ = "";
+
     /**
      * <code>string reviewerModel = 8;</code>
+     * 
      * @return The reviewerModel.
      */
+    @java.lang.Override
     public java.lang.String getReviewerModel() {
-      java.lang.Object ref = reviewerModel_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        reviewerModel_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
+        java.lang.Object ref = reviewerModel_;
+        if (ref instanceof java.lang.String) {
+            return (java.lang.String) ref;
+        } else {
+            com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            reviewerModel_ = s;
+            return s;
+        }
     }
+
     /**
      * <code>string reviewerModel = 8;</code>
+     * 
      * @return The bytes for reviewerModel.
      */
-    public com.google.protobuf.ByteString
-        getReviewerModelBytes() {
-      java.lang.Object ref = reviewerModel_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        reviewerModel_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string reviewerModel = 8;</code>
-     * @param value The reviewerModel to set.
-     * @return This builder for chaining.
-     */
-    public Builder setReviewerModel(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      reviewerModel_ = value;
-      bitField0_ |= 0x00000080;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string reviewerModel = 8;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearReviewerModel() {
-      reviewerModel_ = getDefaultInstance().getReviewerModel();
-      bitField0_ = (bitField0_ & ~0x00000080);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string reviewerModel = 8;</code>
-     * @param value The bytes for reviewerModel to set.
-     * @return This builder for chaining.
-     */
-    public Builder setReviewerModelBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      reviewerModel_ = value;
-      bitField0_ |= 0x00000080;
-      onChanged();
-      return this;
-    }
     @java.lang.Override
-    public final Builder setUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFields(unknownFields);
+    public com.google.protobuf.ByteString getReviewerModelBytes() {
+        java.lang.Object ref = reviewerModel_;
+        if (ref instanceof java.lang.String) {
+            com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                .copyFromUtf8(
+                    (java.lang.String) ref);
+            reviewerModel_ = b;
+            return b;
+        } else {
+            return (com.google.protobuf.ByteString) ref;
+        }
+    }
+
+    private byte memoizedIsInitialized = -1;
+
+    @java.lang.Override
+    public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized == 1)
+            return true;
+        if (isInitialized == 0)
+            return false;
+
+        memoizedIsInitialized = 1;
+        return true;
     }
 
     @java.lang.Override
-    public final Builder mergeUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.mergeUnknownFields(unknownFields);
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+        throws java.io.IOException {
+        if (mediaId_ != 0L) {
+            output.writeInt64(1, mediaId_);
+        }
+        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(inputPrompt_)) {
+            com.google.protobuf.GeneratedMessageV3.writeString(output, 2, inputPrompt_);
+        }
+        if (mediaType_ != com.memes.model.transport.MediaType.IMAGE.getNumber()) {
+            output.writeEnum(3, mediaType_);
+        }
+        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(mediaDescription_)) {
+            com.google.protobuf.GeneratedMessageV3.writeString(output, 4, mediaDescription_);
+        }
+        if (outcome_ != com.memes.model.transport.ReviewOutcome.PENDING.getNumber()) {
+            output.writeEnum(5, outcome_);
+        }
+        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(failureReason_)) {
+            com.google.protobuf.GeneratedMessageV3.writeString(output, 6, failureReason_);
+        }
+        if (reviewTimestamp_ != 0L) {
+            output.writeInt64(7, reviewTimestamp_);
+        }
+        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(reviewerModel_)) {
+            com.google.protobuf.GeneratedMessageV3.writeString(output, 8, reviewerModel_);
+        }
+        getUnknownFields().writeTo(output);
     }
 
-
-    // @@protoc_insertion_point(builder_scope:LLMReviewResult)
-  }
-
-  // @@protoc_insertion_point(class_scope:LLMReviewResult)
-  private static final com.memes.model.transport.LLMReviewResult DEFAULT_INSTANCE;
-  static {
-    DEFAULT_INSTANCE = new com.memes.model.transport.LLMReviewResult();
-  }
-
-  public static com.memes.model.transport.LLMReviewResult getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<LLMReviewResult>
-      PARSER = new com.google.protobuf.AbstractParser<LLMReviewResult>() {
     @java.lang.Override
-    public LLMReviewResult parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
+    public int getSerializedSize() {
+        int size = memoizedSize;
+        if (size != -1)
+            return size;
+
+        size = 0;
+        if (mediaId_ != 0L) {
+            size += com.google.protobuf.CodedOutputStream
+                .computeInt64Size(1, mediaId_);
+        }
+        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(inputPrompt_)) {
+            size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, inputPrompt_);
+        }
+        if (mediaType_ != com.memes.model.transport.MediaType.IMAGE.getNumber()) {
+            size += com.google.protobuf.CodedOutputStream
+                .computeEnumSize(3, mediaType_);
+        }
+        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(mediaDescription_)) {
+            size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, mediaDescription_);
+        }
+        if (outcome_ != com.memes.model.transport.ReviewOutcome.PENDING.getNumber()) {
+            size += com.google.protobuf.CodedOutputStream
+                .computeEnumSize(5, outcome_);
+        }
+        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(failureReason_)) {
+            size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, failureReason_);
+        }
+        if (reviewTimestamp_ != 0L) {
+            size += com.google.protobuf.CodedOutputStream
+                .computeInt64Size(7, reviewTimestamp_);
+        }
+        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(reviewerModel_)) {
+            size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, reviewerModel_);
+        }
+        size += getUnknownFields().getSerializedSize();
+        memoizedSize = size;
+        return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof com.memes.model.transport.LLMReviewResult)) {
+            return super.equals(obj);
+        }
+        com.memes.model.transport.LLMReviewResult other = (com.memes.model.transport.LLMReviewResult) obj;
+
+        if (getMediaId() != other.getMediaId())
+            return false;
+        if (!getInputPrompt()
+            .equals(other.getInputPrompt()))
+            return false;
+        if (mediaType_ != other.mediaType_)
+            return false;
+        if (!getMediaDescription()
+            .equals(other.getMediaDescription()))
+            return false;
+        if (outcome_ != other.outcome_)
+            return false;
+        if (!getFailureReason()
+            .equals(other.getFailureReason()))
+            return false;
+        if (getReviewTimestamp() != other.getReviewTimestamp())
+            return false;
+        if (!getReviewerModel()
+            .equals(other.getReviewerModel()))
+            return false;
+        if (!getUnknownFields().equals(other.getUnknownFields()))
+            return false;
+        return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+        if (memoizedHashCode != 0) {
+            return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptor().hashCode();
+        hash = (37 * hash) + MEDIAID_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal
+            .hashLong(
+                getMediaId());
+        hash = (37 * hash) + INPUTPROMPT_FIELD_NUMBER;
+        hash = (53 * hash) + getInputPrompt().hashCode();
+        hash = (37 * hash) + MEDIATYPE_FIELD_NUMBER;
+        hash = (53 * hash) + mediaType_;
+        hash = (37 * hash) + MEDIADESCRIPTION_FIELD_NUMBER;
+        hash = (53 * hash) + getMediaDescription().hashCode();
+        hash = (37 * hash) + OUTCOME_FIELD_NUMBER;
+        hash = (53 * hash) + outcome_;
+        hash = (37 * hash) + FAILUREREASON_FIELD_NUMBER;
+        hash = (53 * hash) + getFailureReason().hashCode();
+        hash = (37 * hash) + REVIEWTIMESTAMP_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal
+            .hashLong(
+                getReviewTimestamp());
+        hash = (37 * hash) + REVIEWERMODEL_FIELD_NUMBER;
+        hash = (53 * hash) + getReviewerModel().hashCode();
+        hash = (29 * hash) + getUnknownFields().hashCode();
+        memoizedHashCode = hash;
+        return hash;
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseFrom(
+        java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      Builder builder = newBuilder();
-      try {
-        builder.mergeFrom(input, extensionRegistry);
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(builder.buildPartial());
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e)
-            .setUnfinishedMessage(builder.buildPartial());
-      }
-      return builder.buildPartial();
+        return PARSER.parseFrom(data, extensionRegistry);
     }
-  };
 
-  public static com.google.protobuf.Parser<LLMReviewResult> parser() {
-    return PARSER;
-  }
+    public static com.memes.model.transport.LLMReviewResult parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+    }
 
-  @java.lang.Override
-  public com.google.protobuf.Parser<LLMReviewResult> getParserForType() {
-    return PARSER;
-  }
+    public static com.memes.model.transport.LLMReviewResult parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+    }
 
-  @java.lang.Override
-  public com.memes.model.transport.LLMReviewResult getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
+    public static com.memes.model.transport.LLMReviewResult parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input);
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input);
+    }
+
+    public static com.memes.model.transport.LLMReviewResult parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() {
+        return newBuilder();
+    }
+
+    public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
+    }
+
+    public static Builder newBuilder(com.memes.model.transport.LLMReviewResult prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    @java.lang.Override
+    public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder()
+            : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+    }
+
+    /**
+     * Protobuf type {@code LLMReviewResult}
+     */
+    public static final class Builder
+        extends
+            com.google.protobuf.GeneratedMessageV3.Builder<Builder>
+        implements
+            // @@protoc_insertion_point(builder_implements:LLMReviewResult)
+            com.memes.model.transport.LLMReviewResultOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+            return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_descriptor;
+        }
+
+        @java.lang.Override
+        protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable internalGetFieldAccessorTable() {
+            return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_fieldAccessorTable
+                .ensureFieldAccessorsInitialized(
+                    com.memes.model.transport.LLMReviewResult.class,
+                    com.memes.model.transport.LLMReviewResult.Builder.class);
+        }
+
+        // Construct using com.memes.model.transport.LLMReviewResult.newBuilder()
+        private Builder() {
+
+        }
+
+        private Builder(
+            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+            super(parent);
+
+        }
+
+        @java.lang.Override
+        public Builder clear() {
+            super.clear();
+            bitField0_ = 0;
+            mediaId_ = 0L;
+            inputPrompt_ = "";
+            mediaType_ = 0;
+            mediaDescription_ = "";
+            outcome_ = 0;
+            failureReason_ = "";
+            reviewTimestamp_ = 0L;
+            reviewerModel_ = "";
+            return this;
+        }
+
+        @java.lang.Override
+        public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+            return com.memes.model.transport.LlmReview.internal_static_LLMReviewResult_descriptor;
+        }
+
+        @java.lang.Override
+        public com.memes.model.transport.LLMReviewResult getDefaultInstanceForType() {
+            return com.memes.model.transport.LLMReviewResult.getDefaultInstance();
+        }
+
+        @java.lang.Override
+        public com.memes.model.transport.LLMReviewResult build() {
+            com.memes.model.transport.LLMReviewResult result = buildPartial();
+            if (!result.isInitialized()) {
+                throw newUninitializedMessageException(result);
+            }
+            return result;
+        }
+
+        @java.lang.Override
+        public com.memes.model.transport.LLMReviewResult buildPartial() {
+            com.memes.model.transport.LLMReviewResult result = new com.memes.model.transport.LLMReviewResult(this);
+            if (bitField0_ != 0) {
+                buildPartial0(result);
+            }
+            onBuilt();
+            return result;
+        }
+
+        private void buildPartial0(com.memes.model.transport.LLMReviewResult result) {
+            int from_bitField0_ = bitField0_;
+            if (((from_bitField0_ & 0x00000001) != 0)) {
+                result.mediaId_ = mediaId_;
+            }
+            if (((from_bitField0_ & 0x00000002) != 0)) {
+                result.inputPrompt_ = inputPrompt_;
+            }
+            if (((from_bitField0_ & 0x00000004) != 0)) {
+                result.mediaType_ = mediaType_;
+            }
+            if (((from_bitField0_ & 0x00000008) != 0)) {
+                result.mediaDescription_ = mediaDescription_;
+            }
+            if (((from_bitField0_ & 0x00000010) != 0)) {
+                result.outcome_ = outcome_;
+            }
+            if (((from_bitField0_ & 0x00000020) != 0)) {
+                result.failureReason_ = failureReason_;
+            }
+            if (((from_bitField0_ & 0x00000040) != 0)) {
+                result.reviewTimestamp_ = reviewTimestamp_;
+            }
+            if (((from_bitField0_ & 0x00000080) != 0)) {
+                result.reviewerModel_ = reviewerModel_;
+            }
+        }
+
+        @java.lang.Override
+        public Builder clone() {
+            return super.clone();
+        }
+
+        @java.lang.Override
+        public Builder setField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            java.lang.Object value) {
+            return super.setField(field, value);
+        }
+
+        @java.lang.Override
+        public Builder clearField(
+            com.google.protobuf.Descriptors.FieldDescriptor field) {
+            return super.clearField(field);
+        }
+
+        @java.lang.Override
+        public Builder clearOneof(
+            com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+            return super.clearOneof(oneof);
+        }
+
+        @java.lang.Override
+        public Builder setRepeatedField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            int index, java.lang.Object value) {
+            return super.setRepeatedField(field, index, value);
+        }
+
+        @java.lang.Override
+        public Builder addRepeatedField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            java.lang.Object value) {
+            return super.addRepeatedField(field, value);
+        }
+
+        @java.lang.Override
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+            if (other instanceof com.memes.model.transport.LLMReviewResult) {
+                return mergeFrom((com.memes.model.transport.LLMReviewResult) other);
+            } else {
+                super.mergeFrom(other);
+                return this;
+            }
+        }
+
+        public Builder mergeFrom(com.memes.model.transport.LLMReviewResult other) {
+            if (other == com.memes.model.transport.LLMReviewResult.getDefaultInstance())
+                return this;
+            if (other.getMediaId() != 0L) {
+                setMediaId(other.getMediaId());
+            }
+            if (!other.getInputPrompt().isEmpty()) {
+                inputPrompt_ = other.inputPrompt_;
+                bitField0_ |= 0x00000002;
+                onChanged();
+            }
+            if (other.mediaType_ != 0) {
+                setMediaTypeValue(other.getMediaTypeValue());
+            }
+            if (!other.getMediaDescription().isEmpty()) {
+                mediaDescription_ = other.mediaDescription_;
+                bitField0_ |= 0x00000008;
+                onChanged();
+            }
+            if (other.outcome_ != 0) {
+                setOutcomeValue(other.getOutcomeValue());
+            }
+            if (!other.getFailureReason().isEmpty()) {
+                failureReason_ = other.failureReason_;
+                bitField0_ |= 0x00000020;
+                onChanged();
+            }
+            if (other.getReviewTimestamp() != 0L) {
+                setReviewTimestamp(other.getReviewTimestamp());
+            }
+            if (!other.getReviewerModel().isEmpty()) {
+                reviewerModel_ = other.reviewerModel_;
+                bitField0_ |= 0x00000080;
+                onChanged();
+            }
+            this.mergeUnknownFields(other.getUnknownFields());
+            onChanged();
+            return this;
+        }
+
+        @java.lang.Override
+        public final boolean isInitialized() {
+            return true;
+        }
+
+        @java.lang.Override
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+            if (extensionRegistry == null) {
+                throw new java.lang.NullPointerException();
+            }
+            try {
+                boolean done = false;
+                while (!done) {
+                    int tag = input.readTag();
+                    switch (tag) {
+                        case 0:
+                            done = true;
+                            break;
+                        case 8: {
+                            mediaId_ = input.readInt64();
+                            bitField0_ |= 0x00000001;
+                            break;
+                        } // case 8
+                        case 18: {
+                            inputPrompt_ = input.readStringRequireUtf8();
+                            bitField0_ |= 0x00000002;
+                            break;
+                        } // case 18
+                        case 24: {
+                            mediaType_ = input.readEnum();
+                            bitField0_ |= 0x00000004;
+                            break;
+                        } // case 24
+                        case 34: {
+                            mediaDescription_ = input.readStringRequireUtf8();
+                            bitField0_ |= 0x00000008;
+                            break;
+                        } // case 34
+                        case 40: {
+                            outcome_ = input.readEnum();
+                            bitField0_ |= 0x00000010;
+                            break;
+                        } // case 40
+                        case 50: {
+                            failureReason_ = input.readStringRequireUtf8();
+                            bitField0_ |= 0x00000020;
+                            break;
+                        } // case 50
+                        case 56: {
+                            reviewTimestamp_ = input.readInt64();
+                            bitField0_ |= 0x00000040;
+                            break;
+                        } // case 56
+                        case 66: {
+                            reviewerModel_ = input.readStringRequireUtf8();
+                            bitField0_ |= 0x00000080;
+                            break;
+                        } // case 66
+                        default: {
+                            if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                                done = true; // was an endgroup tag
+                            }
+                            break;
+                        } // default:
+                    } // switch (tag)
+                } // while (!done)
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                throw e.unwrapIOException();
+            } finally {
+                onChanged();
+            } // finally
+            return this;
+        }
+
+        private int bitField0_;
+
+        private long mediaId_;
+
+        /**
+         * <code>int64 mediaId = 1;</code>
+         * 
+         * @return The mediaId.
+         */
+        @java.lang.Override
+        public long getMediaId() {
+            return mediaId_;
+        }
+
+        /**
+         * <code>int64 mediaId = 1;</code>
+         * 
+         * @param value
+         *            The mediaId to set.
+         * @return This builder for chaining.
+         */
+        public Builder setMediaId(long value) {
+
+            mediaId_ = value;
+            bitField0_ |= 0x00000001;
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>int64 mediaId = 1;</code>
+         * 
+         * @return This builder for chaining.
+         */
+        public Builder clearMediaId() {
+            bitField0_ = (bitField0_ & ~0x00000001);
+            mediaId_ = 0L;
+            onChanged();
+            return this;
+        }
+
+        private java.lang.Object inputPrompt_ = "";
+
+        /**
+         * <code>string inputPrompt = 2;</code>
+         * 
+         * @return The inputPrompt.
+         */
+        public java.lang.String getInputPrompt() {
+            java.lang.Object ref = inputPrompt_;
+            if (!(ref instanceof java.lang.String)) {
+                com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                inputPrompt_ = s;
+                return s;
+            } else {
+                return (java.lang.String) ref;
+            }
+        }
+
+        /**
+         * <code>string inputPrompt = 2;</code>
+         * 
+         * @return The bytes for inputPrompt.
+         */
+        public com.google.protobuf.ByteString getInputPromptBytes() {
+            java.lang.Object ref = inputPrompt_;
+            if (ref instanceof String) {
+                com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                    .copyFromUtf8(
+                        (java.lang.String) ref);
+                inputPrompt_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        /**
+         * <code>string inputPrompt = 2;</code>
+         * 
+         * @param value
+         *            The inputPrompt to set.
+         * @return This builder for chaining.
+         */
+        public Builder setInputPrompt(
+            java.lang.String value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            inputPrompt_ = value;
+            bitField0_ |= 0x00000002;
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>string inputPrompt = 2;</code>
+         * 
+         * @return This builder for chaining.
+         */
+        public Builder clearInputPrompt() {
+            inputPrompt_ = getDefaultInstance().getInputPrompt();
+            bitField0_ = (bitField0_ & ~0x00000002);
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>string inputPrompt = 2;</code>
+         * 
+         * @param value
+         *            The bytes for inputPrompt to set.
+         * @return This builder for chaining.
+         */
+        public Builder setInputPromptBytes(
+            com.google.protobuf.ByteString value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            checkByteStringIsUtf8(value);
+            inputPrompt_ = value;
+            bitField0_ |= 0x00000002;
+            onChanged();
+            return this;
+        }
+
+        private int mediaType_ = 0;
+
+        /**
+         * <code>.MediaType mediaType = 3;</code>
+         * 
+         * @return The enum numeric value on the wire for mediaType.
+         */
+        @java.lang.Override
+        public int getMediaTypeValue() {
+            return mediaType_;
+        }
+
+        /**
+         * <code>.MediaType mediaType = 3;</code>
+         * 
+         * @param value
+         *            The enum numeric value on the wire for mediaType to set.
+         * @return This builder for chaining.
+         */
+        public Builder setMediaTypeValue(int value) {
+            mediaType_ = value;
+            bitField0_ |= 0x00000004;
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>.MediaType mediaType = 3;</code>
+         * 
+         * @return The mediaType.
+         */
+        @java.lang.Override
+        public com.memes.model.transport.MediaType getMediaType() {
+            com.memes.model.transport.MediaType result = com.memes.model.transport.MediaType.forNumber(mediaType_);
+            return result == null ? com.memes.model.transport.MediaType.UNRECOGNIZED : result;
+        }
+
+        /**
+         * <code>.MediaType mediaType = 3;</code>
+         * 
+         * @param value
+         *            The mediaType to set.
+         * @return This builder for chaining.
+         */
+        public Builder setMediaType(com.memes.model.transport.MediaType value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            bitField0_ |= 0x00000004;
+            mediaType_ = value.getNumber();
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>.MediaType mediaType = 3;</code>
+         * 
+         * @return This builder for chaining.
+         */
+        public Builder clearMediaType() {
+            bitField0_ = (bitField0_ & ~0x00000004);
+            mediaType_ = 0;
+            onChanged();
+            return this;
+        }
+
+        private java.lang.Object mediaDescription_ = "";
+
+        /**
+         * <code>string mediaDescription = 4;</code>
+         * 
+         * @return The mediaDescription.
+         */
+        public java.lang.String getMediaDescription() {
+            java.lang.Object ref = mediaDescription_;
+            if (!(ref instanceof java.lang.String)) {
+                com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                mediaDescription_ = s;
+                return s;
+            } else {
+                return (java.lang.String) ref;
+            }
+        }
+
+        /**
+         * <code>string mediaDescription = 4;</code>
+         * 
+         * @return The bytes for mediaDescription.
+         */
+        public com.google.protobuf.ByteString getMediaDescriptionBytes() {
+            java.lang.Object ref = mediaDescription_;
+            if (ref instanceof String) {
+                com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                    .copyFromUtf8(
+                        (java.lang.String) ref);
+                mediaDescription_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        /**
+         * <code>string mediaDescription = 4;</code>
+         * 
+         * @param value
+         *            The mediaDescription to set.
+         * @return This builder for chaining.
+         */
+        public Builder setMediaDescription(
+            java.lang.String value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            mediaDescription_ = value;
+            bitField0_ |= 0x00000008;
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>string mediaDescription = 4;</code>
+         * 
+         * @return This builder for chaining.
+         */
+        public Builder clearMediaDescription() {
+            mediaDescription_ = getDefaultInstance().getMediaDescription();
+            bitField0_ = (bitField0_ & ~0x00000008);
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>string mediaDescription = 4;</code>
+         * 
+         * @param value
+         *            The bytes for mediaDescription to set.
+         * @return This builder for chaining.
+         */
+        public Builder setMediaDescriptionBytes(
+            com.google.protobuf.ByteString value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            checkByteStringIsUtf8(value);
+            mediaDescription_ = value;
+            bitField0_ |= 0x00000008;
+            onChanged();
+            return this;
+        }
+
+        private int outcome_ = 0;
+
+        /**
+         * <code>.ReviewOutcome outcome = 5;</code>
+         * 
+         * @return The enum numeric value on the wire for outcome.
+         */
+        @java.lang.Override
+        public int getOutcomeValue() {
+            return outcome_;
+        }
+
+        /**
+         * <code>.ReviewOutcome outcome = 5;</code>
+         * 
+         * @param value
+         *            The enum numeric value on the wire for outcome to set.
+         * @return This builder for chaining.
+         */
+        public Builder setOutcomeValue(int value) {
+            outcome_ = value;
+            bitField0_ |= 0x00000010;
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>.ReviewOutcome outcome = 5;</code>
+         * 
+         * @return The outcome.
+         */
+        @java.lang.Override
+        public com.memes.model.transport.ReviewOutcome getOutcome() {
+            com.memes.model.transport.ReviewOutcome result = com.memes.model.transport.ReviewOutcome
+                .forNumber(outcome_);
+            return result == null ? com.memes.model.transport.ReviewOutcome.UNRECOGNIZED : result;
+        }
+
+        /**
+         * <code>.ReviewOutcome outcome = 5;</code>
+         * 
+         * @param value
+         *            The outcome to set.
+         * @return This builder for chaining.
+         */
+        public Builder setOutcome(com.memes.model.transport.ReviewOutcome value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            bitField0_ |= 0x00000010;
+            outcome_ = value.getNumber();
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>.ReviewOutcome outcome = 5;</code>
+         * 
+         * @return This builder for chaining.
+         */
+        public Builder clearOutcome() {
+            bitField0_ = (bitField0_ & ~0x00000010);
+            outcome_ = 0;
+            onChanged();
+            return this;
+        }
+
+        private java.lang.Object failureReason_ = "";
+
+        /**
+         * <code>string failureReason = 6;</code>
+         * 
+         * @return The failureReason.
+         */
+        public java.lang.String getFailureReason() {
+            java.lang.Object ref = failureReason_;
+            if (!(ref instanceof java.lang.String)) {
+                com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                failureReason_ = s;
+                return s;
+            } else {
+                return (java.lang.String) ref;
+            }
+        }
+
+        /**
+         * <code>string failureReason = 6;</code>
+         * 
+         * @return The bytes for failureReason.
+         */
+        public com.google.protobuf.ByteString getFailureReasonBytes() {
+            java.lang.Object ref = failureReason_;
+            if (ref instanceof String) {
+                com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                    .copyFromUtf8(
+                        (java.lang.String) ref);
+                failureReason_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        /**
+         * <code>string failureReason = 6;</code>
+         * 
+         * @param value
+         *            The failureReason to set.
+         * @return This builder for chaining.
+         */
+        public Builder setFailureReason(
+            java.lang.String value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            failureReason_ = value;
+            bitField0_ |= 0x00000020;
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>string failureReason = 6;</code>
+         * 
+         * @return This builder for chaining.
+         */
+        public Builder clearFailureReason() {
+            failureReason_ = getDefaultInstance().getFailureReason();
+            bitField0_ = (bitField0_ & ~0x00000020);
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>string failureReason = 6;</code>
+         * 
+         * @param value
+         *            The bytes for failureReason to set.
+         * @return This builder for chaining.
+         */
+        public Builder setFailureReasonBytes(
+            com.google.protobuf.ByteString value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            checkByteStringIsUtf8(value);
+            failureReason_ = value;
+            bitField0_ |= 0x00000020;
+            onChanged();
+            return this;
+        }
+
+        private long reviewTimestamp_;
+
+        /**
+         * <code>int64 reviewTimestamp = 7;</code>
+         * 
+         * @return The reviewTimestamp.
+         */
+        @java.lang.Override
+        public long getReviewTimestamp() {
+            return reviewTimestamp_;
+        }
+
+        /**
+         * <code>int64 reviewTimestamp = 7;</code>
+         * 
+         * @param value
+         *            The reviewTimestamp to set.
+         * @return This builder for chaining.
+         */
+        public Builder setReviewTimestamp(long value) {
+
+            reviewTimestamp_ = value;
+            bitField0_ |= 0x00000040;
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>int64 reviewTimestamp = 7;</code>
+         * 
+         * @return This builder for chaining.
+         */
+        public Builder clearReviewTimestamp() {
+            bitField0_ = (bitField0_ & ~0x00000040);
+            reviewTimestamp_ = 0L;
+            onChanged();
+            return this;
+        }
+
+        private java.lang.Object reviewerModel_ = "";
+
+        /**
+         * <code>string reviewerModel = 8;</code>
+         * 
+         * @return The reviewerModel.
+         */
+        public java.lang.String getReviewerModel() {
+            java.lang.Object ref = reviewerModel_;
+            if (!(ref instanceof java.lang.String)) {
+                com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                reviewerModel_ = s;
+                return s;
+            } else {
+                return (java.lang.String) ref;
+            }
+        }
+
+        /**
+         * <code>string reviewerModel = 8;</code>
+         * 
+         * @return The bytes for reviewerModel.
+         */
+        public com.google.protobuf.ByteString getReviewerModelBytes() {
+            java.lang.Object ref = reviewerModel_;
+            if (ref instanceof String) {
+                com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                    .copyFromUtf8(
+                        (java.lang.String) ref);
+                reviewerModel_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        /**
+         * <code>string reviewerModel = 8;</code>
+         * 
+         * @param value
+         *            The reviewerModel to set.
+         * @return This builder for chaining.
+         */
+        public Builder setReviewerModel(
+            java.lang.String value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            reviewerModel_ = value;
+            bitField0_ |= 0x00000080;
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>string reviewerModel = 8;</code>
+         * 
+         * @return This builder for chaining.
+         */
+        public Builder clearReviewerModel() {
+            reviewerModel_ = getDefaultInstance().getReviewerModel();
+            bitField0_ = (bitField0_ & ~0x00000080);
+            onChanged();
+            return this;
+        }
+
+        /**
+         * <code>string reviewerModel = 8;</code>
+         * 
+         * @param value
+         *            The bytes for reviewerModel to set.
+         * @return This builder for chaining.
+         */
+        public Builder setReviewerModelBytes(
+            com.google.protobuf.ByteString value) {
+            if (value == null) {
+                throw new NullPointerException();
+            }
+            checkByteStringIsUtf8(value);
+            reviewerModel_ = value;
+            bitField0_ |= 0x00000080;
+            onChanged();
+            return this;
+        }
+
+        @java.lang.Override
+        public final Builder setUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
+            return super.setUnknownFields(unknownFields);
+        }
+
+        @java.lang.Override
+        public final Builder mergeUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
+            return super.mergeUnknownFields(unknownFields);
+        }
+
+        // @@protoc_insertion_point(builder_scope:LLMReviewResult)
+    }
+
+    // @@protoc_insertion_point(class_scope:LLMReviewResult)
+    private static final com.memes.model.transport.LLMReviewResult DEFAULT_INSTANCE;
+    static {
+        DEFAULT_INSTANCE = new com.memes.model.transport.LLMReviewResult();
+    }
+
+    public static com.memes.model.transport.LLMReviewResult getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<LLMReviewResult> PARSER = new com.google.protobuf.AbstractParser<LLMReviewResult>() {
+        @java.lang.Override
+        public LLMReviewResult parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            Builder builder = newBuilder();
+            try {
+                builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+                throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+                throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                    .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
+        }
+    };
+
+    public static com.google.protobuf.Parser<LLMReviewResult> parser() {
+        return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<LLMReviewResult> getParserForType() {
+        return PARSER;
+    }
+
+    @java.lang.Override
+    public com.memes.model.transport.LLMReviewResult getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+    }
 
 }
-

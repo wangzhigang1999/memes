@@ -8,4 +8,4 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MediaContentServiceImpl extends ServiceImpl<MediaMapper, MediaContent> implements MediaContentService {
-} 
+}

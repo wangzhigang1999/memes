@@ -59,7 +59,8 @@ public class QiNiuStorageServiceImpl implements StorageService {
     public FileUploadResult store(byte[] bytes, String mime) {
         String type = getExtension(mime);
         String fileName = putBytes(bytes, type);
-        Preconditions.checkArgument(fileName != null, AppException.storageError("file upload failed,type:%s".formatted(type)));
+        Preconditions
+            .checkArgument(fileName != null, AppException.storageError("file upload failed,type:%s".formatted(type)));
         var url = urlPrefix.concat(fileName);
         return new FileUploadResult(url, fileName, mime);
     }
@@ -67,7 +68,8 @@ public class QiNiuStorageServiceImpl implements StorageService {
     @Override
     public FileUploadResult store(byte[] bytes, String mime, String path) {
         String fileName = putBytes(bytes, mime, path);
-        Preconditions.checkArgument(fileName != null, AppException.storageError("file upload failed,type:%s".formatted(mime)));
+        Preconditions
+            .checkArgument(fileName != null, AppException.storageError("file upload failed,type:%s".formatted(mime)));
         var url = urlPrefix.concat(fileName);
         return new FileUploadResult(url, fileName, mime);
     }
