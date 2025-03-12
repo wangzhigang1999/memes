@@ -23,8 +23,8 @@ import com.memes.model.pojo.MediaContent;
 import com.memes.model.transport.LLMReviewResult;
 import com.memes.model.transport.MediaType;
 import com.memes.model.transport.ReviewOutcome;
+import com.memes.service.MediaContentService;
 import com.memes.service.MessageQueueService;
-import com.memes.service.ReviewService;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -88,16 +88,16 @@ public class AiReviewer {
     private String apiKey;
 
     private final MessageQueueService mqService;
-    private final ReviewService reviewService;
+    private final MediaContentService mediaContentService;
     private final Gson gson = new Gson();
     private final MultiModalConversation conv = new MultiModalConversation();
     private final RedisTemplate<String, String> redisTemplate;
 
-    public AiReviewer(MeterRegistry registry, MessageQueueService mqService, ReviewService reviewService,
+    public AiReviewer(MeterRegistry registry, MessageQueueService mqService, MediaContentService mediaContentService,
         RedisTemplate<String, String> redisTemplate) {
         this.registry = registry;
         this.mqService = mqService;
-        this.reviewService = reviewService;
+        this.mediaContentService = mediaContentService;
         this.redisTemplate = redisTemplate;
     }
 
@@ -222,7 +222,7 @@ public class AiReviewer {
         switch (outcome) {
             case APPROVED:
                 log.info("Submission {} passed review.  Approving.", mediaId);
-                boolean marked = reviewService.markMediaStatus(mediaId, MediaContent.ContentStatus.APPROVED);
+                boolean marked = mediaContentService.markMediaStatus(mediaId, MediaContent.ContentStatus.APPROVED);
                 if (marked) {
                     log.info("Submission {} approved.", mediaId);
                 } else {

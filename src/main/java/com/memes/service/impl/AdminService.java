@@ -7,7 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.memes.mapper.MediaMapper;
 import com.memes.mapper.RequestLogMapper;
+import com.memes.mapper.SubmissionMapper;
+import com.memes.model.pojo.MediaContent;
 import com.memes.model.pojo.RequestLog;
 import com.memes.model.response.VisitStatistic;
 import com.memes.util.TimeUtil;
@@ -18,6 +21,10 @@ import lombok.AllArgsConstructor;
 @Service
 public class AdminService {
     private final RequestLogMapper requestLogMapper;
+    private final SubmissionMapper submissionMapper;
+    private final MediaMapper mediaMapper;
+
+    private static final long MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 
     public VisitStatistic getVisitStatistic(String date) {
 
@@ -91,6 +98,23 @@ public class AdminService {
         long lastTimestamp = logs.stream().mapToLong(RequestLog::getTimestamp).max().orElse(0);
         var summary = logs.stream().mapToInt(RequestLog::getTimecost).summaryStatistics();
         return new LogStats(firstTimestamp, lastTimestamp, summary.getAverage(), summary.getMin(), summary.getMax(), logs.size());
+    }
+
+    public Map<String, Long> getReviewStatistic() {
+        long startTime = TimeUtil.getTodayStartUnixEpochMilli();
+        long endTime = startTime + MILLIS_PER_DAY;
+
+        QueryWrapper<MediaContent> wrapper = new QueryWrapper<MediaContent>()
+            .ge("timestamp", startTime)
+            .lt("timestamp", endTime)
+            .select("status"); // 只查询 status 字段
+
+        List<MediaContent> mediaContents = mediaMapper.selectList(wrapper);
+
+        return mediaContents
+            .stream()
+            .collect(Collectors.groupingBy(content -> content.getStatus().toString(), Collectors.counting()));
+
     }
 
     private record LogStats(long firstTimestamp, long lastTimestamp, double avgTimeCost, int minTimeCost, int maxTimeCost, int count) {

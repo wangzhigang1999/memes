@@ -1,5 +1,7 @@
 package com.memes.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,6 +30,18 @@ public class MediaContentController {
         return mediaContentService.page(new Page<>(page, size));
     }
 
+    // list with status
+    @GetMapping("/status/{status}")
+    public Page<MediaContent> listWithStatus(@PathVariable MediaContent.ContentStatus status, @RequestParam(defaultValue = "1") Integer page,
+        @RequestParam(defaultValue = "10") Integer size) {
+        return mediaContentService.page(new Page<>(page, size), new LambdaQueryWrapper<MediaContent>().eq(MediaContent::getStatus, status));
+    }
+
+    @PutMapping("/{id}/status/{status}")
+    public boolean markStatus(@PathVariable Integer id, @PathVariable MediaContent.ContentStatus status) {
+        return mediaContentService.markMediaStatus(id, status);
+    }
+
     @PutMapping("/{id}")
     public MediaContent update(@PathVariable Integer id, @RequestBody MediaContent mediaContent) {
         mediaContent.setId(id);
@@ -35,26 +49,13 @@ public class MediaContentController {
         return mediaContent;
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        mediaContentService.removeById(id);
+    @PutMapping("/batch/status/{status}")
+    public int batchMarkStatus(@RequestBody Integer[] ids, @PathVariable MediaContent.ContentStatus status) {
+        return mediaContentService.batchMarkMediaStatus(List.of(ids), status);
     }
 
-    @GetMapping("/search")
-    public Page<MediaContent> search(@RequestParam(required = false) String userId,
-        @RequestParam(required = false) MediaContent.DataType dataType, @RequestParam(defaultValue = "1") Integer page,
-        @RequestParam(defaultValue = "10") Integer size) {
-
-        LambdaQueryWrapper<MediaContent> queryWrapper = new LambdaQueryWrapper<>();
-
-        if (userId != null) {
-            queryWrapper.eq(MediaContent::getUserId, userId);
-        }
-
-        if (dataType != null) {
-            queryWrapper.eq(MediaContent::getDataType, dataType);
-        }
-
-        return mediaContentService.page(new Page<>(page, size), queryWrapper);
+    @DeleteMapping("/{id}")
+    public boolean delete(@PathVariable Integer id) {
+        return mediaContentService.removeById(id);
     }
 }

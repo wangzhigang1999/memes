@@ -1,5 +1,7 @@
 package com.memes.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,12 +35,18 @@ public class AdminController {
     }
 
     @AuthRequired
-    @GetMapping("/statistic")
-    public VisitStatistic statistic(@RequestParam(value = "date", required = false) String date) {
+    @GetMapping("/visit/statistic")
+    public VisitStatistic visitStat(@RequestParam(value = "date", required = false) String date) {
         if (date == null) {
             date = TimeUtil.getYMD();
         }
         return this.adminService.getVisitStatistic(date);
+    }
+
+    @AuthRequired
+    @GetMapping("/review/statistic")
+    public Map<String, Long> reviewStat() {
+        return this.adminService.getReviewStatistic();
     }
 
 }
