@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-// @Component
 public class RequestInterceptor implements HandlerInterceptor {
 
     private static final String TOKEN_HEADER = "token";
@@ -26,15 +25,17 @@ public class RequestInterceptor implements HandlerInterceptor {
     private final String localToken;
     private final List<String> adminPathPrefixes;
 
-    public RequestInterceptor(AppConfig config, String localToken, List<String> adminPathPrefixes) {
+    private final String activeProfile;
+
+    public RequestInterceptor(AppConfig config, String localToken, List<String> adminPathPrefixes, String activeProfile) {
         this.config = config;
         this.localToken = localToken;
         this.adminPathPrefixes = adminPathPrefixes;
+        this.activeProfile = activeProfile;
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler)
-        throws Exception {
+    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
         String url = request.getRequestURI();
         String method = request.getMethod();
         String token = request.getHeader(TOKEN_HEADER);
@@ -58,7 +59,11 @@ public class RequestInterceptor implements HandlerInterceptor {
     }
 
     private boolean shouldBypassAuthentication(String url, String method, String token) {
-        return isAdminPath(url) || OPTIONS_METHOD.equals(method) || localToken.equals(token) || ResourceChecker.isStaticResource(url);
+        return isAdminPath(url)
+            || OPTIONS_METHOD.equals(method)
+            || localToken.equals(token)
+            || ResourceChecker.isStaticResource(url)
+            || activeProfile.equals("dev");
     }
 
     private boolean isAdminPath(String url) {

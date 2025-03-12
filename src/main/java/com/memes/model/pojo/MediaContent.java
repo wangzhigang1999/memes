@@ -26,7 +26,7 @@ public class MediaContent {
 
     private String llmDescription;
 
-    private AiModerationStatus aiModerationStatus;
+    private AiModerationStatus llmModerationStatus;
 
     private String rejectionReason;
 

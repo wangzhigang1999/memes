@@ -17,12 +17,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${token}")
     String adminToken = UUID.randomUUID().toString();
 
+    @Value("${spring.profiles.active}")
+    String activeProfile;
+
     public WebMvcConfig(AppConfig config) {
         this.config = config;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new RequestInterceptor(config, adminToken, List.of("/api/admin"))).addPathPatterns("/**");
+        registry.addInterceptor(new RequestInterceptor(config, adminToken, List.of("/api/admin"), activeProfile)).addPathPatterns("/**");
     }
 }

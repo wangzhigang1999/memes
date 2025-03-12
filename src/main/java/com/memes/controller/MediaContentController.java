@@ -24,8 +24,7 @@ public class MediaContentController {
     }
 
     @GetMapping
-    public Page<MediaContent> list(@RequestParam(defaultValue = "1") Integer page,
-        @RequestParam(defaultValue = "10") Integer size) {
+    public Page<MediaContent> list(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size) {
         return mediaContentService.page(new Page<>(page, size));
     }
 
