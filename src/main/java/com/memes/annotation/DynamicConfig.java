@@ -1,11 +1,11 @@
 package com.memes.annotation;
 
-import com.memes.model.pojo.Config;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import com.memes.model.pojo.Config;
 
 /**
  * 用来标记动态配置的注解

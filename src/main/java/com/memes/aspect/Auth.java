@@ -1,10 +1,5 @@
 package com.memes.aspect;
 
-import com.memes.annotation.AuthRequired;
-import com.memes.exception.AppException;
-import com.memes.util.Preconditions;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,6 +8,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.memes.annotation.AuthRequired;
+import com.memes.exception.AppException;
+import com.memes.util.Preconditions;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Aspect

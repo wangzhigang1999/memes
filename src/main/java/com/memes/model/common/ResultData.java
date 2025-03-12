@@ -1,6 +1,7 @@
 package com.memes.model.common;
 
 import com.memes.exception.AppException;
+
 import lombok.Data;
 
 @Data

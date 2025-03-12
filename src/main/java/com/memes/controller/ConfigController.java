@@ -1,12 +1,14 @@
 package com.memes.controller;
 
+import org.springframework.web.bind.annotation.*;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.memes.annotation.AuthRequired;
 import com.memes.model.pojo.Config;
 import com.memes.service.ConfigService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/config")

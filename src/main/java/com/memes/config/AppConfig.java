@@ -1,17 +1,19 @@
 package com.memes.config;
 
-import com.google.gson.Gson;
-import com.memes.annotation.DynamicConfig;
-import com.memes.model.pojo.Config;
-import com.memes.model.pojo.Submission;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import org.springframework.stereotype.Component;
+
+import com.google.gson.Gson;
+import com.memes.annotation.DynamicConfig;
+import com.memes.model.pojo.Config;
+import com.memes.model.pojo.Submission;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 应用配置，动态更新 简单的配置条目使用注解标记字段，复杂的配置条目使用注解标记方法

@@ -1,14 +1,15 @@
 package com.memes.util;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class GsonUtil {

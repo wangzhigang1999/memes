@@ -1,12 +1,13 @@
 package com.memes.model.pojo;
 
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Map;
 
 @Data
 @TableName(value = "config", autoResultMap = true)

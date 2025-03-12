@@ -1,14 +1,15 @@
 package com.memes.service.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.memes.mapper.ConfigMapper;
 import com.memes.model.pojo.Config;
 import com.memes.service.ConfigService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> implements ConfigService {

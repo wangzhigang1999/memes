@@ -1,10 +1,10 @@
 package com.memes.service;
 
+import java.util.List;
+
 import com.memes.model.pojo.MediaContent;
 import com.memes.model.pojo.MediaContent.ContentStatus;
 import com.memes.model.pojo.Submission;
-
-import java.util.List;
 
 public interface ReviewService {
 

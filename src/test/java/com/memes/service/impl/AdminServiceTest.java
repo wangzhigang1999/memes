@@ -1,14 +1,16 @@
 package com.memes.service.impl;
 
-import com.memes.model.response.VisitStatistic;
-import com.memes.util.GsonUtil;
-import com.memes.util.TimeUtil;
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import com.memes.model.response.VisitStatistic;
+import com.memes.util.GsonUtil;
+import com.memes.util.TimeUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @Slf4j

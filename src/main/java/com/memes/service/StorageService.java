@@ -1,12 +1,13 @@
 package com.memes.service;
 
+import java.util.Map;
+
 import com.memes.exception.AppException;
 import com.memes.model.common.FileUploadResult;
 import com.memes.util.Preconditions;
+
 import io.micrometer.common.util.StringUtils;
 import lombok.SneakyThrows;
-
-import java.util.Map;
 
 public interface StorageService {
 

@@ -1,17 +1,19 @@
 package com.memes.service.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.memes.mapper.MediaMapper;
 import com.memes.mapper.SubmissionMapper;
 import com.memes.model.pojo.MediaContent;
 import com.memes.model.pojo.Submission;
 import com.memes.service.ReviewService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor

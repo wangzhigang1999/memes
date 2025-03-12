@@ -1,8 +1,8 @@
 package com.memes.model.response;
 
-import lombok.Data;
-
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class VisitStatistic {

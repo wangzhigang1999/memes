@@ -1,20 +1,22 @@
 package com.memes.service.impl;
 
-import com.memes.model.common.FileUploadResult;
-import com.memes.service.StorageService;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import com.memes.model.common.FileUploadResult;
+import com.memes.service.StorageService;
+
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 @Service("local")
 @Primary

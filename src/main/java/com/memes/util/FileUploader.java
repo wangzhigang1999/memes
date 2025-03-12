@@ -1,12 +1,13 @@
 package com.memes.util;
 
-import com.memes.model.common.FileUploadResult;
-import com.memes.service.StorageService;
+import java.io.IOException;
+import java.util.concurrent.Callable;
+
 import org.slf4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.concurrent.Callable;
+import com.memes.model.common.FileUploadResult;
+import com.memes.service.StorageService;
 
 public record FileUploader(MultipartFile file, StorageService storageService) implements Callable<FileUploadResult> {
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(FileUploader.class);

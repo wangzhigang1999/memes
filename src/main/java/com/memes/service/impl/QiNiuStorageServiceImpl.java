@@ -1,5 +1,12 @@
 package com.memes.service.impl;
 
+import java.util.HashMap;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+
 import com.google.gson.Gson;
 import com.memes.exception.AppException;
 import com.memes.model.common.FileUploadResult;
@@ -13,14 +20,9 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.BatchStatus;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.UUID;
 
 @Service("qiniu")
 @ConditionalOnProperty(prefix = "storage", name = "type", havingValue = "qiniu")

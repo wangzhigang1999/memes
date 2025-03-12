@@ -1,8 +1,8 @@
 package com.memes.util;
 
-import com.memes.exception.AppException;
-
 import java.util.function.Supplier;
+
+import com.memes.exception.AppException;
 
 public class Preconditions {
     public static void checkArgument(boolean condition, AppException exception) {

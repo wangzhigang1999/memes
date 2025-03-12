@@ -1,10 +1,12 @@
 package com.memes.controller;
 
+import org.springframework.web.bind.annotation.*;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.memes.model.pojo.Submission;
 import com.memes.service.SubmissionService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/submissions")

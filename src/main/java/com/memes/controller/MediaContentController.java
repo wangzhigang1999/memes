@@ -1,11 +1,14 @@
 package com.memes.controller;
 
+import org.springframework.web.bind.annotation.*;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.memes.annotation.AuthRequired;
 import com.memes.model.pojo.MediaContent;
 import com.memes.service.MediaContentService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/media")
@@ -14,6 +17,7 @@ public class MediaContentController {
 
     private final MediaContentService mediaContentService;
 
+    @AuthRequired
     @GetMapping("/{id}")
     public MediaContent getById(@PathVariable Integer id) {
         return mediaContentService.getById(id);

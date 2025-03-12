@@ -1,16 +1,18 @@
 package com.memes.service.impl;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.memes.mapper.RequestLogMapper;
 import com.memes.model.pojo.RequestLog;
 import com.memes.model.response.VisitStatistic;
 import com.memes.util.TimeUtil;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @Service

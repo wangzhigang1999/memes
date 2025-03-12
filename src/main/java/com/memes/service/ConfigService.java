@@ -1,9 +1,9 @@
 package com.memes.service;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.memes.model.pojo.Config;
-
-import java.util.List;
 
 public interface ConfigService extends IService<Config> {
     /**
