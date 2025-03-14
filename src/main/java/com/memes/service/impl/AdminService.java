@@ -104,12 +104,12 @@ public class AdminService {
         long startTime = TimeUtil.getTodayStartUnixEpochMilli();
         long endTime = startTime + MILLIS_PER_DAY;
 
-        QueryWrapper<MediaContent> wrapper = new QueryWrapper<MediaContent>()
-            .ge("timestamp", startTime)
-            .lt("timestamp", endTime)
-            .select("status"); // 只查询 status 字段
-
-        List<MediaContent> mediaContents = mediaMapper.selectList(wrapper);
+        List<MediaContent> mediaContents = mediaMapper
+            .selectList(
+                new QueryWrapper<MediaContent>()
+                    .ge("created_at", startTime)
+                    .lt("created_at", endTime)
+                    .select("status"));
 
         return mediaContents
             .stream()

@@ -48,15 +48,7 @@ public final class LlmReview {
         internal_static_LLMReviewResult_descriptor = getDescriptor().getMessageTypes().get(0);
         internal_static_LLMReviewResult_fieldAccessorTable = new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_LLMReviewResult_descriptor,
-            new java.lang.String[]{
-                "MediaId",
-                "InputPrompt",
-                "MediaType",
-                "MediaDescription",
-                "Outcome",
-                "FailureReason",
-                "ReviewTimestamp",
-                "ReviewerModel",});
+            new java.lang.String[]{"MediaId", "InputPrompt", "MediaType", "MediaDescription", "Outcome", "FailureReason", "ReviewTimestamp", "ReviewerModel",});
         com.memes.model.transport.MediaTypeOuterClass.getDescriptor();
     }
 

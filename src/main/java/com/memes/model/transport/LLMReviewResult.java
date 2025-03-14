@@ -1126,8 +1126,7 @@ public final class LLMReviewResult
          */
         @java.lang.Override
         public com.memes.model.transport.ReviewOutcome getOutcome() {
-            com.memes.model.transport.ReviewOutcome result = com.memes.model.transport.ReviewOutcome
-                .forNumber(outcome_);
+            com.memes.model.transport.ReviewOutcome result = com.memes.model.transport.ReviewOutcome.forNumber(outcome_);
             return result == null ? com.memes.model.transport.ReviewOutcome.UNRECOGNIZED : result;
         }
 
