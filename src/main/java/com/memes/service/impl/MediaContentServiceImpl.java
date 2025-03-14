@@ -41,7 +41,7 @@ public class MediaContentServiceImpl extends ServiceImpl<MediaMapper, MediaConte
     @Override
     @Transactional
     public boolean markMediaStatus(Integer id, MediaContent.ContentStatus status) {
-        int updateById = mediaMapper.updateById(MediaContent.builder().status(status).build());
+        int updateById = mediaMapper.updateById(MediaContent.builder().id(id).status(status).build());
         // if approved, insert into submission table
         if (updateById > 0 && status == MediaContent.ContentStatus.APPROVED) {
             int insert = submissionMapper.insert(Submission.builder().mediaContentIdList(List.of(id)).build());

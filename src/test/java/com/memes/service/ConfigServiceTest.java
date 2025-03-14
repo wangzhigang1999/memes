@@ -1,4 +1,4 @@
-package com.memes.service.impl;
+package com.memes.service;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,10 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.memes.mapper.ConfigMapper;
 import com.memes.model.pojo.Config;
-import com.memes.service.ConfigService;
 
 @SpringBootTest
-class ConfigServiceImplTest {
+class ConfigServiceTest {
 
     @Autowired
     ConfigService configService;

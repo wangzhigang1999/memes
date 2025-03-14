@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.memes.annotation.AuthRequired;
 import com.memes.model.response.VisitStatistic;
-import com.memes.service.impl.AdminService;
+import com.memes.service.AdminService;
 import com.memes.util.TimeUtil;
 
 import io.swagger.v3.oas.annotations.Operation;

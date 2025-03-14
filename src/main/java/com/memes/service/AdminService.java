@@ -1,4 +1,4 @@
-package com.memes.service.impl;
+package com.memes.service;
 
 import java.util.List;
 import java.util.Map;

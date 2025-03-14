@@ -1,5 +1,10 @@
 package com.memes.service.impl;
 
+import static com.google.common.collect.Sets.union;
+
+import java.util.Collections;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -22,7 +27,11 @@ public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submiss
         if (firstSub != null && secondSub != null) {
             firstSub.getMediaContentIdList().addAll(secondSub.getMediaContentIdList());
             firstSub.getMediaContentIdList().sort(Integer::compareTo);
-            firstSub.getTags().addAll(secondSub.getTags());
+
+            Set<String> firstTags = firstSub.getTags() != null ? firstSub.getTags() : Collections.emptySet();
+            Set<String> secondTags = secondSub.getTags() != null ? secondSub.getTags() : Collections.emptySet();
+            Set<String> mergedTags = union(firstTags, secondTags);
+            firstSub.setTags(mergedTags);
             submissionMapper.updateById(firstSub);
             submissionMapper.deleteById(second);
             return firstSub;

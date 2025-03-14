@@ -4,15 +4,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
+@TableName(autoResultMap = true)
 public class MediaContent {
     private Integer id;
 
@@ -30,10 +37,12 @@ public class MediaContent {
 
     private String rejectionReason;
 
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> tags;
 
     private Long fileSize;
 
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> metadata;
 
     private ContentStatus status;
