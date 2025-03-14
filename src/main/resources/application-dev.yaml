@@ -14,7 +14,19 @@ management:
 logging:
   level:
     root: info
+
 spring:
   datasource:
-    driver-class-name: org.apache.ibatis.datasource.unpooled.UnpooledDataSource.DriverProxy
-
+    url: ${jdbcUrl}
+    username: ${jdbcUser}
+    password: ${jdbcPassword}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: ${redisHost}
+      username: ${redisUser}
+      password: ${redisPassword}
+      database: 1
+  threads:
+    virtual:
+      enabled: true
