@@ -1,5 +1,6 @@
 package com.memes.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,7 +17,9 @@ import com.memes.model.response.VisitStatistic;
 import com.memes.util.TimeUtil;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class AdminService {
@@ -24,18 +27,21 @@ public class AdminService {
     private final SubmissionMapper submissionMapper;
     private final MediaMapper mediaMapper;
 
-    private static final long MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
+    private final static String TIME_COLUMN = "created_at";
 
+    /**
+     * 获取访问统计信息
+     *
+     * @param date
+     *            日期 YYYY-MM-DD
+     * @return 访问统计信息
+     */
     public VisitStatistic getVisitStatistic(String date) {
-
-        long startTime = TimeUtil.convertYMDToUnixEpochMilli(date);
-        long endTime = startTime + 24 * 60 * 60 * 1000;
-
-        List<RequestLog> requestLogs = requestLogMapper
-            .selectList(
-                new QueryWrapper<RequestLog>()
-                    .ge("timestamp", startTime)
-                    .lt("timestamp", endTime));
+        log.info("get visit statistic for date {}", date);
+        LocalDateTime startTime = TimeUtil.convertYMDToLocalDateTime(date);
+        QueryWrapper<RequestLog> wrapper = new QueryWrapper<>();
+        wrapper.between(TIME_COLUMN, startTime, startTime.plusDays(1));
+        List<RequestLog> requestLogs = requestLogMapper.selectList(wrapper);
 
         VisitStatistic visitStatistic = new VisitStatistic();
         visitStatistic.setRequestNumber(requestLogs.size());
@@ -48,12 +54,12 @@ public class AdminService {
             .stream()
             .filter(log -> log.getUuid() != null)
             .collect(Collectors.groupingBy(RequestLog::getUuid));
-        List<VisitStatistic.UUIDStat> uuidStats = uuidGroups
+        List<VisitStatistic.UidStat> uidStats = uuidGroups
             .entrySet()
             .stream()
             .map(entry -> {
                 LogStats stats = calculateStats(entry.getValue());
-                VisitStatistic.UUIDStat stat = new VisitStatistic.UUIDStat();
+                VisitStatistic.UidStat stat = new VisitStatistic.UidStat();
                 stat.setUuid(entry.getKey());
                 stat.setFirstTime(stats.firstTimestamp());
                 stat.setLastTime(stats.lastTimestamp());
@@ -64,7 +70,7 @@ public class AdminService {
                 return stat;
             })
             .collect(Collectors.toList());
-        visitStatistic.setUUIDStat(uuidStats);
+        visitStatistic.setUidStats(uidStats);
 
         // URL 统计信息
         Map<String, List<RequestLog>> urlGroups = requestLogs
@@ -93,6 +99,9 @@ public class AdminService {
         return visitStatistic;
     }
 
+    private record LogStats(long firstTimestamp, long lastTimestamp, double avgTimeCost, int minTimeCost, int maxTimeCost, int count) {
+    }
+
     private static LogStats calculateStats(List<RequestLog> logs) {
         long firstTimestamp = logs.stream().mapToLong(RequestLog::getTimestamp).min().orElse(0);
         long lastTimestamp = logs.stream().mapToLong(RequestLog::getTimestamp).max().orElse(0);
@@ -100,15 +109,20 @@ public class AdminService {
         return new LogStats(firstTimestamp, lastTimestamp, summary.getAverage(), summary.getMin(), summary.getMax(), logs.size());
     }
 
+    /**
+     * 获取审核统计信息,只统计当前的
+     *
+     * @return 审核统计信息
+     */
     public Map<String, Long> getReviewStatistic() {
-        long startTime = TimeUtil.getTodayStartUnixEpochMilli();
-        long endTime = startTime + MILLIS_PER_DAY;
+        LocalDateTime startTime = TimeUtil.convertYMDToLocalDateTime(TimeUtil.getYMD());
+        LocalDateTime endTime = startTime.plusDays(1); // 直接加一天，不需要手动计算毫秒
 
         List<MediaContent> mediaContents = mediaMapper
             .selectList(
                 new QueryWrapper<MediaContent>()
-                    .ge("created_at", startTime)
-                    .lt("created_at", endTime)
+                    .ge(TIME_COLUMN, startTime)
+                    .lt(TIME_COLUMN, endTime)
                     .select("status"));
 
         return mediaContents
@@ -117,6 +131,4 @@ public class AdminService {
 
     }
 
-    private record LogStats(long firstTimestamp, long lastTimestamp, double avgTimeCost, int minTimeCost, int maxTimeCost, int count) {
-    }
 }

@@ -8,12 +8,12 @@ import lombok.Data;
 public class VisitStatistic {
 
     private Integer requestNumber;
-    private List<UUIDStat> UUIDStat;
+    private List<UidStat> uidStats;
     private Double averageLatency;
     private List<UrlStat> urlStat;
 
     @Data
-    public static class UUIDStat {
+    public static class UidStat {
         private String uuid;
         private Long firstTime;
         private Long lastTime;
