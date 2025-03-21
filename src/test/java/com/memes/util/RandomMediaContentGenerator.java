@@ -33,7 +33,7 @@ public class RandomMediaContentGenerator {
     private static MediaContent generateRandomMediaContent() {
         return MediaContent
             .builder()
-            .id(random.nextInt())
+            .id(random.nextLong())
             .dataType(DataType.values()[random.nextInt(DataType.values().length)])
             .dataContent(dataContents[random.nextInt(dataContents.length)])
             .userId(userIds[random.nextInt(userIds.length)])
