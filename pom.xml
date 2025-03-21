@@ -6,90 +6,106 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
+        <version>3.2.5</version>
         <relativePath/>
     </parent>
+
     <groupId>com.memes</groupId>
     <artifactId>memes</artifactId>
     <version>2.0</version>
     <name>memes</name>
     <description>memes for byr</description>
+
     <properties>
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <protoc.version>3.25.1</protoc.version>
-        <io.grpc.version>1.62.2</io.grpc.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- 依赖版本 -->
+        <protoc.version>3.25.3</protoc.version>
+        <io.grpc.version>1.63.1</io.grpc.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-        <os-maven-plugin.version>1.6.1</os-maven-plugin.version>
-        <annotation-api.version>1.3.2</annotation-api.version>
-        <spotless.version>2.44.3</spotless.version>
-
+        <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
+        <lombok.version>1.18.32</lombok.version>
+        <commons-io.version>2.15.1</commons-io.version>
+        <aspectj.version>1.9.21</aspectj.version>
+        <mysql.version>8.0.33</mysql.version>
+        <spotless.version>2.44.0</spotless.version>
+        <mybatis-plus.version>3.5.10.1</mybatis-plus.version>
+        <gson.version>2.10.1</gson.version>
+        <guava.version>33.1.0-jre</guava.version>
+        <dashscope.version>2.18.2</dashscope.version>
+        <qiniu.version>7.15.0</qiniu.version>
     </properties>
+
     <dependencies>
-
-
+        <!-- Spring Boot 依赖 -->
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.1.0-jre</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.32</version>
-        </dependency>
-
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- 数据库相关依赖 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+
+        <!-- 工具类依赖 -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.14.0</version>
+            <version>${commons-io.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.19</version>
+            <version>${aspectj.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <version>${gson.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.qiniu</groupId>
-            <artifactId>qiniu-java-sdk</artifactId>
-            <version>7.12.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
+        <!-- 监控相关依赖 -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
@@ -99,15 +115,11 @@
             <artifactId>micrometer-registry-influx</artifactId>
         </dependency>
 
+        <!-- 七牛云存储 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>dashscope-sdk-java</artifactId>
-            <version>2.18.2</version>
+            <groupId>com.qiniu</groupId>
+            <artifactId>qiniu-java-sdk</artifactId>
+            <version>${qiniu.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -116,16 +128,20 @@
             </exclusions>
         </dependency>
 
+        <!-- 阿里达摩院 AI SDK -->
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-            <version>3.5.10.1</version>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dashscope-sdk-java</artifactId>
+            <version>${dashscope.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-jsqlparser</artifactId>
-            <version>3.5.10.1</version>
-        </dependency>
+
+        <!-- gRPC 和 Protobuf 相关依赖 -->
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
@@ -143,27 +159,27 @@
             <version>${protoc.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+        <!-- 代码格式化工具 -->
         <dependency>
             <groupId>com.diffplug.spotless</groupId>
             <artifactId>spotless-maven-plugin</artifactId>
-            <version>2.44.0.BETA1</version>
+            <version>${spotless.version}</version>
         </dependency>
-        <!-- SpringDoc OpenAPI (Swagger) -->
+
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.1.0</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.1.214</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-common</artifactId>
-            <version>2.1.0</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.1.214</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
+
     <build>
         <extensions>
             <extension>
@@ -173,15 +189,28 @@
             </extension>
         </extensions>
         <plugins>
+            <!-- Spring Boot Maven 插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Spotless 代码格式化插件 -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless.version}</version>
                 <configuration>
                     <formats>
-                        <!-- 你可以配置对特定文件的格式化 -->
                         <format>
-                            <!-- 对所有文件进行简单的空白符处理 -->
                             <includes>
                                 <include>*.md</include>
                                 <include>.gitignore</include>
@@ -194,15 +223,10 @@
                             </indent>
                         </format>
                     </formats>
-                    <!-- Java 源代码的格式化配置 -->
                     <java>
-                        <!-- 清除多余的 imports -->
                         <removeUnusedImports/>
-                        <!-- 确保文件以新行结束 -->
                         <endWithNewline/>
-                        <!-- 源文件编码 -->
                         <encoding>UTF-8</encoding>
-                        <!-- 自定义导入顺序 -->
                         <importOrder>
                             <order>java,javax,org,com,</order>
                         </importOrder>
@@ -220,6 +244,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Protobuf 编译插件 -->
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
@@ -244,6 +270,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Java 编译器插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -255,5 +283,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
