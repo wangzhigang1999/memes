@@ -1,5 +1,6 @@
 package com.memes.service;
 
+import java.io.InputStream;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -9,9 +10,13 @@ public interface MediaContentService extends IService<MediaContent> {
 
     List<MediaContent> listPendingMediaContent(Integer limit);
 
-    boolean markMediaStatus(Integer id, MediaContent.ContentStatus status);
+    boolean markMediaStatus(Long id, MediaContent.ContentStatus status);
 
-    int batchMarkMediaStatus(List<Integer> ids, MediaContent.ContentStatus status);
+    int batchMarkMediaStatus(List<Long> ids, MediaContent.ContentStatus status);
 
     long getNumByStatusAndDate(MediaContent.ContentStatus status, String date);
+
+    MediaContent storeTextFormatSubmission(String text, String mime);
+
+    MediaContent storeStreamSubmission(InputStream inputStream, String mime);
 }
