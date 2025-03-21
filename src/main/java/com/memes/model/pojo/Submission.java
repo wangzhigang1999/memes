@@ -1,9 +1,12 @@
 package com.memes.model.pojo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 
@@ -20,14 +23,22 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @TableName(autoResultMap = true)
 public class Submission {
-    private Integer id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Integer> mediaContentIdList;
+    private List<Long> mediaContentIdList;
 
     private Integer likesCount;
 
     private Integer dislikesCount;
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Set<String> tags;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    @TableField(exist = false)
+    private List<MediaContent> mediaContentList;
 }

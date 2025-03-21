@@ -2,7 +2,9 @@ package com.memes.model.pojo;
 
 import java.util.Map;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 
@@ -13,7 +15,8 @@ import lombok.Data;
 @TableName(value = "config", autoResultMap = true)
 @Builder
 public class Config {
-    private Integer id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
     private String configKey;
     private String value;
     private String description;
