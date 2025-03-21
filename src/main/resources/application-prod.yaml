@@ -1,9 +1,4 @@
 spring:
-  data:
-    redis:
-      host: ${redisHost}
-      username: ${redisUser}
-      password: ${redisPassword}
   threads:
     virtual:
       enabled: true

@@ -20,17 +20,10 @@ dashscope:
   apiKey: ${dashscopeApiKey}
 server:
   port: 8080
-springdoc:
-  api-docs:
-    path: /api-docs
-    enabled: true
-  swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
-    operationsSorter: method
-    tagsSorter: alpha
-    tryItOutEnabled: true
-    filter: true
-  show-actuator: true
-  packages-to-scan: com.memes.controller
-  paths-to-match: /api/**
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
