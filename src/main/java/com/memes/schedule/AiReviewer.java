@@ -3,11 +3,11 @@ package com.memes.schedule;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -17,27 +17,24 @@ import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationR
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationUsage;
 import com.alibaba.dashscope.common.MultiModalMessage;
 import com.alibaba.dashscope.common.Role;
-import com.google.gson.Gson;
 import com.google.protobuf.util.JsonFormat;
 import com.memes.model.pojo.MediaContent;
 import com.memes.model.transport.LLMReviewResult;
-import com.memes.model.transport.MediaType;
 import com.memes.model.transport.ReviewOutcome;
 import com.memes.service.MediaContentService;
-import com.memes.service.MessageQueueService;
+import com.memes.util.GsonUtil;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
+@ConditionalOnProperty(value = "spring.profiles.active", havingValue = "dev")
 public class AiReviewer {
 
     final MeterRegistry registry;
 
     private static final String MODEL = "qwen-vl-max-latest";
-    private static final String MEMES_QUEUE = "memes";
     private static final String SYSTEM = Role.SYSTEM.getValue();
     private static final String USER = Role.USER.getValue();
     private static final String TYPE_TEXT = "text";
@@ -56,14 +53,14 @@ public class AiReviewer {
         ## 审核标准
 
         1. 图片必须具有趣味性、宠物元素、哲理性或令人舒适的观看体验：
-            *   趣味性：画面构图新颖，色彩搭配和谐，让人感到愉悦和放松的图片。
-            *   宠物元素：画面中包含猫、狗等常见宠物，并且宠物行为符合常理，不会引起不适。
-            *   哲理性：图片能够引发思考，例如通过对比、隐喻等方式表达深刻的道理。
-            *   令人舒适的观看体验：画面色彩柔和、构图和谐，让人感到放松和舒适。
-            *   搞怪、搞笑：画面内容幽默风趣，能够让人发笑，但不得包含低俗或恶意内容。
+        * 趣味性：画面构图新颖，色彩搭配和谐，让人感到愉悦和放松的图片。
+        * 宠物元素：画面中包含猫、狗等常见宠物，并且宠物行为符合常理，不会引起不适。
+        * 哲理性：图片能够引发思考，例如通过对比、隐喻等方式表达深刻的道理。
+        * 令人舒适的观看体验：画面色彩柔和、构图和谐，让人感到放松和舒适。
+        * 搞怪、搞笑：画面内容幽默风趣，能够让人发笑，但不得包含低俗或恶意内容。
         2. 图片不能包含任何潜在的政治人物，不能具有歧视性的内容：
-            *   潜在的政治人物：指中华人民共和国现任及已卸任的国家领导人，以及其他可能引发政治敏感话题的人物。
-            *   歧视性内容：包括但不限于种族歧视、性别歧视、地域歧视、宗教歧视等。
+        * 潜在的政治人物：指中华人民共和国现任及已卸任的国家领导人，以及其他可能引发政治敏感话题的人物。
+        * 歧视性内容：包括但不限于种族歧视、性别歧视、地域歧视、宗教歧视等。
         3. 图片可以包含中国的传统节日。
         4. 图片可以具备一些知识性的内容： 涵盖科学知识、历史知识、艺术知识等。
         5. 图片可以是搞怪的、搞笑的。
@@ -74,74 +71,89 @@ public class AiReviewer {
         3. **合规性标识**：对于成功的审核案例，“failureReason”字段应为空；反之则需详述不达标的具体原因。
         4. **无编辑权限**：你不能对图片进行任何修改或编辑操作，职责限于根据图片原貌进行评估与描述。
         5. **不需要强制审核**：如果你无法判断，outcome的输出应该是 FLAGGED。 无法判断的情况包括：
-            * 信息不足，无法确定是否符合标准的情况。
-            * 图片内容存在争议，难以做出明确判断的情况。
-            * 需要结合特定背景知识才能判断的情况。
+        * 信息不足，无法确定是否符合标准的情况。
+        * 图片内容存在争议，难以做出明确判断的情况。
+        * 需要结合特定背景知识才能判断的情况。
         6. **输出格式**： 你的输出必须是json格式，只能包含下面的内容 ：{
-                                                                    "mediaDescription": "一只金毛在草地上奔跑，阳光明媚，画面色彩鲜艳，给人一种活力四射的感觉。",
-                                                                    "outcome": "APPROVED, REJECTED, FLAGGED"
-                                                                    "failureReason": ""
-                                                                  }
+        "mediaDescription": "一只金毛在草地上奔跑，阳光明媚，画面色彩鲜艳，给人一种活力四射的感觉。",
+        "outcome": "APPROVED, REJECTED, FLAGGED"
+        "failureReason": ""
+        }
         """;
 
     @Value("${dashscope.apiKey}")
     private String apiKey;
 
-    private final MessageQueueService mqService;
     private final MediaContentService mediaContentService;
-    private final Gson gson = new Gson();
     private final MultiModalConversation conv = new MultiModalConversation();
-    private final RedisTemplate<String, String> redisTemplate;
 
-    public AiReviewer(MeterRegistry registry, MessageQueueService mqService, MediaContentService mediaContentService,
-        RedisTemplate<String, String> redisTemplate) {
+    public AiReviewer(MeterRegistry registry, MediaContentService mediaContentService) {
         this.registry = registry;
-        this.mqService = mqService;
         this.mediaContentService = mediaContentService;
-        this.redisTemplate = redisTemplate;
     }
 
-    private MultiModalMessage createSystemMessage() {
-        return MultiModalMessage
-            .builder()
-            .role(SYSTEM)
-            .content(List.of(Collections.singletonMap(TYPE_TEXT, SYS_PROMPT)))
-            .build();
+    @Scheduled(fixedDelay = 1000)
+    public void run() {
+        List<MediaContent> mediaContents = mediaContentService.listPendingMediaContent(100);
+        mediaContents
+            .stream()
+            .filter(Objects::nonNull)
+            .filter(mediaContent -> mediaContent.getDataType() == MediaContent.DataType.IMAGE)
+            .forEach(this::processMediaContentReview);
     }
 
-    private MultiModalMessage createUserMessage(String url) {
-        return MultiModalMessage
-            .builder()
-            .role(USER)
-            .content(
-                Arrays
-                    .asList(
-                        Collections.singletonMap(TYPE_IMAGE, url),
-                        Collections.singletonMap(TYPE_TEXT, REVIEW_PROMPT)))
-            .build();
-    }
-
+    /**
+     * 调用 LLM API
+     *
+     * @param url
+     *            图片链接
+     * @return LLMReviewResult
+     */
     public LLMReviewResult callWithRemoteImage(String url) {
-        MultiModalConversationParam param = MultiModalConversationParam
-            .builder()
-            .apiKey(apiKey)
-            .model(MODEL)
-            .messages(Arrays.asList(createSystemMessage(), createUserMessage(url)))
-            .build();
-
-        log.debug("Calling LLM API with URL: {}", url);
         try {
+            log.debug("Calling LLM API with URL: {}", url);
+
+            // 直接内联创建消息，移除单独的方法
+            List<MultiModalMessage> messages = Arrays
+                .asList(
+                    // 系统消息
+                    MultiModalMessage
+                        .builder()
+                        .role(SYSTEM)
+                        .content(List.of(Collections.singletonMap(TYPE_TEXT, SYS_PROMPT)))
+                        .build(),
+                    // 用户消息
+                    MultiModalMessage
+                        .builder()
+                        .role(USER)
+                        .content(
+                            Arrays
+                                .asList(
+                                    Collections.singletonMap(TYPE_IMAGE, url),
+                                    Collections.singletonMap(TYPE_TEXT, REVIEW_PROMPT)))
+                        .build());
+
+            // 创建参数
+            MultiModalConversationParam param = MultiModalConversationParam
+                .builder()
+                .apiKey(apiKey)
+                .model(MODEL)
+                .messages(messages)
+                .build();
+
+            // 调用API
             MultiModalConversationResult result = conv.call(param);
+
+            // 处理使用量统计
             MultiModalConversationUsage usage = result.getUsage();
-            log.info("LLM API Usage: {}", gson.toJson(usage)); // Use JSON for readability
+            log.info("LLM API Usage: {}", GsonUtil.toJson(usage));
             registry.counter("total_token", "model", MODEL).increment(usage.getTotalTokens());
             registry.counter("input_token", "model", MODEL).increment(usage.getInputTokens());
             registry.counter("image_token", "model", MODEL).increment(usage.getImageTokens());
             registry.counter("output_token", "model", MODEL).increment(usage.getOutputTokens());
-            mqService.sendMessage("usage", usage);
             log.info("Sent LLM Usage Data to message queue.");
 
-            // Extract model output
+            // 提取并解析模型输出
             String modelOut = result
                 .getOutput()
                 .getChoices()
@@ -151,20 +163,21 @@ public class AiReviewer {
                 .getFirst()
                 .get(TYPE_TEXT)
                 .toString();
-            String str;
-            if (modelOut.startsWith("```json") && modelOut.endsWith("```")) {
-                str = modelOut.substring(7, modelOut.length() - 3).trim();
-            } else {
-                str = modelOut.trim();
-            }
-            log.debug("Raw LLM Output: {}", str); // Debug level: Raw output is good for troubleshooting
+
+            String jsonStr = modelOut.startsWith("```json") && modelOut.endsWith("```")
+                ? modelOut.substring(7, modelOut.length() - 3).trim()
+                : modelOut.trim();
+
+            log.debug("Raw LLM Output: {}", jsonStr);
+
+            // 解析结果
             LLMReviewResult.Builder builder = LLMReviewResult.newBuilder();
-            JsonFormat.parser().merge(str, builder);
+            JsonFormat.parser().merge(jsonStr, builder);
             log.debug("LLM Review Result Builder: {}", builder.toString());
             return builder.build();
 
         } catch (Exception e) {
-            log.error("Error calling LLM API.  URL: {}", url, e); // Include URL and the exception
+            log.error("Error calling LLM API. URL: {}", url, e);
             registry.counter("llm_api_error", "model", MODEL).increment();
             return LLMReviewResult
                 .newBuilder()
@@ -176,65 +189,43 @@ public class AiReviewer {
         }
     }
 
-    @Scheduled(fixedRate = 1000)
-    public void run() {
-        mqService.receiveMessage(MEMES_QUEUE, MediaContent.class).ifPresent(this::onReviewed);
-    }
+    /**
+     * 处理媒体内容审核
+     */
+    private void processMediaContentReview(MediaContent mediaContent) {
+        // 添加媒体内容ID到MDC用于日志追踪
+        String mediaContentIdKey = "mediaContentId";
+        MDC.put(mediaContentIdKey, String.valueOf(mediaContent.getId()));
+        log.info("开始处理媒体内容: {}", mediaContent.getId());
 
-    private void onReviewed(MediaContent mediaContent) {
-        // Add mediaContent ID to MDC for all logs in this method
-        MDC.put("mediaContentId", String.valueOf(mediaContent.getId()));
-        log.info("Processing mediaContent: {}", mediaContent.getId());
-
-        try {
-            if (mediaContent.getDataType() == MediaContent.DataType.IMAGE) {
-                LLMReviewResult reviewResult = reviewImageSubmission(mediaContent);
-                mediaContent.setLlmDescription(reviewResult.getMediaDescription());
-                redisTemplate.opsForHash().put("mediaContent", mediaContent.getId(), gson.toJson(mediaContent));
-                redisTemplate.opsForHash().put("review_result", mediaContent.getId(), gson.toJson(reviewResult));
-                afterReviewed(mediaContent.getId(), reviewResult.getOutcome());
-            } else {
-                log.warn("Unsupported mediaContent type: {}.  Skipping review.", mediaContent.getDataType());
-            }
-        } catch (Exception e) {
-            log.error("Error processing mediaContent: {}", mediaContent.getId(), e); // Include the exception!
-        } finally {
-            MDC.remove("submissionId"); // Clean up MDC
+        if (mediaContent.getDataType() != MediaContent.DataType.IMAGE) {
+            log.warn("不支持的媒体类型: {}，跳过审核", mediaContent.getDataType());
+            return;
         }
-    }
 
-    private LLMReviewResult reviewImageSubmission(MediaContent mediaContent) {
-        log.info("Reviewing image mediaContent: {}", mediaContent.getId());
+        // 执行图片审核
+        log.info("正在审核图片内容: {}", mediaContent.getId());
         LLMReviewResult result = callWithRemoteImage(mediaContent.getDataContent());
+        // 记录指标
         registry.counter("llm_review_count", "outcome", result.getOutcome().name()).increment();
-        log.info("LLM review outcome: {} for mediaContent: {}", result.getOutcome().name(), mediaContent.getId());
-        return result
-            .toBuilder()
-            .setMediaId(mediaContent.getId())
-            .setInputPrompt(REVIEW_PROMPT)
-            .setMediaType(MediaType.valueOf(mediaContent.getDataType().name()))
-            .setReviewerModel(MODEL)
-            .setReviewTimestamp(System.currentTimeMillis())
-            .build();
-    }
+        log.info("AI审核结果: {} - 媒体ID: {}", result.getOutcome().name(), mediaContent.getId());
 
-    private void afterReviewed(Integer mediaId, ReviewOutcome outcome) {
-        switch (outcome) {
-            case APPROVED:
-                log.info("Submission {} passed review.  Approving.", mediaId);
-                boolean marked = mediaContentService.markMediaStatus(mediaId, MediaContent.ContentStatus.APPROVED);
-                if (marked) {
-                    log.info("Submission {} approved.", mediaId);
-                } else {
-                    log.error("Failed to approve submission {}", mediaId);
-                }
-                break;
-            case FLAGGED:
-            case REJECTED:
-                log.info("Submission {} is undecided or failed, will be reviewed manually", mediaId);
-                break;
-            default:
-                log.error("Submission {} has an unknown outcome, will be reviewed manually", mediaId);
+        // 更新媒体内容
+        mediaContent.setLlmDescription(result.getMediaDescription());
+        mediaContent.setRejectionReason(result.getFailureReason());
+        mediaContent.setLlmModerationStatus(MediaContent.AiModerationStatus.valueOf(result.getOutcome().name()));
+        mediaContentService.updateById(mediaContent);
+
+        // 处理审核结果
+        ReviewOutcome outcome = result.getOutcome();
+        if (outcome == ReviewOutcome.APPROVED) {
+            log.info("媒体内容 {} 通过审核，正在进行批准", mediaContent.getId());
+            boolean updateSuccess = mediaContentService.markMediaStatus(mediaContent.getId(), MediaContent.ContentStatus.APPROVED);
+            log.info(updateSuccess ? "媒体内容 {} 已成功批准" : "媒体内容 {} 批准失败", mediaContent.getId());
+        } else if (outcome == ReviewOutcome.FLAGGED || outcome == ReviewOutcome.REJECTED) {
+            log.info("媒体内容 {} 被标记或拒绝，将进行人工审核", mediaContent.getId());
+        } else {
+            log.error("媒体内容 {} 出现未知审核结果，将进行人工审核", mediaContent.getId());
         }
     }
 }
