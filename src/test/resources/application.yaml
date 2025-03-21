@@ -1,9 +1,6 @@
 spring:
-  application:
-    name: memes
   profiles:
-    active: ${env:dev}
-
+    active: test
   servlet:
     multipart:
       max-file-size: 10MB
@@ -15,8 +12,37 @@ spring:
     static-path-pattern: /static/**
   main:
     lazy-initialization: true
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: root
+    password: test
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+#      data-locations: classpath:data.sql
+  application:
+    name: memes
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 dashscope:
-  apiKey: ${dashscopeApiKey}
+  apiKey: ${dashscopeApiKey:hello}
+
 server:
   port: 8080
+
+storage:
+  type: local
+
+local:
+  urlPrefix: localhost:8080
+
+token: hello
+
+
+logging:
+  level:
+    root: info
