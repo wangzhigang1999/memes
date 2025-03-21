@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(value = "spring.profiles.active", havingValue = "dev")
+@ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
 public class AiReviewer {
 
     final MeterRegistry registry;
