@@ -1,6 +1,7 @@
 package com.memes.util;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class TimeUtil {
 
@@ -40,5 +41,10 @@ public class TimeUtil {
     public static long convertYMDToUnixEpochMilli(String ymd) {
         var localDate = java.time.LocalDate.parse(ymd);
         return localDate.atStartOfDay(java.time.ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli();
+    }
+
+    public static LocalDateTime convertYMDToLocalDateTime(String date) {
+        long epochMilli = convertYMDToUnixEpochMilli(date);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMilli), java.time.ZoneId.of("Asia/Shanghai"));
     }
 }

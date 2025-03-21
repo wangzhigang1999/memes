@@ -30,4 +30,16 @@ public class GsonUtil {
             return null;
         }
     }
+
+    /**
+     * 将 JSON 字符串转换为对象
+     */
+    public static <T> T fromJson(String message, Class<T> clazz) {
+        try {
+            return gson.fromJson(message, clazz);
+        } catch (Exception e) {
+            log.error("Failed to deserialize message: {}", message, e);
+            return null;
+        }
+    }
 }
