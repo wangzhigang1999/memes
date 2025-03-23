@@ -71,7 +71,7 @@ public class RequestInterceptor implements HandlerInterceptor {
     }
 
     private void checkServerStatus() {
-        if (config.serverDown) {
+        if (config.isServerDown()) {
             log.warn("Server is down manually, rejecting request...");
             throw AppException.serverDown();
         }
@@ -82,7 +82,7 @@ public class RequestInterceptor implements HandlerInterceptor {
     }
 
     private void checkBlacklistedUser(String uuid) {
-        if (config.uidBlacklist.contains(uuid)) {
+        if (config.getUidBlacklist().contains(uuid)) {
             log.warn("Blacklisted user: {}", uuid);
             throw AppException.forbidden();
         }
