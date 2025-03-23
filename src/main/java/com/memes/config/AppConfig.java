@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import com.memes.annotation.DynamicConfig;
 import com.memes.exception.AppException;
 import com.memes.model.pojo.Config;
-import com.memes.model.pojo.Submission;
 import com.memes.service.ConfigService;
 import com.memes.util.GsonUtil;
 import com.memes.util.Preconditions;
@@ -43,7 +42,7 @@ public class AppConfig {
     @DynamicConfig(key = "server.down", desc = "服务器是否停止服务", defaultValue = "false", type = Config.Type.BOOLEAN)
     private boolean serverDown = false;
 
-    private Set<Submission> topSubmissions = new CopyOnWriteArraySet<>();
+    private Set<String> topSubmissions = new CopyOnWriteArraySet<>();
     private Set<String> uidBlacklist = new CopyOnWriteArraySet<>();
 
     public AppConfig(ConfigService configService) {
@@ -63,7 +62,7 @@ public class AppConfig {
         if (topSubmissions == null || topSubmissions.isEmpty()) {
             return;
         }
-        Submission[] submissions = GsonUtil.fromJson(topSubmissions, Submission[].class);
+        String[] submissions = GsonUtil.fromJson(topSubmissions, String[].class);
         Preconditions.checkNotNull(submissions, () -> new AppException("置顶投稿列表不能为 NULL"));
         this.topSubmissions = new HashSet<>(Arrays.asList(submissions));
     }
