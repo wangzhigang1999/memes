@@ -12,4 +12,11 @@ public interface SubmissionService extends IService<Submission> {
     Submission updateSubmissionCount(Long id, boolean isLike);
 
     List<Submission> list(Integer pageSize, Long lastId, String date);
+
+    boolean pinSubmission(Long id);
+
+    boolean unpinSubmission(Long id);
+
+    List<Submission> listPinnedSubmission();
+
 }

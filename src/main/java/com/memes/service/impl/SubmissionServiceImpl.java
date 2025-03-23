@@ -17,10 +17,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.memes.aspect.Audit;
 import com.memes.exception.AppException;
 import com.memes.mapper.MediaMapper;
+import com.memes.mapper.PinnedSubmissionMapper;
 import com.memes.mapper.SubmissionMapper;
 import com.memes.model.pojo.MediaContent;
+import com.memes.model.pojo.PinnedSubmission;
 import com.memes.model.pojo.Submission;
 import com.memes.service.SubmissionService;
 import com.memes.util.Preconditions;
@@ -32,10 +35,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submission> implements SubmissionService {
     private final SubmissionMapper submissionMapper;
+    private final PinnedSubmissionMapper pinnedSubmissionMapper;
     private final MediaMapper mediaMapper;
 
-    public SubmissionServiceImpl(SubmissionMapper submissionMapper, MediaMapper mediaMapper) {
+    public SubmissionServiceImpl(SubmissionMapper submissionMapper, PinnedSubmissionMapper pinnedSubmissionMapper, MediaMapper mediaMapper) {
         this.submissionMapper = submissionMapper;
+        this.pinnedSubmissionMapper = pinnedSubmissionMapper;
         this.mediaMapper = mediaMapper;
     }
 
@@ -136,6 +141,43 @@ public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submiss
         // 等待所有任务完成
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
+        return submissions;
+    }
+
+    @Override
+    public boolean pinSubmission(Long subId) {
+        PinnedSubmission pinnedSubmission = PinnedSubmission
+            .builder()
+            .submissionId(subId)
+            .createdBy(Audit.getCurrentUuid())
+            .build();
+        if (pinnedSubmissionMapper.selectCount(new LambdaQueryWrapper<PinnedSubmission>().eq(PinnedSubmission::getSubmissionId, subId)) > 0) {
+            throw new AppException("submission already pinned");
+        }
+        return pinnedSubmissionMapper.insert(pinnedSubmission) > 0;
+    }
+
+    @Override
+    public boolean unpinSubmission(Long subId) {
+        return pinnedSubmissionMapper.delete(new LambdaQueryWrapper<PinnedSubmission>().eq(PinnedSubmission::getSubmissionId, subId)) > 0;
+    }
+
+    public List<Submission> listPinnedSubmission() {
+        List<PinnedSubmission> pinnedSubmissions = pinnedSubmissionMapper.selectList(null);
+        List<Long> submissionIds = pinnedSubmissions.stream().map(PinnedSubmission::getSubmissionId).distinct().toList();
+        if (submissionIds.isEmpty()) {
+            return List.of();
+        }
+        LambdaQueryWrapper<Submission> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Submission::getId, submissionIds);
+        List<Submission> submissions = submissionMapper.selectList(queryWrapper);
+        for (Submission submission : submissions) {
+            if (submission.getTags() == null) {
+                submission.setTags(new HashSet<>());
+            }
+            submission.getTags().add("pinned");
+            fillMediaContent(submission);
+        }
         return submissions;
     }
 

@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/submissions")
+@RequestMapping("/api/submission")
 @RequiredArgsConstructor
 public class SubmissionController {
 
@@ -44,5 +44,22 @@ public class SubmissionController {
     @PostMapping("/{id}/feedback/{isLike}")
     public Submission updateSubmissionCount(@PathVariable Long id, @PathVariable boolean isLike) {
         return submissionService.updateSubmissionCount(id, isLike);
+    }
+
+    @AuthRequired
+    @PostMapping("/{id}/pin")
+    public boolean pinSubmission(@PathVariable Long id) {
+        return submissionService.pinSubmission(id);
+    }
+
+    @AuthRequired
+    @DeleteMapping("/{id}/pin")
+    public boolean unpinSubmission(@PathVariable Long id) {
+        return submissionService.unpinSubmission(id);
+    }
+
+    @GetMapping("/pinned")
+    public List<Submission> listPinnedSubmission() {
+        return submissionService.listPinnedSubmission();
     }
 }
