@@ -181,7 +181,7 @@ public class AiReviewer {
             registry.counter("llm_api_error", "model", MODEL).increment();
             return LLMReviewResult
                 .newBuilder()
-                .setOutcome(ReviewOutcome.PENDING)
+                .setOutcome(ReviewOutcome.FLAGGED)
                 .setFailureReason("LLM API call failed")
                 .build();
         } finally {

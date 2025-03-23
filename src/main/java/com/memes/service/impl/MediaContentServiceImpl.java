@@ -40,6 +40,7 @@ public class MediaContentServiceImpl extends ServiceImpl<MediaMapper, MediaConte
     public List<MediaContent> listPendingMediaContent(Integer limit) {
         QueryWrapper<MediaContent> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", MediaContent.ContentStatus.PENDING);
+        queryWrapper.eq("llm_moderation_status", MediaContent.AiModerationStatus.PENDING);
         // order by time asc
         queryWrapper.orderByAsc("created_at");
         // limit
