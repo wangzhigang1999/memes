@@ -65,6 +65,9 @@ public class MediaContentController {
             mediaContent = mediaContentService.storeStreamSubmission(inputStream, mime);
             inputStream.close();
         }
+        if (mediaContent.getDataType() == MediaContent.DataType.MARKDOWN) {
+            mediaContent.setDataContent("Yay !");
+        }
         return mediaContent;
     }
 }
