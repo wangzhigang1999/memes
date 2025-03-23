@@ -23,16 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class AppConfig {
     private final ConfigService configService;
-    @DynamicConfig(key = "bot.up", desc = "机器人是否开启", defaultValue = "true", type = Config.Type.BOOLEAN)
+    @DynamicConfig(key = "bot.up", desc = "机器人是否开启", defaultValue = "true", type = Config.Type.BOOLEAN, visibleName = "爬虫开启")
     private boolean botUp;
 
-    @DynamicConfig(key = "submission.num.min", desc = "每天的最少投稿数", defaultValue = "50")
+    @DynamicConfig(key = "submission.num.min", desc = "每天的最少投稿数", defaultValue = "50", visibleName = "最少投稿数")
     private int minSubmissions = 50;
 
-    @DynamicConfig(key = "submission.fetch.limit", desc = "每次获取的最大投稿数", defaultValue = "20")
+    @DynamicConfig(key = "submission.fetch.limit", desc = "每次获取的最大投稿数", defaultValue = "20", visibleName = "fetch size")
     private int subFetchLimit = 20;
 
-    @DynamicConfig(key = "server.down", desc = "服务器是否停止服务", defaultValue = "false", type = Config.Type.BOOLEAN)
+    @DynamicConfig(key = "server.down", desc = "服务器是否停止服务", defaultValue = "false", type = Config.Type.BOOLEAN, visibleName = "停止服务")
     private boolean serverDown = false;
 
     public AppConfig(ConfigService configService) {
