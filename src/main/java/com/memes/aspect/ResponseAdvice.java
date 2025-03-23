@@ -28,14 +28,7 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
         @NonNull Class selectedConverterType,
         @NonNull ServerHttpRequest request,
         @NonNull ServerHttpResponse response) {
-        // if swagger,skip
-        if (request.getURI().getPath().contains("/swagger") || request.getURI().getPath().contains("/api-docs")) {
-            return o;
-        }
-        if (o == null) {
-            return ResultData.success(null);
-        }
-        if (o instanceof ResultData<?>) {
+        if (o == null || o instanceof ResultData<?>) {
             return o;
         }
         return ResultData.success(o);
