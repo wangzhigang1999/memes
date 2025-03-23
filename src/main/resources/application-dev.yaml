@@ -21,12 +21,7 @@ spring:
     username: ${jdbcUser}
     password: ${jdbcPassword}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  data:
-    redis:
-      host: ${redisHost}
-      username: ${redisUser}
-      password: ${redisPassword}
-      database: 1
+
   threads:
     virtual:
       enabled: true
