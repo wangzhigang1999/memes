@@ -51,10 +51,6 @@ public class RequestInterceptor implements HandlerInterceptor {
 
         // 3. Validate UUID
         validateUuid(uuid);
-
-        // 4. Check blacklisted user
-        checkBlacklistedUser(uuid);
-
         return true;
     }
 
@@ -79,13 +75,6 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     private void validateUuid(String uuid) {
         Preconditions.checkStringNotEmpty(uuid, AppException.invalidParam("uuid"));
-    }
-
-    private void checkBlacklistedUser(String uuid) {
-        if (config.getUidBlacklist().contains(uuid)) {
-            log.warn("Blacklisted user: {}", uuid);
-            throw AppException.forbidden();
-        }
     }
 
     @Override

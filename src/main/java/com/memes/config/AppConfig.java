@@ -2,19 +2,12 @@ package com.memes.config;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.springframework.stereotype.Component;
 
 import com.memes.annotation.DynamicConfig;
-import com.memes.exception.AppException;
 import com.memes.model.pojo.Config;
 import com.memes.service.ConfigService;
-import com.memes.util.GsonUtil;
-import com.memes.util.Preconditions;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
@@ -42,9 +35,6 @@ public class AppConfig {
     @DynamicConfig(key = "server.down", desc = "服务器是否停止服务", defaultValue = "false", type = Config.Type.BOOLEAN)
     private boolean serverDown = false;
 
-    private Set<String> topSubmissions = new CopyOnWriteArraySet<>();
-    private Set<String> uidBlacklist = new CopyOnWriteArraySet<>();
-
     public AppConfig(ConfigService configService) {
         this.configService = configService;
     }
@@ -57,27 +47,6 @@ public class AppConfig {
         log.info("应用配置初始化完成");
     }
 
-    @DynamicConfig(key = "top.submission", desc = "置顶的投稿", defaultValue = "[]", type = Config.Type.JSON, visible = false)
-    public void setTopSubmissions(String topSubmissions) {
-        if (topSubmissions == null || topSubmissions.isEmpty()) {
-            return;
-        }
-        String[] submissions = GsonUtil.fromJson(topSubmissions, String[].class);
-        Preconditions.checkNotNull(submissions, () -> new AppException("置顶投稿列表不能为 NULL"));
-        this.topSubmissions = new HashSet<>(Arrays.asList(submissions));
-    }
-
-    @DynamicConfig(key = "blacklist", desc = "黑名单", defaultValue = "[]", type = Config.Type.JSON, visible = false)
-    public void setUidBlacklist(String uidBlacklist) {
-        if (uidBlacklist == null || uidBlacklist.isEmpty()) {
-            return;
-        }
-        String[] uuids = GsonUtil.fromJson(uidBlacklist, String[].class);
-        Preconditions.checkNotNull(uuids, () -> new AppException("黑名单列表不能为 NULL"));
-        this.uidBlacklist.clear();
-        this.uidBlacklist.addAll(Arrays.asList(uuids));
-    }
-
     private void initFields() {
         Field[] fields = this.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -88,7 +57,6 @@ public class AppConfig {
 
             String key = annotation.key();
             String defaultValue = annotation.defaultValue();
-            Config.Type type = annotation.type();
 
             // 检查配置是否存在
             Config config = configService.getConfig(key);
