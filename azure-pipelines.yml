@@ -8,8 +8,7 @@ trigger:
   branches:
     exclude:
       - dev
-      - master
-
+      -
 resources:
   - repo: self
 pool: "Azure Pipelines"
