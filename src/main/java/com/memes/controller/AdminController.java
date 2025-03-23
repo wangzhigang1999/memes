@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.memes.annotation.AuthRequired;
+import com.memes.config.AppConfig;
 import com.memes.model.response.VisitStatistic;
 import com.memes.service.AdminService;
 import com.memes.util.TimeUtil;
@@ -21,11 +22,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminController {
 
-    AdminService adminService;
+    private final AppConfig appConfig;
+    private final AdminService adminService;
 
     @Autowired
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, AppConfig appConfig) {
         this.adminService = adminService;
+        this.appConfig = appConfig;
     }
 
     @AuthRequired
@@ -47,5 +50,10 @@ public class AdminController {
     @GetMapping("/review/statistic")
     public Map<String, Long> reviewStat() {
         return this.adminService.getReviewStatistic();
+    }
+
+    @GetMapping("bot")
+    public boolean get() {
+        return appConfig.isBotUp();
     }
 }
