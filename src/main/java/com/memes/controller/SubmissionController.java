@@ -19,7 +19,7 @@ public class SubmissionController {
     private final SubmissionService submissionService;
 
     @GetMapping("/{id}")
-    public Submission getById(@PathVariable Integer id) {
+    public Submission getById(@PathVariable Long id) {
         return submissionService.getById(id);
     }
 
@@ -28,6 +28,7 @@ public class SubmissionController {
         return submissionService.list(pageSize, lastId, date);
     }
 
+    @AuthRequired
     @PutMapping("/{id}")
     public Submission update(@PathVariable Long id, @RequestBody Submission submission) {
         submission.setId(id);
@@ -42,7 +43,7 @@ public class SubmissionController {
     }
 
     @PostMapping("/{id}/feedback/{isLike}")
-    public Submission updateSubmissionCount(@PathVariable Long id, @PathVariable boolean isLike) {
+    public Submission updateSubmissionFeedbackCount(@PathVariable Long id, @PathVariable boolean isLike) {
         return submissionService.updateSubmissionCount(id, isLike);
     }
 

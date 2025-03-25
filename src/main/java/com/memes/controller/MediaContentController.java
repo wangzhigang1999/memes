@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.memes.annotation.AuthRequired;
 import com.memes.exception.AppException;
 import com.memes.model.pojo.MediaContent;
 import com.memes.service.MediaContentService;
@@ -25,6 +26,7 @@ public class MediaContentController {
 
     private final MediaContentService mediaContentService;
 
+    @AuthRequired
     @GetMapping("/status/{status}")
     public List<MediaContent> listWithStatus(@PathVariable MediaContent.ContentStatus status, Integer limit, Long lastId) {
         Preconditions.checkArgument(status != null, AppException.invalidParam("status"));
@@ -35,18 +37,20 @@ public class MediaContentController {
         }
         LambdaQueryWrapper<MediaContent> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(MediaContent::getStatus, status);
-        wrapper.orderByDesc(MediaContent::getCreatedAt);
+        wrapper.orderByAsc(MediaContent::getCreatedAt);
         if (lastId != null) {
             wrapper.lt(MediaContent::getId, lastId);
         }
         return mediaContentService.list(new Page<>(0, limit), wrapper);
     }
 
+    @AuthRequired
     @PostMapping("/{id}/status/{status}")
     public boolean markStatus(@PathVariable Long id, @PathVariable MediaContent.ContentStatus status) {
         return mediaContentService.markMediaStatus(id, status);
     }
 
+    @AuthRequired
     @PostMapping("/batch/status/{status}")
     public int batchMarkStatus(@RequestBody Long[] ids, @PathVariable MediaContent.ContentStatus status) {
         return mediaContentService.batchMarkMediaStatus(List.of(ids), status);
