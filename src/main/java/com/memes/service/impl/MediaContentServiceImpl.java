@@ -58,7 +58,6 @@ public class MediaContentServiceImpl extends ServiceImpl<MediaMapper, MediaConte
             int insert = submissionMapper.insert(Submission.builder().mediaContentIdList(List.of(id)).build());
             return insert > 0;
         }
-        log.warn("update media content failed, id: {}, status: {}", id, status);
         return false;
     }
 
