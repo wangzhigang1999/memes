@@ -70,4 +70,13 @@ public class MediaContentController {
         }
         return mediaContent;
     }
+
+    @GetMapping("/{id}")
+    public MediaContent getMedia(@PathVariable Long id) {
+        MediaContent mediaContent = mediaContentService.getById(id);
+        if (mediaContent == null) {
+            throw AppException.resourceNotFound(String.valueOf(id));
+        }
+        return mediaContent;
+    }
 }
