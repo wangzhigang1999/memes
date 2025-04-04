@@ -18,33 +18,33 @@
 
     <properties>
         <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
 
-        <!-- 依赖版本 -->
-        <protoc.version>3.25.3</protoc.version>
-        <io.grpc.version>1.63.1</io.grpc.version>
-        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-        <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
-        <lombok.version>1.18.32</lombok.version>
-        <commons-io.version>2.15.1</commons-io.version>
+        <aliyun-oss.version>3.18.1</aliyun-oss.version>
         <aspectj.version>1.9.21</aspectj.version>
-        <mysql.version>8.0.33</mysql.version>
-        <spotless.version>2.44.0</spotless.version>
-        <mybatis-plus.version>3.5.10.1</mybatis-plus.version>
-        <gson.version>2.10.1</gson.version>
-        <guava.version>33.1.0-jre</guava.version>
-        <dashscope.version>2.18.2</dashscope.version>
+        <commons-io.version>2.15.1</commons-io.version>
+        <dashscope.version>2.19.0</dashscope.version>
+        <gson.version>2.12.1</gson.version>
+        <guava.version>33.4.6-jre</guava.version>
+        <h2.version>2.2.220</h2.version>
+        <io.grpc.version>1.63.1</io.grpc.version>
+        <lombok.version>1.18.36</lombok.version>
+        <mybatis-plus.version>3.5.11</mybatis-plus.version>
+        <mysql.version>9.2.0</mysql.version>
+        <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
+        <protoc.version>3.25.3</protoc.version>
+        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <qiniu.version>7.15.0</qiniu.version>
+        <spotless.version>2.44.3</spotless.version>
     </properties>
 
     <dependencies>
-        <!-- Spring Boot 依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -53,31 +53,50 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- 数据库相关依赖 -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+            <version>${mybatis-plus.version}</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
             <version>${mybatis-plus.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-jsqlparser</artifactId>
-            <version>${mybatis-plus.version}</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- 工具类依赖 -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -86,26 +105,11 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons-io.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
             <version>${aspectj.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
 
-        <!-- 监控相关依赖 -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
@@ -115,14 +119,11 @@
             <artifactId>micrometer-registry-influx</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.aliyun.oss/aliyun-sdk-oss -->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
-            <version>3.17.4</version>
+            <version>${aliyun-oss.version}</version>
         </dependency>
-
-        <!-- 七牛云存储 -->
         <dependency>
             <groupId>com.qiniu</groupId>
             <artifactId>qiniu-java-sdk</artifactId>
@@ -135,7 +136,6 @@
             </exclusions>
         </dependency>
 
-        <!-- 阿里达摩院 AI SDK -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>dashscope-sdk-java</artifactId>
@@ -148,7 +148,6 @@
             </exclusions>
         </dependency>
 
-        <!-- gRPC 和 Protobuf 相关依赖 -->
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
@@ -166,18 +165,10 @@
             <version>${protoc.version}</version>
         </dependency>
 
-        <!-- 代码格式化工具 -->
         <dependency>
             <groupId>com.diffplug.spotless</groupId>
             <artifactId>spotless-maven-plugin</artifactId>
             <version>${spotless.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.2.220</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -190,7 +181,6 @@
             </extension>
         </extensions>
         <plugins>
-            <!-- Spring Boot Maven 插件 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -204,7 +194,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Spotless 代码格式化插件 -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
@@ -246,7 +235,6 @@
                 </executions>
             </plugin>
 
-            <!-- Protobuf 编译插件 -->
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
@@ -272,7 +260,6 @@
                 </executions>
             </plugin>
 
-            <!-- Java 编译器插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

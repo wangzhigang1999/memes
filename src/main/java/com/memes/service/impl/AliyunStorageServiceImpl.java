@@ -62,19 +62,24 @@ public class AliyunStorageServiceImpl implements StorageService {
         log.debug("Endpoint: {}, Region: {}, Bucket: {}", endpoint, region, bucketName);
 
         if (!StringUtils.hasText(endpoint) || !StringUtils.hasText(accessKeyId) || !StringUtils.hasText(accessKeySecret)
-                || !StringUtils.hasText(bucketName) || !StringUtils.hasText(region) || !StringUtils.hasText(baseUrl)) {
-            log.error("Aliyun OSS configuration is incomplete. Please check properties like "
-                    + "storage.aliyun.endpoint, access-key-id, access-key-secret, bucket-name, region, base-url");
+            || !StringUtils.hasText(bucketName) || !StringUtils.hasText(region) || !StringUtils.hasText(baseUrl)) {
+            log
+                .error(
+                    "Aliyun OSS configuration is incomplete. Please check properties like "
+                        + "storage.aliyun.endpoint, access-key-id, access-key-secret, bucket-name, region, base-url");
             return;
         }
 
         ClientBuilderConfiguration clientBuilderConfiguration = new ClientBuilderConfiguration();
         clientBuilderConfiguration.setSignatureVersion(SignVersion.V4);
 
-        this.ossClient = OSSClientBuilder.create().endpoint(endpoint)
-                .credentialsProvider(new DefaultCredentialProvider(accessKeyId, accessKeySecret, ""))
-                .clientConfiguration(clientBuilderConfiguration)
-                .region(region).build();
+        this.ossClient = OSSClientBuilder
+            .create()
+            .endpoint(endpoint)
+            .credentialsProvider(new DefaultCredentialProvider(accessKeyId, accessKeySecret, ""))
+            .clientConfiguration(clientBuilderConfiguration)
+            .region(region)
+            .build();
         log.info("Aliyun OSS Client initialized successfully.");
     }
 
@@ -98,11 +103,13 @@ public class AliyunStorageServiceImpl implements StorageService {
     /**
      * Stores the byte array in OSS.
      *
-     * @param bytes The file content.
-     * @param mime The MIME type of the file.
-     * @param path The desired directory path within the bucket (can be empty).
-     * @return A FileUploadResult record containing the URL, object key (as fileName), and MIME type on success, or null if an error occurred during
-     *         upload.
+     * @param bytes
+     *            The file content.
+     * @param mime
+     *            The MIME type of the file.
+     * @param path
+     *            The desired directory path within the bucket (can be empty).
+     * @return A FileUploadResult record containing the URL, object key (as fileName), and MIME type on success, or null if an error occurred during upload.
      */
     @Override
     public FileUploadResult store(byte[] bytes, String mime, String path) {
@@ -144,8 +151,15 @@ public class AliyunStorageServiceImpl implements StorageService {
             return new FileUploadResult(fileUrl, objectName, mime != null ? mime : "application/octet-stream"); // Provide default if mime was null
 
         } catch (OSSException oe) {
-            log.error("OSS Exception during upload for object '{}'. Error Message: {}, Error Code: {}, Request ID: {}, Host ID: {}", objectName,
-                    oe.getErrorMessage(), oe.getErrorCode(), oe.getRequestId(), oe.getHostId(), oe);
+            log
+                .error(
+                    "OSS Exception during upload for object '{}'. Error Message: {}, Error Code: {}, Request ID: {}, Host ID: {}",
+                    objectName,
+                    oe.getErrorMessage(),
+                    oe.getErrorCode(),
+                    oe.getRequestId(),
+                    oe.getHostId(),
+                    oe);
             return null; // Indicate failure
         } catch (ClientException ce) {
             log.error("OSS Client Exception during upload for object '{}'. Error Message: {}", objectName, ce.getMessage(), ce);
@@ -195,8 +209,14 @@ public class AliyunStorageServiceImpl implements StorageService {
             }
 
         } catch (OSSException oe) {
-            log.error("OSS Exception during delete operation. Error Message: {}, Error Code: {}, Request ID: {}, Host ID: {}", oe.getErrorMessage(),
-                    oe.getErrorCode(), oe.getRequestId(), oe.getHostId(), oe);
+            log
+                .error(
+                    "OSS Exception during delete operation. Error Message: {}, Error Code: {}, Request ID: {}, Host ID: {}",
+                    oe.getErrorMessage(),
+                    oe.getErrorCode(),
+                    oe.getRequestId(),
+                    oe.getHostId(),
+                    oe);
             for (String key : keyList) {
                 results.putIfAbsent(key, false);
             }
@@ -240,10 +260,19 @@ public class AliyunStorageServiceImpl implements StorageService {
     }
 
     private static class MimeTypeUtils {
-        private static final Map<String, String> MIME_EXTENSION_MAP = Map.ofEntries(Map.entry("image/jpeg", ".jpg"), Map.entry("image/png", ".png"),
-                Map.entry("image/gif", ".gif"), Map.entry("image/webp", ".webp"), Map.entry("image/svg+xml", ".svg"), Map.entry("video/mp4", ".mp4"),
-                Map.entry("video/webm", ".webm"), Map.entry("application/pdf", ".pdf"), Map.entry("text/plain", ".txt"),
-                Map.entry("text/html", ".html"), Map.entry("application/json", ".json"));
+        private static final Map<String, String> MIME_EXTENSION_MAP = Map
+            .ofEntries(
+                Map.entry("image/jpeg", ".jpg"),
+                Map.entry("image/png", ".png"),
+                Map.entry("image/gif", ".gif"),
+                Map.entry("image/webp", ".webp"),
+                Map.entry("image/svg+xml", ".svg"),
+                Map.entry("video/mp4", ".mp4"),
+                Map.entry("video/webm", ".webm"),
+                Map.entry("application/pdf", ".pdf"),
+                Map.entry("text/plain", ".txt"),
+                Map.entry("text/html", ".html"),
+                Map.entry("application/json", ".json"));
 
         public static String getExtension(String mimeType) {
             if (!StringUtils.hasText(mimeType)) {
