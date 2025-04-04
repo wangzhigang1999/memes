@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.memes.mapper.MediaMapper;
 import com.memes.mapper.RequestLogMapper;
-import com.memes.mapper.SubmissionMapper;
 import com.memes.model.pojo.MediaContent;
 import com.memes.model.pojo.RequestLog;
 import com.memes.model.response.VisitStatistic;
@@ -24,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AdminService {
     private final RequestLogMapper requestLogMapper;
-    private final SubmissionMapper submissionMapper;
     private final MediaMapper mediaMapper;
 
     private final static String TIME_COLUMN = "created_at";
@@ -117,18 +115,26 @@ public class AdminService {
     public Map<String, Long> getReviewStatistic() {
         LocalDateTime startTime = TimeUtil.convertYMDToLocalDateTime(TimeUtil.getYMD());
         LocalDateTime endTime = startTime.plusDays(1); // 直接加一天，不需要手动计算毫秒
+        log.info("get review statistic from {} to {}", startTime, endTime);
 
-        List<MediaContent> mediaContents = mediaMapper
+        List<MediaContent> llmModerationStatus = mediaMapper
             .selectList(
                 new QueryWrapper<MediaContent>()
                     .ge(TIME_COLUMN, startTime)
                     .lt(TIME_COLUMN, endTime)
-                    .select("status"));
+                    .select("llm_moderation_status"));
 
-        return mediaContents
+        Map<String, Long> stringLongMap = llmModerationStatus
             .stream()
-            .collect(Collectors.groupingBy(content -> content.getStatus().toString(), Collectors.counting()));
+            .filter(content -> content.getLlmModerationStatus() != null)
+            .collect(Collectors.groupingBy(content -> content.getLlmModerationStatus().toString(), Collectors.counting()));
 
+        Long pendingCount = mediaMapper
+            .selectCount(
+                new QueryWrapper<MediaContent>()
+                    .eq("status", "PENDING"));
+        stringLongMap.put("PENDING", Math.max(pendingCount, stringLongMap.getOrDefault("PENDING", 0L)));
+        return stringLongMap;
     }
 
 }
