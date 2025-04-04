@@ -1,1 +1,0 @@
-![hi](https://bbs.bupt.site/shadiao/shadiao/1743778987646-e70c72d2-8f80-43da-bddd-274a1f014210.jpeg)
