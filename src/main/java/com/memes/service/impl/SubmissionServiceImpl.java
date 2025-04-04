@@ -5,8 +5,7 @@ import static com.google.common.collect.Sets.union;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -80,68 +79,81 @@ public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submiss
     }
 
     @Override
-    public List<Submission> list(Integer querySize, Long lastId, String date) {
-        // 主查询构建
-        LambdaQueryWrapper<Submission> queryWrapper = new LambdaQueryWrapper<>();
-        if (lastId != null && lastId > 0) {
-            queryWrapper.lt(Submission::getId, lastId);
-        }
-        if (StringUtils.isNotEmpty(date)) {
-            LocalDateTime startTime = TimeUtil.convertYMDToLocalDateTime(date);
-            LocalDateTime endTime = startTime.plusDays(1);
-            queryWrapper.between(Submission::getCreatedAt, startTime, endTime);
-        }
-        queryWrapper.orderByDesc(Submission::getId);
+    public List<Submission> list(Integer querySize, Long lastId, String date, boolean random) {
+        // 参数验证精简
+        Preconditions
+            .checkArgument(
+                querySize != null && querySize > 0 && querySize < 50,
+                AppException.invalidParam("querySize must be between 1 and 50"));
 
-        // 执行主查询
-        Page<Submission> submissionPage = submissionMapper.selectPage(new Page<>(1, querySize), queryWrapper);
-        List<Submission> submissions = submissionPage.getRecords();
+        // 主查询逻辑
+        List<Submission> submissions = random ? getRandomSubmissions(querySize) : queryPaginatedSubmissions(querySize, lastId, date);
 
-        // 如果没有记录，直接返回
         if (submissions.isEmpty()) {
             return submissions;
         }
 
-        // 收集所有媒体内容ID，一次性查询
-        Set<Long> allMediaIds = submissions
+        // 媒体内容处理
+        populateMediaContents(submissions);
+
+        return submissions;
+    }
+
+    private List<Submission> queryPaginatedSubmissions(Integer querySize, Long lastId, String date) {
+        LambdaQueryWrapper<Submission> queryWrapper = new LambdaQueryWrapper<>();
+
+        if (lastId != null && lastId > 0) {
+            queryWrapper.lt(Submission::getId, lastId);
+        }
+
+        if (StringUtils.isNotEmpty(date)) {
+            LocalDateTime startTime = TimeUtil.convertYMDToLocalDateTime(date);
+            queryWrapper.between(Submission::getCreatedAt, startTime, startTime.plusDays(1));
+        }
+
+        queryWrapper.orderByDesc(Submission::getId);
+        return submissionMapper.selectPage(new Page<>(1, querySize), queryWrapper).getRecords();
+    }
+
+    private void populateMediaContents(List<Submission> submissions) {
+        Set<Long> mediaIds = submissions
             .stream()
             .flatMap(s -> s.getMediaContentIdList().stream())
             .collect(Collectors.toSet());
 
-        // 如果没有媒体ID，则直接返回
-        if (allMediaIds.isEmpty()) {
-            return List.of();
+        if (mediaIds.isEmpty()) {
+            return;
         }
 
-        // 一次性查询所有媒体内容
-        QueryWrapper<MediaContent> wrapper = new QueryWrapper<>();
-        wrapper.in("id", allMediaIds);
-        wrapper.select("id", "data_type", "data_content", "user_id", "created_at", "updated_at");
-        List<MediaContent> allMediaContents = mediaMapper.selectList(wrapper);
+        Map<Long, MediaContent> mediaMap = fetchMediaContents(mediaIds);
 
-        // 构建媒体内容的Map，便于快速查找
-        Map<Long, MediaContent> mediaContentMap = allMediaContents
+        // 使用并行流替代虚拟线程，除非确实需要更轻量级的线程
+        submissions.parallelStream().forEach(submission -> {
+            List<MediaContent> submissionMedias = submission
+                .getMediaContentIdList()
+                .stream()
+                .map(mediaMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+            submission.setMediaContentList(submissionMedias);
+        });
+    }
+
+    private Map<Long, MediaContent> fetchMediaContents(Set<Long> mediaIds) {
+        // 使用LambdaQueryWrapper更简洁
+        return mediaMapper
+            .selectList(
+                new LambdaQueryWrapper<MediaContent>()
+                    .in(MediaContent::getId, mediaIds)
+                    .select(
+                        MediaContent::getId,
+                        MediaContent::getDataType,
+                        MediaContent::getDataContent,
+                        MediaContent::getUserId,
+                        MediaContent::getCreatedAt,
+                        MediaContent::getUpdatedAt))
             .stream()
-            .collect(Collectors.toMap(MediaContent::getId, mc -> mc));
-
-        // 使用虚拟线程并行处理每个提交
-        List<CompletableFuture<Void>> futures = submissions
-            .stream()
-            .map(submission -> CompletableFuture.runAsync(() -> {
-                List<MediaContent> submissionMedias = submission
-                    .getMediaContentIdList()
-                    .stream()
-                    .map(mediaContentMap::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-                submission.setMediaContentList(submissionMedias);
-            }, Executors.newVirtualThreadPerTaskExecutor()))
-            .toList();
-
-        // 等待所有任务完成
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
-        return submissions;
+            .collect(Collectors.toMap(MediaContent::getId, Function.identity()));
     }
 
     @Override
@@ -196,6 +208,29 @@ public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submiss
         Submission byId = super.getById(id);
         fillMediaContent(byId);
         return byId;
+    }
+
+    public List<Submission> getRandomSubmissions(int num) {
+        // 获取所有记录的数量
+        long totalRecords = count();
+        if (totalRecords == 0 || num <= 0) {
+            return List.of(); // 返回空列表
+        }
+        // 计算需要查询的记录数
+        int recordsToFetch = Math.min(num, (int) totalRecords);
+        // 创建随机ID集合
+        Random random = new Random();
+        List<Long> randomIds = new ArrayList<>();
+        while (randomIds.size() < recordsToFetch) {
+            long randomId = (long) (random.nextDouble() * totalRecords + 1);
+            if (!randomIds.contains(randomId)) {
+                randomIds.add(randomId);
+            }
+        }
+        // 使用QueryWrapper查询这些随机ID
+        QueryWrapper<Submission> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("id", randomIds);
+        return list(queryWrapper);
     }
 
 }

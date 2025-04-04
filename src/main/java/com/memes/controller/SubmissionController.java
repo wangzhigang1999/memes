@@ -24,8 +24,9 @@ public class SubmissionController {
     }
 
     @GetMapping
-    public List<Submission> list(@RequestParam(defaultValue = "20") Integer pageSize, Long lastId, String date) {
-        return submissionService.list(pageSize, lastId, date);
+    public List<Submission> list(@RequestParam(defaultValue = "20") Integer pageSize, Long lastId, String date,
+        @RequestParam(defaultValue = "false") boolean random) {
+        return submissionService.list(pageSize, lastId, date, random);
     }
 
     @AuthRequired

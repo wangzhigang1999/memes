@@ -11,7 +11,7 @@ public interface SubmissionService extends IService<Submission> {
 
     Submission updateSubmissionCount(Long id, boolean isLike);
 
-    List<Submission> list(Integer pageSize, Long lastId, String date);
+    List<Submission> list(Integer pageSize, Long lastId, String date, boolean random);
 
     boolean pinSubmission(Long id);
 
