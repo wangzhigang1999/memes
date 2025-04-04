@@ -15,6 +15,10 @@ public class AppException extends RuntimeException {
         this.errorType = ErrorType.INTERNAL_ERROR;
     }
 
+    public static AppException fatal(String s) {
+        return new AppException(ErrorType.INTERNAL_ERROR, s);
+    }
+
     public enum ErrorType {
         INVALID_PARAM("The param %s is invalid.", 400), RESOURCE_NOT_FOUND("The resource %s was not found.",
             404), UNAUTHORIZED("Unauthorized access. %s",
