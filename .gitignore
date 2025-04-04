@@ -1,10 +1,10 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
+# Maven
+/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
+!**/src/main/**/target/**
 !**/src/test/**/target/
 
-### STS ###
+# STS (Spring Tool Suite)
 .apt_generated
 .classpath
 .factorypath
@@ -13,30 +13,32 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# IntelliJ IDEA
+/.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
+/build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# VS Code
+/.vscode/
 /daily.html
 /test.md
 /.VSCodeCounter/
 
-memes-img
+# Custom Files and Directories
+memes-img/
 monitor.json
-/benckmark.py
+benckmark.py
 memes.sh
 /memes/
+/target/spotless-index
