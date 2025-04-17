@@ -74,7 +74,8 @@ public class AiReviewer {
         * 信息不足，无法确定是否符合标准的情况。
         * 图片内容存在争议，难以做出明确判断的情况。
         * 需要结合特定背景知识才能判断的情况。
-        6. **输出格式**： 你的输出必须是json格式，只能包含下面的内容 ：{
+        6. **输出格式**： 你的输出必须是json格式，只能包含下面的内容:
+        {
         "mediaDescription": "一只金毛在草地上奔跑，阳光明媚，画面色彩鲜艳，给人一种活力四射的感觉。",
         "outcome": "APPROVED, REJECTED, FLAGGED"
         "failureReason": ""
