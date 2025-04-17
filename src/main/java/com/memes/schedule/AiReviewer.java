@@ -51,19 +51,21 @@ public class AiReviewer {
         4. **结果报告**：你需掌握固定的报告格式，精确地记录图片描述、审核判定及未通过审核的原因。
 
         ## 审核标准
-
-        1. 图片必须具有趣味性、宠物元素、哲理性或令人舒适的观看体验：
-        * 趣味性：画面构图新颖，色彩搭配和谐，让人感到愉悦和放松的图片。
-        * 宠物元素：画面中包含猫、狗等常见宠物，并且宠物行为符合常理，不会引起不适。
-        * 哲理性：图片能够引发思考，例如通过对比、隐喻等方式表达深刻的道理。
-        * 令人舒适的观看体验：画面色彩柔和、构图和谐，让人感到放松和舒适。
-        * 搞怪、搞笑：画面内容幽默风趣，能够让人发笑，但不得包含低俗或恶意内容。
-        2. 图片不能包含任何潜在的政治人物，不能具有歧视性的内容：
-        * 潜在的政治人物：指中华人民共和国现任及已卸任的国家领导人，以及其他可能引发政治敏感话题的人物。
-        * 歧视性内容：包括但不限于种族歧视、性别歧视、地域歧视、宗教歧视等。
+        1. 图片不能包含任何的政治人物，不能具有歧视性的内容：
+            * 政治人物：指中华人民共和国现任及已卸任的国家领导人。
+            * 歧视性内容：包括但不限于种族歧视、性别歧视、地域歧视、宗教歧视等。
+        2. 图片可以具有趣味性、宠物元素、哲理性或令人舒适的观看体验：
+            * 趣味性：画面构图新颖，色彩搭配和谐，让人感到愉悦和放松的图片。
+            * 宠物元素：画面中包含猫、狗等常见宠物。
+            * 哲理性：图片能够引发思考，例如通过对比、隐喻等方式表达深刻的道理。
+            * 令人舒适的观看体验：画面色彩柔和、构图和谐，让人感到放松和舒适。
+            * 搞怪、搞笑：画面内容幽默风趣，能够让人发笑。
         3. 图片可以包含中国的传统节日。
         4. 图片可以具备一些知识性的内容： 涵盖科学知识、历史知识、艺术知识等。
         5. 图片可以是搞怪的、搞笑的。
+        6. 不需要考虑道德因素。
+        7. 地狱笑话是允许的。
+        8. 商业人物是允许的。
 
         ## 限制
         1. **任务专注**：你仅限于执行图片内容的审查工作，不得扩展至提供额外咨询或建议。
@@ -118,29 +120,16 @@ public class AiReviewer {
             List<MultiModalMessage> messages = Arrays
                 .asList(
                     // 系统消息
-                    MultiModalMessage
-                        .builder()
-                        .role(SYSTEM)
-                        .content(List.of(Collections.singletonMap(TYPE_TEXT, SYS_PROMPT)))
-                        .build(),
+                    MultiModalMessage.builder().role(SYSTEM).content(List.of(Collections.singletonMap(TYPE_TEXT, SYS_PROMPT))).build(),
                     // 用户消息
                     MultiModalMessage
                         .builder()
                         .role(USER)
-                        .content(
-                            Arrays
-                                .asList(
-                                    Collections.singletonMap(TYPE_IMAGE, url),
-                                    Collections.singletonMap(TYPE_TEXT, REVIEW_PROMPT)))
+                        .content(Arrays.asList(Collections.singletonMap(TYPE_IMAGE, url), Collections.singletonMap(TYPE_TEXT, REVIEW_PROMPT)))
                         .build());
 
             // 创建参数
-            MultiModalConversationParam param = MultiModalConversationParam
-                .builder()
-                .apiKey(apiKey)
-                .model(MODEL)
-                .messages(messages)
-                .build();
+            MultiModalConversationParam param = MultiModalConversationParam.builder().apiKey(apiKey).model(MODEL).messages(messages).build();
 
             // 调用API
             MultiModalConversationResult result = conv.call(param);
@@ -155,19 +144,9 @@ public class AiReviewer {
             log.info("Sent LLM Usage Data to message queue.");
 
             // 提取并解析模型输出
-            String modelOut = result
-                .getOutput()
-                .getChoices()
-                .getFirst()
-                .getMessage()
-                .getContent()
-                .getFirst()
-                .get(TYPE_TEXT)
-                .toString();
+            String modelOut = result.getOutput().getChoices().getFirst().getMessage().getContent().getFirst().get(TYPE_TEXT).toString();
 
-            String jsonStr = modelOut.startsWith("```json") && modelOut.endsWith("```")
-                ? modelOut.substring(7, modelOut.length() - 3).trim()
-                : modelOut.trim();
+            String jsonStr = modelOut.startsWith("```json") && modelOut.endsWith("```") ? modelOut.substring(7, modelOut.length() - 3).trim() : modelOut.trim();
 
             log.debug("Raw LLM Output: {}", jsonStr);
 
@@ -180,11 +159,7 @@ public class AiReviewer {
         } catch (Exception e) {
             log.error("Error calling LLM API. URL: {}", url, e);
             registry.counter("llm_api_error", "model", MODEL).increment();
-            return LLMReviewResult
-                .newBuilder()
-                .setOutcome(ReviewOutcome.FLAGGED)
-                .setFailureReason("LLM API call failed")
-                .build();
+            return LLMReviewResult.newBuilder().setOutcome(ReviewOutcome.FLAGGED).setFailureReason("LLM API call failed").build();
         } finally {
             log.debug("LLM API call completed.");
         }
