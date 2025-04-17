@@ -11,9 +11,20 @@ management:
     metrics:
       export:
         enabled: false
+
 logging:
+  config: classpath:logback-spring.xml
+  file:
+    name: logs/${spring.application.name}.log
   level:
-    root: info
+    root: INFO
+    org:
+      springframework: INFO
+      hibernate: WARN
+    com:
+      memes:
+        schedule:
+          AiReviewer: debug
 
 spring:
   datasource:
