@@ -153,7 +153,6 @@ public class AiReviewer {
             // 解析结果
             LLMReviewResult.Builder builder = LLMReviewResult.newBuilder();
             JsonFormat.parser().merge(jsonStr, builder);
-            log.debug("LLM Review Result Builder: {}", builder.toString());
             return builder.build();
 
         } catch (Exception e) {
