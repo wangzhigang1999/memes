@@ -138,7 +138,7 @@ public class AiReviewer {
             Status status = e.getStatus();
             if (status.getStatusCode() == 400) {
                 registry.counter("llm_inappropriate_content", "model", MODEL).increment();
-                return LLMReviewResult.newBuilder().setOutcome(ReviewOutcome.FLAGGED).setFailureReason(e.getMessage()).build();
+                return LLMReviewResult.newBuilder().setOutcome(ReviewOutcome.FLAGGED).setFailureReason(e.getStatus().getMessage()).build();
             }
             throw e;
         } catch (Exception e) {
