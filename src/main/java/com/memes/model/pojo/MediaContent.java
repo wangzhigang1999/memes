@@ -54,6 +54,8 @@ public class MediaContent {
 
     private LocalDateTime updatedAt;
 
+    private String sharpReview;
+
     public enum DataType {
         IMAGE, VIDEO, MARKDOWN
     }

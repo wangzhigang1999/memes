@@ -1,6 +1,7 @@
 package com.memes.service.impl;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -41,6 +42,25 @@ public class MediaContentServiceImpl extends ServiceImpl<MediaMapper, MediaConte
         QueryWrapper<MediaContent> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", MediaContent.ContentStatus.PENDING);
         queryWrapper.eq("llm_moderation_status", MediaContent.AiModerationStatus.PENDING);
+        // order by time asc
+        queryWrapper.orderByAsc("created_at");
+        // limit
+        queryWrapper.last("limit %d".formatted(limit));
+        log.debug("queryWrapper: {}", queryWrapper);
+        return this.mediaMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<MediaContent> listNoSharpReviewMediaContent(Integer limit) {
+        QueryWrapper<MediaContent> queryWrapper = new QueryWrapper<>();
+        // 过去 3 天的内容
+        queryWrapper.ge("created_at", LocalDateTime.now().minusDays(7));
+        // llm_description 不为空
+        queryWrapper.isNotNull("llm_description");
+        // sharp_review 为空
+        queryWrapper.isNull("sharp_review");
+        // not rejected
+        queryWrapper.ne("status", MediaContent.ContentStatus.REJECTED);
         // order by time asc
         queryWrapper.orderByAsc("created_at");
         // limit

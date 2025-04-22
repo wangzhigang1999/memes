@@ -10,6 +10,8 @@ public interface MediaContentService extends IService<MediaContent> {
 
     List<MediaContent> listPendingMediaContent(Integer limit);
 
+    List<MediaContent> listNoSharpReviewMediaContent(Integer limit);
+
     boolean markMediaStatus(Long id, MediaContent.ContentStatus status);
 
     int batchMarkMediaStatus(List<Long> ids, MediaContent.ContentStatus status);
