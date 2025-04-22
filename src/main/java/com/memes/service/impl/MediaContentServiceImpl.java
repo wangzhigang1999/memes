@@ -60,7 +60,7 @@ public class MediaContentServiceImpl extends ServiceImpl<MediaMapper, MediaConte
         // sharp_review 为空
         queryWrapper.isNull("sharp_review");
         // not rejected
-        queryWrapper.ne("status", MediaContent.ContentStatus.REJECTED);
+        queryWrapper.eq("status", MediaContent.ContentStatus.APPROVED);
         // order by time asc
         queryWrapper.orderByDesc("id");
         // limit
