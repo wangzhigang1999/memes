@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Lazy(value = false)
 @ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
 public class SharpReview {
 
@@ -74,6 +76,7 @@ public class SharpReview {
 
     private void startReview() {
         reviewExecutor.submit(() -> {
+            log.info("Starting sharp reviewer...");
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     List<MediaContent> mediaContents = mediaContentService.listNoSharpReviewMediaContent(100);

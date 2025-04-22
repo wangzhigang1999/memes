@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
@@ -38,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Lazy(value = false)
 @ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
 public class AiReviewer {
 
@@ -84,6 +86,7 @@ public class AiReviewer {
 
     private void startReview() {
         reviewExecutor.submit(() -> {
+            log.info("Starting AI reviewer...");
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     List<MediaContent> mediaContents = mediaContentService.listPendingMediaContent(100);
