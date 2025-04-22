@@ -62,7 +62,7 @@ public class MediaContentServiceImpl extends ServiceImpl<MediaMapper, MediaConte
         // not rejected
         queryWrapper.ne("status", MediaContent.ContentStatus.REJECTED);
         // order by time asc
-        queryWrapper.orderByAsc("created_at");
+        queryWrapper.orderByDesc("id");
         // limit
         queryWrapper.last("limit %d".formatted(limit));
         log.debug("queryWrapper: {}", queryWrapper);

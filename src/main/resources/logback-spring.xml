@@ -90,6 +90,9 @@
     <logger name="com.memes.schedule.AiReviewer" level="DEBUG" additivity="false">
         <appender-ref ref="BUSINESS_FILE" />
     </logger>
+    <logger name="com.memes.schedule.SharpReview" level="DEBUG" additivity="false">
+        <appender-ref ref="BUSINESS_FILE" />
+    </logger>
 
     <!-- 第三方库日志级别控制 -->
     <logger name="org.springframework" level="INFO"/>
