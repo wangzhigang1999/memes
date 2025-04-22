@@ -8,11 +8,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
@@ -62,13 +63,18 @@ public class AiReviewer {
     @PostConstruct
     public void init() throws IOException {
         SYS_PROMPT = StreamUtils.copyToString(promptResource.getInputStream(), StandardCharsets.UTF_8);
+        startReview();
     }
 
     @Value("${dashscope.apiKey}")
     private String apiKey;
 
     private final MediaContentService mediaContentService;
-
+    private final ExecutorService reviewExecutor = Executors.newSingleThreadExecutor(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("ai-review-thread");
+        return thread;
+    });
     private final MultiModalConversation conv = new MultiModalConversation();
 
     public AiReviewer(MeterRegistry registry, MediaContentService mediaContentService) {
@@ -76,14 +82,25 @@ public class AiReviewer {
         this.mediaContentService = mediaContentService;
     }
 
-    @Scheduled(fixedDelay = 1000)
-    public void run() {
-        List<MediaContent> mediaContents = mediaContentService.listPendingMediaContent(100);
-        mediaContents
-            .stream()
-            .filter(Objects::nonNull)
-            .filter(mediaContent -> mediaContent.getDataType() == MediaContent.DataType.IMAGE)
-            .forEach(this::processMediaContentReview);
+    private void startReview() {
+        reviewExecutor.submit(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    List<MediaContent> mediaContents = mediaContentService.listPendingMediaContent(100);
+                    mediaContents
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .filter(mediaContent -> mediaContent.getDataType() == MediaContent.DataType.IMAGE)
+                        .forEach(this::processMediaContentReview);
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    log.error("Error in review process", e);
+                }
+            }
+        });
     }
 
     /**

@@ -5,11 +5,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
@@ -30,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod")
 public class SharpReview {
 
     final MeterRegistry registry;
@@ -51,26 +54,43 @@ public class SharpReview {
             .role(SYSTEM)
             .content(SYS_PROMPT)
             .build();
+        startReview();
     }
 
     @Value("${dashscope.apiKey}")
     private String apiKey;
 
     private final MediaContentService mediaContentService;
+    private final ExecutorService reviewExecutor = Executors.newSingleThreadExecutor(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("sharp-review-thread");
+        return thread;
+    });
 
     public SharpReview(MeterRegistry registry, MediaContentService mediaContentService) {
         this.registry = registry;
         this.mediaContentService = mediaContentService;
     }
 
-    @Scheduled(fixedDelay = 1000)
-    public void run() {
-        List<MediaContent> mediaContents = mediaContentService.listNoSharpReviewMediaContent(100);
-        mediaContents
-            .stream()
-            .filter(Objects::nonNull)
-            .filter(mediaContent -> StringUtils.isNotEmpty(mediaContent.getLlmDescription()))
-            .forEach(this::sharpReview);
+    private void startReview() {
+        reviewExecutor.submit(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    List<MediaContent> mediaContents = mediaContentService.listNoSharpReviewMediaContent(100);
+                    mediaContents
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .filter(mediaContent -> StringUtils.isNotEmpty(mediaContent.getLlmDescription()))
+                        .forEach(this::sharpReview);
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    log.error("Error in sharp review process", e);
+                }
+            }
+        });
     }
 
     /**
