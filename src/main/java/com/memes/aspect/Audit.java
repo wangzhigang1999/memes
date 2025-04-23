@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class Audit {
-    private static final String INSTANCE_UUID = UUID.randomUUID().toString();
+    public static final String INSTANCE_UUID = UUID.randomUUID().toString();
     private static final String ANONYMOUS = "anonymous";
     private static final String UUID_HEADER = "uuid";
     private static final ConcurrentHashMap<String, Timer> TIMER_CACHE = new ConcurrentHashMap<>();

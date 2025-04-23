@@ -10,6 +10,8 @@ import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCusto
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.memes.aspect.Audit;
+
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -36,6 +38,7 @@ public class MetricsConfig {
         List<Tag> tags = new LinkedList<>();
         tags.add(Tag.of("hostname", hostname));
         tags.add(Tag.of("applicationName", applicationName));
+        tags.add(Tag.of("instance", Audit.INSTANCE_UUID));
         return registry -> registry.config().commonTags(tags);
     }
 }
