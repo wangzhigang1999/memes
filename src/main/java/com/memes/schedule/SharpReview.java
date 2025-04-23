@@ -79,7 +79,7 @@ public class SharpReview {
             log.info("Starting sharp reviewer...");
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    List<MediaContent> mediaContents = mediaContentService.listNoSharpReviewMediaContent(100);
+                    List<MediaContent> mediaContents = mediaContentService.listNoSharpReviewMediaContent(5);
                     mediaContents
                         .stream()
                         .filter(Objects::nonNull)
