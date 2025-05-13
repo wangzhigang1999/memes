@@ -193,12 +193,30 @@ public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submiss
         return submissions;
     }
 
+    @Override
+    public boolean removeById(Serializable id) {
+        Submission submission = getById(id);
+        List<Long> mediaContentIdList = submission.getMediaContentIdList();
+        mediaContentIdList.forEach(mediaContentId -> {
+            MediaContent mediaContent = mediaMapper.selectById(mediaContentId);
+            mediaContent.setStatus(MediaContent.ContentStatus.REJECTED);
+            mediaContent.setRejectionReason("Reject By Admin");
+            mediaMapper.updateById(mediaContent);
+        });
+        return super.removeById(id);
+    }
+
     private void fillMediaContent(Submission submission) {
+        if (submission == null) {
+            log.error("submission is null");
+            return;
+        }
         List<Long> mediaContentIdList = submission.getMediaContentIdList();
         QueryWrapper<MediaContent> wrapper = new QueryWrapper<>();
         wrapper.in("id", mediaContentIdList);
         // ignore llm moderation status
         wrapper.select("id", "data_type", "data_content", "user_id", "created_at", "updated_at");
+        wrapper.eq("status", MediaContent.ContentStatus.APPROVED);
         List<MediaContent> mediaContents = mediaMapper.selectList(wrapper);
         submission.setMediaContentList(mediaContents);
     }

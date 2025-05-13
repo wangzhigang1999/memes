@@ -16,7 +16,9 @@ import com.memes.service.MediaContentService;
 import com.memes.util.Preconditions;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @CrossOrigin(origins = "*")
 
 @RestController
@@ -79,6 +81,11 @@ public class MediaContentController {
     public MediaContent getMedia(@PathVariable Long id) {
         MediaContent mediaContent = mediaContentService.getById(id);
         if (mediaContent == null) {
+            throw AppException.resourceNotFound(String.valueOf(id));
+        }
+        if (mediaContent.getStatus().equals(MediaContent.ContentStatus.REJECTED)
+            || mediaContent.getStatus().equals(MediaContent.ContentStatus.DELETED)) {
+            log.warn("try to get rejected or deleted media content, id is {},status is {}", id, mediaContent.getStatus());
             throw AppException.resourceNotFound(String.valueOf(id));
         }
         return mediaContent;

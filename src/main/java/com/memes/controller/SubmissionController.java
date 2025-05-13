@@ -18,11 +18,6 @@ public class SubmissionController {
 
     private final SubmissionService submissionService;
 
-    @GetMapping("/{id}")
-    public Submission getById(@PathVariable Long id) {
-        return submissionService.getById(id);
-    }
-
     @GetMapping
     public List<Submission> list(@RequestParam(defaultValue = "20") Integer pageSize, Long lastId, String date,
         @RequestParam(defaultValue = "false") boolean random) {
