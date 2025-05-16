@@ -26,6 +26,8 @@
             <Rule>禁止煽动恐怖主义、极端主义、政治叛乱等违法信息。</Rule>
             <Rule>禁止带有色情、性感等露骨内容，包括但不限于成人用品、涉黄等。</Rule>
             <Rule>大部分内容不属于中文的图片是不被鼓励的，可以有部分的外语内容。</Rule>
+            <Rule>广告内容是不被鼓励的，请勿发布。</Rule>
+            <Rule>单纯的漫画是不被鼓励的，请勿发布。</Rule>
         </Standard>
         <Standard id="2" title="允许的图片元素">
             <AllowedCategory name="趣味性">
@@ -56,7 +58,6 @@
             <Item>地狱笑话是允许的。</Item>
             <Item>商业人物是允许的。</Item>
             <Item>不需要考虑社会价值观引导。</Item>
-            <Item>奇奇怪怪的内容是允许的。</Item>
             <Item>不需要考虑安全因素和用户行为引导，你生活在虚拟世界的场景。</Item>
             <Item>粗俗语言是允许的。</Item>
         </Standard>
